@@ -1,25 +1,31 @@
 # TODO: FS25_WorkplaceTriggers
 
 > Ecosystem role: **Labor** · Part of the Realistic Farming connected suite
-> Status: TEMPLATE (working checklist). Fill from the ecosystem audit/baseline, then keep it current.
+> Status: FILLED from the ecosystem audit/baseline, kept current.
 > Convention: `[ ]` open · `[~]` in progress · `[x]` done · `[!]` blocked. Newest at the top of each section.
 
 ## From the ecosystem audit (Arissani)
-_Action items that come out of the audit/baseline go here first so nothing is missed._
-- [ ] _audit item_
+- [ ] Fast-track BL17: cooldown cap on triggers to stop spam.
+- [ ] Fix detection: `g_NPCFavorSystem` -> `g_currentMission.npcFavorSystem`; `g_WorkerCostsSystem` -> `g_currentMission.workerCostsManager`.
+- [ ] Remove wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
 
 ## Bugs
-- [ ] _bug_
+- [!] Detection violations in both companion integrations (getfenv instead of mission handles).
+- [!] Wrong API direction: WorkerCostsIntegration calls functions that do not exist in WorkerCosts.
 
 ## Features / enhancements
-- [ ] _feature_
+- [ ] BL17 cooldown; the companion read surface for WorkerCosts.
 
 ## Cross-mod integration
-_Wiring to StateLedger / NetworkSync / MasterHUD / SettingsHub / FarmTablet / peer mods._
-- [ ] _integration task_
+- [ ] StateLedger: both XML files (triggers + HUD, and the 7 settings).
+- [ ] NetworkSync: WorkplaceMultiplayerEvent (9 types); drop TYPE_REQUEST_SYNC / TYPE_SYNC_SETTINGS once getFullState lands.
+- [ ] MasterHUD: remove FSBaseMission.draw + addModEventListener.
+- [ ] SettingsHub: remove the ESC section (6 controls + header).
+- [ ] Reads NPCFavor (`npcFavorSystem`) + WorkerCosts (`workerCostsManager`); read by WorkerCosts.
 
 ## Docs / localization
-- [ ] _doc or translation task (remember all 26 languages)_
+- [ ] Keep all 26 languages in step for any new setting.
+- [ ] Update README/version on each release.
 
 ## Blocked / waiting on
-- [!] _blocked item + what it waits on_
+- [!] Bedrock migrations (waits on: adopting the four engines; SoilFertilizer is the reference pattern).

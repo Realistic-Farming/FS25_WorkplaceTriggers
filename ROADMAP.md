@@ -1,7 +1,7 @@
 # Roadmap: FS25_WorkplaceTriggers
 
 > Ecosystem role: **Labor** · Part of the Realistic Farming connected suite
-> Status: TEMPLATE (complete after the ecosystem audit/baseline).
+> Status: FILLED from the ecosystem audit/baseline.
 > Forward-looking only. Shipped history lives in CHANGELOG.md and the releases.
 
 ## How to use this file
@@ -10,23 +10,26 @@
 - Keep it honest: near-term is committed, mid-term is intended, long-term is aspirational.
 
 ## Current baseline
-- Version at baseline: _modDesc version_
-- Audit reference: _link to audit doc / CLAUDE-LOG entry_
-- Baseline date: _..._
+- Version at baseline: v0.1.0.0
+- Audit reference: ecosystem-dev-tracking Point 1-5 (FS25_WorkplaceTriggers, 2026-06-30)
+- Baseline date: 2026-06-30
 
 ## Near-term (next release cycle)
-- [ ] _item_
+- [ ] Fast-track BL17: add a cooldown cap on triggers to stop spam.
+- [ ] Fix the detection violations: NPCFavorIntegration and WorkerCostsIntegration must use `g_currentMission.npcFavorSystem` and `g_currentMission.workerCostsManager`, not getfenv globals.
+- [ ] Remove the wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
 
 ## Mid-term (this season)
-- [ ] _item_
+- [ ] Bedrock migration: StateLedger (both XML files), NetworkSync (WorkplaceMultiplayerEvent), MasterHUD (remove draw hook + addModEventListener), SettingsHub (remove the ESC section).
+- [ ] Expose the companion read surface WorkerCosts consumes.
 
 ## Long-term / aspirational
-- [ ] _item_
+- [ ] Richer workplace types and job variety.
 
 ## Cross-mod / ecosystem dependencies
-_Roadmap items that depend on a peer mod or a core-API bedrock mod._
-- [ ] _item (blocks on: which mod / which bedrock engine)_
+- [ ] Reads NPCFavor (`npcFavorSystem`) and WorkerCosts (`workerCostsManager`).
+- [ ] Read by WorkerCosts (via the WorkplaceTriggers companion API).
+- [ ] All four bedrock migrations (blocks on: StateLedger, NetworkSync, MasterHUD, SettingsHub).
 
 ## Deferred / parked
-_Ideas intentionally not scheduled, each with a one-line reason._
-- _..._
+- TYPE_REQUEST_SYNC / TYPE_SYNC_SETTINGS join handshake: parked for removal once NetworkSync getFullState replaces it.

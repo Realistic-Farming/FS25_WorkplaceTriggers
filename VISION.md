@@ -1,44 +1,40 @@
 # Vision: FS25_WorkplaceTriggers
 
 > Ecosystem role: **Labor** · Part of the Realistic Farming connected suite
-> Status: TEMPLATE (complete after the ecosystem audit/baseline). Blanks are not decisions.
-> Last updated: _fill on first edit_
-
-This is a scaffold. It is intentionally empty so that after Arissani's ecosystem
-audit/baseline we can fill it in without missing anything. Do not delete sections;
-fill them or mark them "N/A" with a one-line reason.
+> Status: FILLED from the ecosystem audit (Point 1-5, ecosystem-map, notes).
+> Last updated: 2026-07-08
 
 ## 1. One-line purpose
-_What is this mod, in a single sentence a player would understand? Fill after audit._
+Off-farm work: place workplace triggers at locations around the map so you or your workers can take paid jobs away from the farm, tying labour and NPCs into the wider world.
 
 ## 2. Problem it solves
-_The gameplay or realism gap this mod exists to close._
+FS25 income is on-farm only; there is no loop for working elsewhere. WorkplaceTriggers adds trigger-based off-farm jobs that pay, giving the labour and NPC systems somewhere to plug into beyond the field.
 
 ## 3. Design pillars
-_Three to five non-negotiable principles that guide every feature decision._
-- _pillar 1_
-- _pillar 2_
-- _pillar 3_
+- **Server-authoritative triggers.** Trigger state and job payouts are server-owned and synced.
+- **Correct detection.** Peer mods are found via `g_currentMission` handles, never getfenv globals.
+- **Correct API direction.** WorkplaceTriggers is READ by WorkerCosts; it does not call into WorkerCosts. It never invents peer functions.
+- **Labour and NPC aware.** It reads NPCFavor and WorkerCosts to place jobs in context.
 
 ## 4. Role in the ecosystem
-_How this mod fits the connected suite: what it depends on, what depends on it._
-- Public handle on `g_currentMission.???`: _confirm from source during audit_
-- Reads from (peer mods this consumes): _..._
-- Read by (peer mods / FarmTablet apps that consume this): _..._
-- Core-API registration status:
-  - StateLedger (save/load): _yes/no + module name_
-  - NetworkSync (MP state): _yes/no + channel_
-  - MasterHUD (overlays): _yes/no_
-  - SettingsHub (admin settings): _yes/no_
+- Public handle on `g_currentMission.workplaceTriggers` (the `g_WorkplaceSystem` getfenv export is the access-pattern violation, replaced by the mission handle).
+- Reads from (consumes): NPCFavor (`g_currentMission.npcFavorSystem`) and WorkerCosts (`g_currentMission.workerCostsManager`). Both detections must move off getfenv to the mission handle.
+- Read by (consumers): WorkerCosts (through the WorkplaceTriggers companion read surface), FarmTablet.
+- Core-API registration status (specced in Point 1-5, not yet wired):
+  - StateLedger (save/load): planned, replacing FS25_WorkplaceTriggers.xml (triggers + HUD) and workplace_triggers_settings.xml (7 settings); removes the FSCareerMissionInfo save hook.
+  - NetworkSync (MP state): planned, replacing WorkplaceMultiplayerEvent (9 types); TYPE_REQUEST_SYNC / TYPE_SYNC_SETTINGS become redundant once getFullState delivers the join snapshot.
+  - MasterHUD (overlays): planned, removing the FSBaseMission.draw hook + addModEventListener.
+  - SettingsHub (admin settings): planned, replacing the full ESC-menu section (6 controls + header) from WorkplaceSettingsIntegration.
 
 ## 5. Explicit non-goals
-_What this mod will deliberately NOT do (scope guardrails)._
-- _non-goal 1_
-- _non-goal 2_
+- Does not call WorkerCosts. The old WorkerCostsIntegration calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome) do not exist in WorkerCosts and are removed. Data flows WorkerCosts reads WorkplaceTriggers, not the reverse.
+- No getfenv-based peer detection.
 
 ## 6. Success criteria
-_How we know the vision is being met (player-facing and technical)._
+- Off-farm jobs pay out correctly and stay consistent in multiplayer.
+- Peer detection uses `npcFavorSystem` and `workerCostsManager` mission handles.
+- A cooldown caps trigger spam.
 
 ## 7. Open questions for the audit
-_Things we want Arissani's audit/baseline to settle._
-- _..._
+- Confirm TYPE_REQUEST_SYNC / TYPE_SYNC_SETTINGS can be dropped once NetworkSync getFullState handles the join snapshot.
+- Confirm the companion read surface WorkerCosts needs from WorkplaceTriggers.
