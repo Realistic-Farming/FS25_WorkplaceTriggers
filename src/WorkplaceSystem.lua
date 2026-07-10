@@ -82,9 +82,24 @@ function WorkplaceSystem:onMissionLoaded()
     -- Sending REQUEST_SYNC during onMissionLoaded() is too early — the server's
     -- broadcast back may not reach the client while the stream is still opening.
     -- The update() loop sends it after a short warm-up delay.
+    -- StateLedger bridge: register (wires serialize for saves + deserialize) and force
+    -- an idempotent parse so the ledger block is delivered NOW, before we choose the
+    -- load source just below (this runs in the same phase StateLedger parses). No-op
+    -- if StateLedger is absent.
+    if WorkplaceStateLedgerBridge ~= nil then
+        WorkplaceStateLedgerBridge.register(self)
+    end
+
     if g_currentMission then
         if g_currentMission:getIsServer() then
-            self:loadFromXMLFile(g_currentMission.missionInfo)
+            -- StateLedger, when present with a stored block, is the load source of truth
+            -- for trigger definitions; FS25_WorkplaceTriggers.xml is imported only when
+            -- the ledger has no block yet (first load after install, or ledger absent).
+            if WorkplaceStateLedgerBridge ~= nil and WorkplaceStateLedgerBridge.hasLedgerState() then
+                WorkplaceStateLedgerBridge.applyState(self)
+            else
+                self:loadFromXMLFile(g_currentMission.missionInfo)
+            end
         else
             -- Arm the deferred sync. update() will fire it after SYNC_DELAY_SEC.
             self.syncPending      = true

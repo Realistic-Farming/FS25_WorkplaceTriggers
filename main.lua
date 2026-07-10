@@ -44,6 +44,7 @@ if modDirectory then
     source(modDirectory .. "src/NPCFavorIntegration.lua")
     source(modDirectory .. "src/WorkerCostsIntegration.lua")
     source(modDirectory .. "src/WorkplaceSystem.lua")
+    source(modDirectory .. "src/WorkplaceStateLedgerBridge.lua")
     source(modDirectory .. "src/WorkplaceSettingsHubBridge.lua")
     source(modDirectory .. "src/WorkplaceMasterHUDBridge.lua")
 
