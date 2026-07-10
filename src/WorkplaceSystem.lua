@@ -93,6 +93,13 @@ function WorkplaceSystem:onMissionLoaded()
             wtLog("Client: deferred trigger sync armed")
         end
     end
+
+    -- Bedrock bridges (delegate-when-present; each no-ops if its bedrock mod is
+    -- absent). Handles (g_currentMission.settingsHub / .masterHUD) are published by
+    -- the bedrock mods at Mission00.load, so they are ready by now. Registration is
+    -- guarded once by the isInitialized check at the top of this function.
+    if WorkplaceSettingsHubBridge ~= nil then WorkplaceSettingsHubBridge.register() end
+    if WorkplaceMasterHUDBridge  ~= nil then WorkplaceMasterHUDBridge.register()  end
 end
 
 -- =========================================================
