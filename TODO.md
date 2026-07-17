@@ -5,7 +5,7 @@
 > Convention: `[ ]` open · `[~]` in progress · `[x]` done · `[!]` blocked. Newest at the top of each section.
 
 ## From the ecosystem audit (Arissani)
-- [ ] Fast-track BL17: cooldown cap on triggers to stop spam.
+- [x] Fast-track BL17: cooldown cap on triggers to stop spam. DONE.
 - [ ] Fix detection: `g_NPCFavorSystem` -> `g_currentMission.npcFavorSystem`; `g_WorkerCostsSystem` -> `g_currentMission.workerCostsManager`.
 - [ ] Remove wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
 
@@ -14,7 +14,7 @@
 - [!] Wrong API direction: WorkerCostsIntegration calls functions that do not exist in WorkerCosts.
 
 ## Features / enhancements
-- [ ] BL17 cooldown; the companion read surface for WorkerCosts.
+- [~] BL17 cooldown DONE; the companion read surface for WorkerCosts still open.
 
 ## Cross-mod integration
 - [x] StateLedger: `WorkplaceTriggers_Data` bridge live (trigger definitions + HUD layout; commit c98a876, delegate-when-present, own XML kept as the safety copy, force-parseFile timing). Settings go to SettingsHub, NOT a second SL module (state-to-SL / settings-to-SettingsHub split).
