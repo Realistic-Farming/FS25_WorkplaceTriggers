@@ -145,7 +145,7 @@ function WorkplaceMultiplayerEvent:run(connection)
     elseif t == WorkplaceMultiplayerEvent.TYPE_SHIFT_CONFIRM   then self:handleShiftConfirm(sys)
     elseif t == WorkplaceMultiplayerEvent.TYPE_CREATE_TRIGGER  then self:handleCreateTrigger(sys, connection)
     elseif t == WorkplaceMultiplayerEvent.TYPE_TRIGGER_CREATED then self:handleTriggerCreated(sys)
-    elseif t == WorkplaceMultiplayerEvent.TYPE_UPDATE_TRIGGER  then self:handleUpdateTrigger(sys)
+    elseif t == WorkplaceMultiplayerEvent.TYPE_UPDATE_TRIGGER  then self:handleUpdateTrigger(sys, connection)
     elseif t == WorkplaceMultiplayerEvent.TYPE_DELETE_TRIGGER  then self:handleDeleteTrigger(sys)
     elseif t == WorkplaceMultiplayerEvent.TYPE_REQUEST_SYNC    then self:handleRequestSync(sys, connection)
     elseif t == WorkplaceMultiplayerEvent.TYPE_SYNC_SETTINGS   then self:handleSyncSettings(sys)
@@ -426,8 +426,16 @@ function WorkplaceMultiplayerEvent:handleTriggerCreated(sys)
 end
 
 -- Runs when any client edits an existing trigger's name/wage/radius.
-function WorkplaceMultiplayerEvent:handleUpdateTrigger(sys)
+function WorkplaceMultiplayerEvent:handleUpdateTrigger(sys, connection)
     if g_currentMission:getIsServer() then
+        -- ADMIN GUARD: only admin connections may edit triggers on a dedicated server
+        -- (same pattern as handleCreateTrigger; blocks non-admin clients from
+        -- changing hourlyWage or any other trigger field)
+        if connection and connection.getIsAdmin and not connection:getIsAdmin() then
+            wtLog("Server: UPDATE_TRIGGER rejected - sender is not admin")
+            return
+        end
+
         local trigger = sys.triggerManager:getTriggerById(self.triggerId)
         if trigger then
             trigger.workplaceName   = self.workplaceName
