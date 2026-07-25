@@ -10,6 +10,7 @@
 - [ ] Remove wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
 
 ## Bugs
+- [x] MP wage exploit (9f0845f): the UPDATE_TRIGGER multiplayer event now requires an admin. Closes a path where a non-admin client could push wage/trigger changes.
 - [!] Detection violations in both companion integrations (getfenv instead of mission handles).
 - [!] Wrong API direction: WorkerCostsIntegration calls functions that do not exist in WorkerCosts.
 

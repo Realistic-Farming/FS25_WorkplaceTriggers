@@ -10,12 +10,13 @@
 - Keep it honest: near-term is committed, mid-term is intended, long-term is aspirational.
 
 ## Current baseline
-- Version at baseline: v0.1.0.0
+- Version at baseline: v1.1.1.1
 - Audit reference: ecosystem-dev-tracking Point 1-5 (FS25_WorkplaceTriggers, 2026-06-30)
-- Baseline date: 2026-06-30
+- Baseline date: 2026-06-30 (updated 2026-07-25)
 
 ## Near-term (next release cycle)
 - [x] Fast-track BL17: cooldown cap on triggers to stop spam. DONE.
+- [x] MP wage exploit (9f0845f): the UPDATE_TRIGGER multiplayer event now requires an admin. DONE.
 - [ ] Fix the detection violations: NPCFavorIntegration and WorkerCostsIntegration must use `g_currentMission.npcFavorSystem` and `g_currentMission.workerCostsManager`, not getfenv globals.
 - [ ] Remove the wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
 
