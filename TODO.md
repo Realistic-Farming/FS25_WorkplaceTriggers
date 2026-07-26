@@ -13,6 +13,7 @@
 - [x] MP wage exploit (9f0845f): the UPDATE_TRIGGER multiplayer event now requires an admin. Closes a path where a non-admin client could push wage/trigger changes.
 - [!] Detection violations in both companion integrations (getfenv instead of mission handles).
 - [!] Wrong API direction: WorkerCostsIntegration calls functions that do not exist in WorkerCosts.
+- [x] WT-001 / WT-002 / WT-003: additional WorkplaceTriggers bugs fixed in 2026-07-26 bug sweep, merged to main.
 
 ## Features / enhancements
 - [~] BL17 cooldown DONE; the companion read surface for WorkerCosts still open.

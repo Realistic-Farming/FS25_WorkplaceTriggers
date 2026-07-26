@@ -19,6 +19,7 @@
 - [x] MP wage exploit (9f0845f): the UPDATE_TRIGGER multiplayer event now requires an admin. DONE.
 - [ ] Fix the detection violations: NPCFavorIntegration and WorkerCostsIntegration must use `g_currentMission.npcFavorSystem` and `g_currentMission.workerCostsManager`, not getfenv globals.
 - [ ] Remove the wrong-direction WorkerCosts calls (registerOffFarmJob / deregisterOffFarmJob / recordJobIncome); replace the `g_WorkplaceSystem` getfenv export with the mission handle.
+- [x] 2026-07-26 bug sweep: WT-001 / WT-002 / WT-003 fixed and merged to main.
 
 ## Mid-term (this season)
 - [~] Bedrock migration: StateLedger + MasterHUD + SettingsHub bridged (939f701, c98a876, delegate-when-present). NetworkSync (WorkplaceMultiplayerEvent) deferred - a money-authority-class request/response protocol (shifts pay wages server-side), needs the NS build-brief.
