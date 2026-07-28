@@ -447,7 +447,7 @@ function WTEditDialog:onClickSave()
     if self.isNew then
         local farmId = g_currentMission and g_currentMission:getFarmId() or 1
         local ok, err = pcall(function()
-            WorkplaceMultiplayerEvent.sendCreateTrigger({
+            WTNetworkSyncBridge.sendCreateTrigger({
                 workplaceName  = name,
                 hourlyWage     = self.wage,
                 triggerRadius  = self.radius,
@@ -469,7 +469,7 @@ function WTEditDialog:onClickSave()
         -- sees the updated name/wage/radius without a rejoin.
         local t = self.trigger
         if t then
-            WorkplaceMultiplayerEvent.sendUpdateTrigger(tostring(t.id), {
+            WTNetworkSyncBridge.sendUpdateTrigger(tostring(t.id), {
                 workplaceName   = name,
                 hourlyWage      = self.wage,
                 triggerRadius   = self.radius,

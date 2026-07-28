@@ -40,7 +40,7 @@ if modDirectory then
     source(modDirectory .. "src/WorkplaceSaveLoad.lua")
     source(modDirectory .. "src/WorkplaceSettings.lua")
     source(modDirectory .. "src/WorkplaceSettingsIntegration.lua")
-    source(modDirectory .. "src/WorkplaceMultiplayerEvent.lua")
+    source(modDirectory .. "src/integrations/WTNetworkSyncBridge.lua")
     source(modDirectory .. "src/NPCFavorIntegration.lua")
     source(modDirectory .. "src/WorkerCostsIntegration.lua")
     source(modDirectory .. "src/WorkplaceSystem.lua")

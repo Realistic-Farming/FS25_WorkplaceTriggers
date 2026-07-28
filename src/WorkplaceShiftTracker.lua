@@ -440,7 +440,7 @@ function WorkplaceShiftTracker:updateZoneCheck(dtSec)
             -- Clear activeTriggerId immediately so zone check stops while the
             -- penalty event travels to the server and SHIFT_CONFIRM comes back.
             self.activeTriggerId = nil
-            WorkplaceMultiplayerEvent.sendShiftEnd(true)
+            WTNetworkSyncBridge.sendShiftEnd(true)
         end
     end
 end

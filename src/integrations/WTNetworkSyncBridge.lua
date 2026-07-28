@@ -1,0 +1,453 @@
+-- =========================================================
+-- FS25 Workplace Triggers - NetworkSync bridge
+-- =========================================================
+-- Optional bridge to FS25_NetworkSync. Routes all 9 original
+-- WorkplaceMultiplayerEvent types through NetworkSync:
+--
+--   State-sync module (server->client): full trigger list +
+--   settings (wageMultiplier) + active shifts. Server marks
+--   dirty on any mutation; NetworkSync batches at 1Hz.
+--   Client join receives the full snapshot automatically.
+--
+--   Action channel (client->server): shift_start, shift_end,
+--   create_trigger, update_trigger, delete_trigger. Admin
+--   gating for trigger CRUD; farm-scoped shift actions.
+--
+-- Delegate-when-present:
+--   * NetworkSync installed -> this bridge handles all MP sync
+--   * NetworkSync absent    -> MP sync is not available (event class removed)
+-- =========================================================
+
+WTNetworkSyncBridge = {}
+
+WTNetworkSyncBridge.MODULE_ID = "WorkplaceTriggers"
+WTNetworkSyncBridge.CHANNEL   = "WorkplaceTriggers_Sync"
+WTNetworkSyncBridge.ACTION_ID = "WorkplaceTriggers_Request"
+
+WTNetworkSyncBridge.active      = false
+WTNetworkSyncBridge.stateActive = false
+WTNetworkSyncBridge._ns         = nil
+
+local function wtLog(msg)
+    print("[WorkplaceTriggers] NetworkSyncBridge: " .. tostring(msg))
+end
+
+-- =========================================================
+-- State serialization (server -> client full snapshot)
+-- =========================================================
+-- Flat array: [triggerCount, ...per trigger fields..., wageMultiplier]
+-- Schema v1.  12 fields per trigger (matches WorkplaceStateLedgerBridge.buildState).
+local function buildStateArray()
+    local arr = {}
+    local sys = g_WorkplaceSystem
+    local triggers = (sys and sys.triggerManager) and sys.triggerManager:getAllTriggers() or {}
+
+    arr[#arr + 1] = #triggers
+    for _, t in ipairs(triggers) do
+        arr[#arr + 1] = tostring(t.id or "")
+        arr[#arr + 1] = t.workplaceName or "Workplace"
+        arr[#arr + 1] = t.hourlyWage or 500
+        arr[#arr + 1] = t.triggerRadius or 4
+        arr[#arr + 1] = t.posX or 0
+        arr[#arr + 1] = t.posY or 0
+        arr[#arr + 1] = t.posZ or 0
+        arr[#arr + 1] = t.rotY or 0
+        arr[#arr + 1] = t.paySchedule or "hourly"
+        arr[#arr + 1] = t.timeMultiplier or 0
+        arr[#arr + 1] = t.endShiftOnLeave ~= false
+        arr[#arr + 1] = t.playerInside or false
+    end
+
+    -- Settings (server-authoritative wage multiplier)
+    local s = sys and sys.settings
+    arr[#arr + 1] = s and s.wageMultiplier or 1.0
+
+    return arr
+end
+
+-- =========================================================
+-- State deserialization (client applies full snapshot)
+-- =========================================================
+local function applyStateArray(arr)
+    if type(arr) ~= "table" then return end
+    local sys = g_WorkplaceSystem
+    if sys == nil or sys.triggerManager == nil then return end
+
+    local i = 1
+    local count = tonumber(arr[i]) or 0; i = i + 1
+
+    -- Clear existing triggers and rebuild from snapshot
+    sys.triggerManager:delete()
+    sys.triggerManager:initialize()
+
+    for _ = 1, count do
+        local triggerData = {
+            id              = tostring(arr[i] or ""),
+            workplaceName   = arr[i + 1] or "Workplace",
+            hourlyWage      = arr[i + 2] or 500,
+            triggerRadius   = arr[i + 3] or 4,
+            posX            = arr[i + 4] or 0,
+            posY            = arr[i + 5] or 0,
+            posZ            = arr[i + 6] or 0,
+            rotY            = arr[i + 7] or 0,
+            paySchedule     = arr[i + 8] or "hourly",
+            timeMultiplier  = arr[i + 9] or 0,
+            endShiftOnLeave = arr[i + 10] ~= false,
+            playerInside    = arr[i + 11] or false,
+        }
+        sys.triggerManager:registerTrigger(triggerData)
+        i = i + 12
+    end
+
+    -- Apply settings
+    if sys.settings then
+        sys.settings.wageMultiplier = tonumber(arr[i]) or 1.0
+    end
+
+    wtLog(string.format("Applied %d trigger(s) from NetworkSync", count))
+end
+
+-- =========================================================
+-- NetworkSync callbacks (no self; called by NetworkSync)
+-- =========================================================
+function WTNetworkSyncBridge._onWriteState()
+    return buildStateArray()
+end
+
+function WTNetworkSyncBridge._onReadState(arr)
+    applyStateArray(arr)
+end
+
+-- =========================================================
+-- Server-side action handler
+-- =========================================================
+local TRIGGER_ACTIONS = {
+    create_trigger = true,
+    update_trigger = true,
+    delete_trigger = true,
+}
+
+local function onAction(userId, args)
+    if type(args) ~= "table" then return end
+    local actionType = args[1]
+    if actionType == nil then return end
+
+    local sys = g_WorkplaceSystem
+    if sys == nil then return end
+
+    -- Trigger CRUD: admin only
+    if TRIGGER_ACTIONS[actionType] then
+        if userId ~= nil then
+            local user = g_currentMission.userManager
+                and g_currentMission.userManager:getUserByUserId(userId)
+            if user == nil or not (user.isMasterUser == true or user.isAdmin == true) then
+                wtLog("action '" .. tostring(actionType) .. "' denied: not admin")
+                return
+            end
+        end
+    end
+
+    if actionType == "shift_start" then
+        onShiftStart(sys, userId, args)
+    elseif actionType == "shift_end" then
+        onShiftEnd(sys, userId, args)
+    elseif actionType == "create_trigger" then
+        onCreateTrigger(sys, userId, args)
+    elseif actionType == "update_trigger" then
+        onUpdateTrigger(sys, userId, args)
+    elseif actionType == "delete_trigger" then
+        onDeleteTrigger(sys, userId, args)
+    else
+        return
+    end
+
+    -- Mark state dirty so the next 1Hz batch includes the change
+    if WTNetworkSyncBridge.stateActive and WTNetworkSyncBridge._ns ~= nil then
+        WTNetworkSyncBridge._ns:markDirty(WTNetworkSyncBridge.MODULE_ID)
+    end
+end
+
+-- =========================================================
+-- Shift action handlers
+-- =========================================================
+local function onShiftStart(sys, userId, args)
+    local farmId   = args[2] or 1
+    local triggerId = tostring(args[3] or "")
+
+    local trigger = sys.triggerManager:getTriggerById(triggerId)
+    if trigger == nil then
+        wtLog("SHIFT_START rejected: trigger not found: " .. triggerId)
+        return
+    end
+
+    if sys.shiftTracker:isShiftActiveForFarm(farmId) then
+        wtLog("SHIFT_START rejected: farm " .. tostring(farmId) .. " already active")
+        return
+    end
+
+    sys.shiftTracker:startShiftForFarm(farmId, trigger)
+
+    -- Listen-server: also update single-slot state for the host's own shift
+    if g_currentMission and g_currentMission:getIsServer() then
+        local localFarmId = g_currentMission:getFarmId and g_currentMission:getFarmId() or -1
+        if farmId == localFarmId then
+            pcall(function() sys.shiftTracker:startShift(trigger, true) end)
+            sys.shiftTracker.activeFarmId      = farmId
+            sys.shiftTracker.shiftOwnerIsLocal = true
+        else
+            sys.shiftTracker.shiftOwnerIsLocal = false
+        end
+    end
+
+    wtLog(string.format("SHIFT_START: farm=%d trigger='%s'", farmId, trigger.workplaceName or "?"))
+end
+
+local function onShiftEnd(sys, userId, args)
+    local farmId    = args[2] or 1
+    local isPenalty = args[3] == true
+
+    if not sys.shiftTracker:isShiftActiveForFarm(farmId) then
+        wtLog("SHIFT_END: farm " .. tostring(farmId) .. " not active")
+        return
+    end
+
+    local earned, name
+    if isPenalty then
+        earned, name = sys.shiftTracker:endShiftPenaltyForFarm(farmId)
+    else
+        earned, name = sys.shiftTracker:endShiftForFarm(farmId)
+    end
+
+    -- Clear single-slot state if this farm owned it
+    if sys.shiftTracker.activeFarmId == farmId
+       and sys.shiftTracker:isShiftActive() then
+        pcall(function()
+            if isPenalty then sys.shiftTracker:endShiftPenalty()
+            else              sys.shiftTracker:endShift() end
+        end)
+    end
+
+    wtLog(string.format("SHIFT_END: farm=%d earned=$%d '%s'", farmId, earned or 0, name or "?"))
+end
+
+-- =========================================================
+-- Trigger CRUD action handlers
+-- =========================================================
+local _serverIdCounter = 0
+
+local function generateStableId()
+    _serverIdCounter = _serverIdCounter + 1
+    local t = g_currentMission and math.floor(g_currentMission.time) or 0
+    return string.format("wt_%d_%d", t, _serverIdCounter)
+end
+
+local function onCreateTrigger(sys, userId, args)
+    local stableId = (args[2] and args[2] ~= "") and tostring(args[2]) or generateStableId()
+
+    local triggerData = {
+        id              = stableId,
+        workplaceName   = args[3] or "Workplace",
+        hourlyWage      = args[4] or 500,
+        triggerRadius   = args[5] or 4,
+        posX            = args[6] or 0,
+        posY            = args[7] or 0,
+        posZ            = args[8] or 0,
+        paySchedule     = args[9] or "hourly",
+        timeMultiplier  = args[10] or 0,
+        endShiftOnLeave = args[11] ~= false,
+        playerInside    = false,
+    }
+
+    local ok, err = pcall(function()
+        sys.triggerManager:registerTrigger(triggerData)
+    end)
+    if not ok then
+        wtLog("CREATE_TRIGGER error: " .. tostring(err))
+    end
+
+    wtLog("CREATE_TRIGGER: id=" .. stableId .. " name='" .. (triggerData.workplaceName or "?") .. "'")
+end
+
+local function onUpdateTrigger(sys, userId, args)
+    local triggerId = tostring(args[2] or "")
+    local trigger = sys.triggerManager:getTriggerById(triggerId)
+    if trigger == nil then
+        wtLog("UPDATE_TRIGGER rejected: not found: " .. triggerId)
+        return
+    end
+
+    trigger.workplaceName   = args[3] or trigger.workplaceName
+    trigger.hourlyWage      = args[4] or trigger.hourlyWage
+    trigger.triggerRadius   = args[5] or trigger.triggerRadius
+    trigger.paySchedule     = args[6] or trigger.paySchedule
+    trigger.timeMultiplier  = args[7] or trigger.timeMultiplier
+    trigger.endShiftOnLeave = args[8] ~= false
+
+    if sys.triggerManager then
+        sys.triggerManager:updateMapHotspotName(trigger)
+    end
+
+    wtLog("UPDATE_TRIGGER: " .. (trigger.workplaceName or "?"))
+end
+
+local function onDeleteTrigger(sys, userId, args)
+    local triggerId = tostring(args[2] or "")
+
+    -- End any active shifts using this trigger
+    if sys.shiftTracker then
+        if sys.shiftTracker:isShiftActive()
+           and tostring(sys.shiftTracker.activeTriggerId) == triggerId then
+            sys.shiftTracker:endShift()
+        end
+        if sys.shiftTracker._farmShifts then
+            for farmId, entry in pairs(sys.shiftTracker._farmShifts) do
+                if tostring(entry.triggerId) == triggerId then
+                    sys.shiftTracker:endShiftForFarm(farmId)
+                end
+            end
+        end
+    end
+
+    if sys.triggerManager then
+        sys.triggerManager:deregisterTrigger(triggerId)
+    end
+
+    wtLog("DELETE_TRIGGER: id=" .. triggerId)
+end
+
+-- =========================================================
+-- Public: send a client->server action through NetworkSync
+-- =========================================================
+-- On the server (listen-host or dedicated): runs onAction directly, then marks dirty.
+-- On a client: sends via NetworkSync requestAction for server-side execution.
+
+function WTNetworkSyncBridge.requestAction(args)
+    if WTNetworkSyncBridge.active and WTNetworkSyncBridge._ns ~= nil then
+        if g_currentMission ~= nil and g_currentMission:getIsServer() then
+            onAction(nil, args)
+            return true
+        end
+        WTNetworkSyncBridge._ns:requestAction(WTNetworkSyncBridge.ACTION_ID, args)
+        return true
+    end
+    return false
+end
+
+-- =========================================================
+-- Public send helpers (replace WorkplaceMultiplayerEvent.send*)
+-- Each returns true when NetworkSync handled it (caller skips own event).
+-- =========================================================
+
+function WTNetworkSyncBridge.sendShiftStart(triggerId)
+    local farmId = (g_currentMission and g_currentMission:getFarmId()) or 1
+    return WTNetworkSyncBridge.requestAction({ "shift_start", farmId, tostring(triggerId) })
+end
+
+function WTNetworkSyncBridge.sendShiftEnd(isPenalty)
+    local farmId = (g_currentMission and g_currentMission:getFarmId()) or 1
+    return WTNetworkSyncBridge.requestAction({ "shift_end", farmId, isPenalty == true })
+end
+
+function WTNetworkSyncBridge.sendCreateTrigger(data)
+    local farmId = (g_currentMission and g_currentMission:getFarmId()) or 1
+    local clientId = string.format("wt_%d_%d",
+        math.floor((g_currentMission and g_currentMission.time) or 0),
+        math.floor(math.random() * 100000))
+
+    -- Optimistic local registration on client
+    if g_currentMission and not g_currentMission:getIsServer() then
+        local sys = g_WorkplaceSystem
+        if sys and sys.triggerManager then
+            pcall(function()
+                sys.triggerManager:registerTrigger({
+                    id              = clientId,
+                    workplaceName   = data.workplaceName or "Workplace",
+                    hourlyWage      = data.hourlyWage    or 500,
+                    triggerRadius   = data.triggerRadius or 4,
+                    posX            = data.posX          or 0,
+                    posY            = data.posY          or 0,
+                    posZ            = data.posZ          or 0,
+                    paySchedule     = data.paySchedule   or "hourly",
+                    timeMultiplier  = data.timeMultiplier or 0,
+                    endShiftOnLeave = data.endShiftOnLeave ~= false,
+                    playerInside    = false,
+                })
+            end)
+        end
+    end
+
+    return WTNetworkSyncBridge.requestAction({
+        "create_trigger", clientId,
+        data.workplaceName   or "Workplace",
+        data.hourlyWage      or 500,
+        data.triggerRadius   or 4,
+        data.posX            or 0,
+        data.posY            or 0,
+        data.posZ            or 0,
+        data.paySchedule     or "hourly",
+        data.timeMultiplier  or 0,
+        data.endShiftOnLeave ~= false,
+    })
+end
+
+function WTNetworkSyncBridge.sendUpdateTrigger(triggerId, data)
+    return WTNetworkSyncBridge.requestAction({
+        "update_trigger", tostring(triggerId),
+        data.workplaceName,
+        data.hourlyWage,
+        data.triggerRadius,
+        data.paySchedule,
+        data.timeMultiplier or 0,
+        data.endShiftOnLeave ~= false,
+    })
+end
+
+function WTNetworkSyncBridge.sendDeleteTrigger(triggerId)
+    return WTNetworkSyncBridge.requestAction({ "delete_trigger", tostring(triggerId) })
+end
+
+function WTNetworkSyncBridge.sendSyncSettings()
+    if not WTNetworkSyncBridge.stateActive or WTNetworkSyncBridge._ns == nil then
+        return false
+    end
+    WTNetworkSyncBridge._ns:markDirty(WTNetworkSyncBridge.MODULE_ID)
+    return true
+end
+
+-- =========================================================
+-- Registration (called from WorkplaceSystem:onMissionLoaded)
+-- =========================================================
+function WTNetworkSyncBridge.register()
+    WTNetworkSyncBridge.active      = false
+    WTNetworkSyncBridge.stateActive = false
+    WTNetworkSyncBridge._ns         = nil
+
+    local ns = (g_currentMission ~= nil and g_currentMission.networkSync) or g_networkSync
+    if ns == nil then
+        wtLog("NetworkSync not detected; MP sync disabled (requires FS25_NetworkSync)")
+        return
+    end
+
+    local ok, err = pcall(function()
+        ns:registerModule(WTNetworkSyncBridge.MODULE_ID, {
+            channel      = WTNetworkSyncBridge.CHANNEL,
+            onWriteState = WTNetworkSyncBridge._onWriteState,
+            onReadState  = WTNetworkSyncBridge._onReadState,
+        })
+        ns:registerAction(WTNetworkSyncBridge.ACTION_ID, {
+            adminOnly = false,
+            onAction  = onAction,
+        })
+    end)
+
+    if ok then
+        WTNetworkSyncBridge.active      = true
+        WTNetworkSyncBridge.stateActive = true
+        WTNetworkSyncBridge._ns         = ns
+        wtLog("Registered with NetworkSync (state module + action channel)")
+    else
+        wtLog("Registration failed: " .. tostring(err))
+    end
+end
+
+print("[WorkplaceTriggers] WTNetworkSyncBridge loaded")
