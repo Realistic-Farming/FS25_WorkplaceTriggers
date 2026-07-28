@@ -7,6 +7,11 @@
 WorkplaceTrigger = {}
 WorkplaceTrigger_mt = Class(WorkplaceTrigger)
 
+-- BL17 spam cooldown: a trigger's activation (teleport + workplace dialog) cannot
+-- re-fire within this window, so rapid re-entry or a held interact key no longer
+-- spams the teleport and dialog. Per-trigger, per-client (activation is local).
+WorkplaceTrigger.ACTIVATE_COOLDOWN_MS = 1500
+
 function WorkplaceTrigger.new(node, workplaceName, workplaceId, system)
     local self = setmetatable({}, WorkplaceTrigger_mt)
     
@@ -177,18 +182,27 @@ end
 -- Called when player interacts with the trigger
 -- =========================================================
 function WorkplaceTrigger:openWorkplace()
+    -- BL17 spam cooldown: block a re-fire of the teleport + dialog within the window.
+    local now = (g_currentMission and g_currentMission.time) or 0
+    if self._lastActivateTime ~= nil and (now - self._lastActivateTime) < WorkplaceTrigger.ACTIVATE_COOLDOWN_MS then
+        return
+    end
+
     -- Check if guided tour is running
     if g_guidedTourManager and g_guidedTourManager:getIsTourRunning() then
         InfoDialog.show(g_i18n:getText("guidedTour_feature_deactivated"))
         return
     end
-    
+
     -- Check if we have a spawn node
     if not self.spawnNode then
         Logging.warning("WorkplaceTrigger: No spawn node defined for " .. tostring(self.workplaceName))
         return
     end
-    
+
+    -- Activation proceeds: start the cooldown so rapid re-fires are suppressed.
+    self._lastActivateTime = now
+
     -- Teleport player to spawn point (following ShopTrigger pattern)
     local x, y, z = getWorldTranslation(self.spawnNode)
     local dx, _, dz = localDirectionToWorld(self.spawnNode, 0, 0, -1)

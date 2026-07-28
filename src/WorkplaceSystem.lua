@@ -82,27 +82,43 @@ function WorkplaceSystem:onMissionLoaded()
     -- Sending REQUEST_SYNC during onMissionLoaded() is too early — the server's
     -- broadcast back may not reach the client while the stream is still opening.
     -- The update() loop sends it after a short warm-up delay.
+    -- StateLedger bridge: register (wires serialize for saves + deserialize) and force
+    -- an idempotent parse so the ledger block is delivered NOW, before we choose the
+    -- load source just below (this runs in the same phase StateLedger parses). No-op
+    -- if StateLedger is absent.
+    if WorkplaceStateLedgerBridge ~= nil then
+        WorkplaceStateLedgerBridge.register(self)
+    end
+
     if g_currentMission then
         if g_currentMission:getIsServer() then
-            self:loadFromXMLFile(g_currentMission.missionInfo)
+            -- StateLedger, when present with a stored block, is the load source of truth
+            -- for trigger definitions; FS25_WorkplaceTriggers.xml is imported only when
+            -- the ledger has no block yet (first load after install, or ledger absent).
+            if WorkplaceStateLedgerBridge ~= nil and WorkplaceStateLedgerBridge.hasLedgerState() then
+                WorkplaceStateLedgerBridge.applyState(self)
+            else
+                self:loadFromXMLFile(g_currentMission.missionInfo)
+            end
         else
-            -- Arm the deferred sync. update() will fire it after SYNC_DELAY_SEC.
-            self.syncPending      = true
-            self.syncDelayTimer   = 0
-            self.syncAttempts     = 0
-            wtLog("Client: deferred trigger sync armed")
+            -- Client: sync is handled automatically by NetworkSync's full snapshot
+            -- mechanism (onReadState receives the trigger list on join).
+            wtLog("Client: sync deferred to NetworkSync")
         end
     end
+
+    -- Bedrock bridges (delegate-when-present; each no-ops if its bedrock mod is
+    -- absent). Handles (g_currentMission.settingsHub / .masterHUD) are published by
+    -- the bedrock mods at Mission00.load, so they are ready by now. Registration is
+    -- guarded once by the isInitialized check at the top of this function.
+    if WTNetworkSyncBridge    ~= nil then WTNetworkSyncBridge.register()    end
+    if WorkplaceSettingsHubBridge ~= nil then WorkplaceSettingsHubBridge.register() end
+    if WorkplaceMasterHUDBridge  ~= nil then WorkplaceMasterHUDBridge.register()  end
 end
 
 -- =========================================================
 -- Update (dt in milliseconds from FS25)
 -- =========================================================
--- Seconds to wait before first REQUEST_SYNC attempt on client.
--- Gives the server stream time to fully open before we expect a broadcast back.
-WorkplaceSystem.SYNC_DELAY_SEC   = 2.0
-WorkplaceSystem.SYNC_RETRY_SEC   = 8.0
-WorkplaceSystem.SYNC_MAX_ATTEMPTS = 5
 
 function WorkplaceSystem:update(dt)
     if not self.isInitialized then return end
@@ -110,30 +126,8 @@ function WorkplaceSystem:update(dt)
     -- Convert ms to seconds for subsystem use
     local dtSec = dt / 1000.0
 
-    -- Deferred client sync: send REQUEST_SYNC after warm-up, retry until triggers arrive
-    if self.syncPending and g_currentMission and not g_currentMission:getIsServer() then
-        self.syncDelayTimer = (self.syncDelayTimer or 0) + dtSec
-        local threshold = (self.syncAttempts == 0)
-            and WorkplaceSystem.SYNC_DELAY_SEC
-            or  WorkplaceSystem.SYNC_RETRY_SEC
-        if self.syncDelayTimer >= threshold then
-            self.syncDelayTimer = 0
-            self.syncAttempts   = (self.syncAttempts or 0) + 1
-            local triggerCount  = #self.triggerManager:getAllTriggers()
-            wtLog(string.format("Client: sync attempt %d (have %d triggers)",
-                self.syncAttempts, triggerCount))
-            if triggerCount > 0 then
-                -- We have triggers — sync succeeded (or we're the host)
-                self.syncPending = false
-                wtLog("Client: sync complete — triggers received")
-            elseif self.syncAttempts <= WorkplaceSystem.SYNC_MAX_ATTEMPTS then
-                WorkplaceMultiplayerEvent.sendRequestSync()
-            else
-                self.syncPending = false
-                wtLog("Client: sync gave up after " .. WorkplaceSystem.SYNC_MAX_ATTEMPTS .. " attempts")
-            end
-        end
-    end
+    -- Client sync is handled automatically by NetworkSync's full snapshot mechanism.
+    -- When triggers arrive via the bridge's onReadState, syncPending is cleared there.
 
     self.triggerManager:update(dtSec)
     self.shiftTracker:update(dtSec)
@@ -174,13 +168,13 @@ function WorkplaceSystem:onInteractPressed()
         -- shiftOwnerIsLocal=false means a different farm started it (listen-server case)
         -- — pressing E must not accidentally end someone else's shift.
         if self.shiftTracker.shiftOwnerIsLocal ~= false then
-            WorkplaceMultiplayerEvent.sendShiftEnd()
+            WTNetworkSyncBridge.sendShiftEnd()
         end
     else
         -- Start shift at nearest trigger
         local trigger = self.triggerManager:getNearestPlayerTrigger()
         if trigger then
-            WorkplaceMultiplayerEvent.sendShiftStart(tostring(trigger.id))
+            WTNetworkSyncBridge.sendShiftStart(tostring(trigger.id))
         end
     end
 end

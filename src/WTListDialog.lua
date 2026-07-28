@@ -285,7 +285,7 @@ for i = 1, WTListDialog.MAX_ROWS do
         local t = triggers[idx]
         if not t then return end
         -- Route through MP event so all machines sync
-        WorkplaceMultiplayerEvent.sendDeleteTrigger(t.id)
+        WTNetworkSyncBridge.sendDeleteTrigger(t.id)
         -- Clamp page after deletion
         local remaining = #self:getTriggers()
         local maxPage = math.max(1, math.ceil(remaining / self.MAX_ROWS))

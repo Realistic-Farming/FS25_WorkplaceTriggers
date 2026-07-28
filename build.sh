@@ -36,6 +36,7 @@ if command -v zip &>/dev/null; then
         --exclude "./__MACOSX/*" \
         --exclude "./*.DS_Store" \
         --exclude "./*.zip" \
+        --exclude "./tools/*" 
         --exclude "./icon_source.png" \
         --exclude "./icon_wt.png"
     echo "  Built via zip"

@@ -257,7 +257,7 @@ local function apply(key, value, msg, globalSetting)
     if mi then s:saveToXMLFile(mi) end
     -- Broadcast global settings to all connected clients so they take effect immediately.
     if globalSetting and g_currentMission and g_currentMission:getIsServer() then
-        WorkplaceMultiplayerEvent.sendSyncSettings()
+        WTNetworkSyncBridge.sendSyncSettings()
     end
 end
 

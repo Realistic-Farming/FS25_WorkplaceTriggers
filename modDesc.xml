@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <modDesc descVersion="106">
     <author>TisonK</author>
-    <version>1.1.1.0</version>
+    <version>1.1.1.1</version>
     <modName>FS25_WorkplaceTriggers</modName>
 
     <title>
@@ -83,15 +83,9 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
         <action name="WT_HUD_EDIT"/>
     </actions>
     <inputBinding>
-        <actionBinding action="WT_INTERACT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_e"/>
-        </actionBinding>
-        <actionBinding action="WT_MENU">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_F4"/>
-        </actionBinding>
-        <actionBinding action="WT_HUD_EDIT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_F7"/>
-        </actionBinding>
+        <actionBinding action="WT_INTERACT"/>
+        <actionBinding action="WT_MENU"/>
+        <actionBinding action="WT_HUD_EDIT"/>
     </inputBinding>
 
     <placeableSpecializations>

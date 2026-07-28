@@ -40,10 +40,13 @@ if modDirectory then
     source(modDirectory .. "src/WorkplaceSaveLoad.lua")
     source(modDirectory .. "src/WorkplaceSettings.lua")
     source(modDirectory .. "src/WorkplaceSettingsIntegration.lua")
-    source(modDirectory .. "src/WorkplaceMultiplayerEvent.lua")
+    source(modDirectory .. "src/integrations/WTNetworkSyncBridge.lua")
     source(modDirectory .. "src/NPCFavorIntegration.lua")
     source(modDirectory .. "src/WorkerCostsIntegration.lua")
     source(modDirectory .. "src/WorkplaceSystem.lua")
+    source(modDirectory .. "src/WorkplaceStateLedgerBridge.lua")
+    source(modDirectory .. "src/WorkplaceSettingsHubBridge.lua")
+    source(modDirectory .. "src/WorkplaceMasterHUDBridge.lua")
 
     print("[WorkplaceTriggers] All source files loaded")
     -- Init dialog loader with mod path
@@ -173,6 +176,10 @@ end
 -- Draw hook (HUD rendering MUST be in draw callbacks)
 if FSBaseMission and FSBaseMission.draw then
     FSBaseMission.draw = Utils.appendedFunction(FSBaseMission.draw, function(mission)
+        -- When MasterHUD is present it owns the single draw loop (our draw was
+        -- registered as a self-draw via the bridge); stand down so the HUD never
+        -- draws twice. Absent MasterHUD, this hook runs the draw as before.
+        if WorkplaceMasterHUDBridge ~= nil and WorkplaceMasterHUDBridge.active then return end
         if workplaceSystem then
             workplaceSystem:draw()
         end
