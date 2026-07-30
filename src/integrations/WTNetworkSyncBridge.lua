@@ -189,7 +189,23 @@ local function onShiftStart(sys, userId, args)
 
     -- Listen-server: also update single-slot state for the host's own shift
     if g_currentMission and g_currentMission:getIsServer() then
-        local localFarmId = g_currentMission:getFarmId and g_currentMission:getFarmId() or -1
+        -- `g_currentMission:getFarmId and ...` was a COMPILE error: the `:` call syntax
+        -- requires an immediate argument list, so Lua stopped at `and` ("expected '(',
+        -- '{' or <string>"). The whole file failed to load, taking this bridge with it.
+        --
+        -- Resolved with the order proven across the suite (SoilFertilizer, NPCFavor,
+        -- WorkerCosts) rather than a one-character syntax patch: `getFarmId` is not in
+        -- the Community LUADOC, so a guarded probe on it alone would have compiled and
+        -- then silently always yielded -1, meaning the host's own shift state never
+        -- updated. It stays as a last-resort probe, correctly guarded with `.`.
+        local localFarmId = -1
+        if g_localPlayer ~= nil and g_localPlayer.farmId ~= nil then
+            localFarmId = g_localPlayer.farmId
+        elseif g_currentMission.player ~= nil and g_currentMission.player.farmId ~= nil then
+            localFarmId = g_currentMission.player.farmId
+        elseif type(g_currentMission.getFarmId) == "function" then
+            localFarmId = g_currentMission:getFarmId() or -1
+        end
         if farmId == localFarmId then
             pcall(function() sys.shiftTracker:startShift(trigger, true) end)
             sys.shiftTracker.activeFarmId      = farmId
