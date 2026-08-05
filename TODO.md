@@ -4,6 +4,10 @@
 > Status: FILLED from the ecosystem audit/baseline, kept current.
 > Convention: `[ ]` open · `[~]` in progress · `[x]` done · `[!]` blocked. Newest at the top of each section.
 
+## Bugs
+- [x] 2026-07-30: `src/integrations/WTNetworkSyncBridge.lua:192` failed to COMPILE - `g_currentMission:getFarmId and ...`. The `:` call syntax requires an immediate argument list, so Lua stopped at `and` ("expected '(', '{' or <string>"). The whole file was rejected and the NetworkSync bridge was dead in every session. Resolved with the suite's proven local-farm-id order (`g_localPlayer.farmId`, then `g_currentMission.player.farmId`) rather than a one-character patch: `getFarmId` is not in the Community LUADOC, so a guarded probe on it alone would have compiled and then silently always yielded -1, leaving the host's own shift state permanently un-updated.
+- [ ] **ROOT CAUSE, still open: `build.sh` has NO Lua 5.1 syntax gate**, which is the only reason the above reached the game. SoilFertilizer catches this class before it ships (pre-commit `luaparse` pinned to 5.1 across all sources, plus lint). Port that gate here or into `build.sh` as a build-failing step.
+
 ## From the ecosystem audit (Arissani)
 - [x] Fast-track BL17: cooldown cap on triggers to stop spam. DONE.
 - [ ] Fix detection: `g_NPCFavorSystem` -> `g_currentMission.npcFavorSystem`; `g_WorkerCostsSystem` -> `g_currentMission.workerCostsManager`.
@@ -17,6 +21,7 @@
 
 ## Features / enhancements
 - [~] BL17 cooldown DONE; the companion read surface for WorkerCosts still open.
+- [x] Trigger purpose designation (2026-08-05): optional `purpose` on the trigger record, server-gated `set_trigger_purpose` bridge action under the existing admin gate, `getTriggersByPurpose`. Persisted through own XML + StateLedger bridge + NetworkSync snapshot/actions. First consumer: Co-Op Home Ladder rung 3. Non-breaking both directions (loader defaults every read).
 
 ## Cross-mod integration
 - [x] StateLedger: `WorkplaceTriggers_Data` bridge live (trigger definitions + HUD layout; commit c98a876, delegate-when-present, own XML kept as the safety copy, force-parseFile timing). Settings go to SettingsHub, NOT a second SL module (state-to-SL / settings-to-SettingsHub split).

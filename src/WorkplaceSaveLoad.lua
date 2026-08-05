@@ -4,7 +4,8 @@
 -- =========================================================
 -- Pattern: SaveLoadHandler.lua from FS25_SeasonalCropStress
 -- CRITICAL: Use OOP xmlFile:setInt() etc. NEVER legacy globals.
--- Save layout inside careerSavegame XML:
+-- Save layout inside the mod's own standalone file (getSavePath below), NOT the
+-- career savegame:
 --   <workplaceTriggers>
 --     <triggers>
 --       <trigger idx="0" id="wt_1" name="Post Office" hourlyWage="500"
@@ -115,6 +116,7 @@ function WorkplaceSaveLoad:saveToXMLFile(missionInfo)
         xmlFile:setString(key .. "#paySchedule",     trigger.paySchedule    or "hourly")
         xmlFile:setInt(   key .. "#timeMultiplier",  trigger.timeMultiplier or 0)
         xmlFile:setBool(  key .. "#endShiftOnLeave", trigger.endShiftOnLeave ~= false)
+        xmlFile:setString(key .. "#purpose",         trigger.purpose or "")
         count = count + 1
     end
 
@@ -174,6 +176,7 @@ function WorkplaceSaveLoad:loadFromXMLFile(missionInfo)
         local savedSched           = xmlFile:getString(key .. "#paySchedule",     "hourly")
         local savedTimeMultiplier  = xmlFile:getInt(   key .. "#timeMultiplier",  0)
         local savedEndShiftOnLeave = xmlFile:getBool(  key .. "#endShiftOnLeave", true)
+        local savedPurpose         = xmlFile:getString(key .. "#purpose",         "")
 
         -- Triggers are pure data objects — register directly, no placeable needed
         local triggerData = {
@@ -187,6 +190,7 @@ function WorkplaceSaveLoad:loadFromXMLFile(missionInfo)
             paySchedule     = savedSched,
             timeMultiplier  = savedTimeMultiplier or 0,
             endShiftOnLeave = savedEndShiftOnLeave ~= false,
+            purpose         = savedPurpose,
             playerInside    = false,
         }
         self.system.triggerManager:registerTrigger(triggerData)

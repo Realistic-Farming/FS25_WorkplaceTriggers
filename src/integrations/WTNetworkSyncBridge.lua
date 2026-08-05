@@ -36,7 +36,7 @@ end
 -- State serialization (server -> client full snapshot)
 -- =========================================================
 -- Flat array: [triggerCount, ...per trigger fields..., wageMultiplier]
--- Schema v1.  12 fields per trigger (matches WorkplaceStateLedgerBridge.buildState).
+-- Schema v2.  13 fields per trigger (added purpose, appended after playerInside).
 local function buildStateArray()
     local arr = {}
     local sys = g_WorkplaceSystem
@@ -56,6 +56,7 @@ local function buildStateArray()
         arr[#arr + 1] = t.timeMultiplier or 0
         arr[#arr + 1] = t.endShiftOnLeave ~= false
         arr[#arr + 1] = t.playerInside or false
+        arr[#arr + 1] = t.purpose or ""
     end
 
     -- Settings (server-authoritative wage multiplier)
@@ -94,9 +95,10 @@ local function applyStateArray(arr)
             timeMultiplier  = arr[i + 9] or 0,
             endShiftOnLeave = arr[i + 10] ~= false,
             playerInside    = arr[i + 11] or false,
+            purpose         = arr[i + 12] or "",
         }
         sys.triggerManager:registerTrigger(triggerData)
-        i = i + 12
+        i = i + 13
     end
 
     -- Apply settings
@@ -122,9 +124,10 @@ end
 -- Server-side action handler
 -- =========================================================
 local TRIGGER_ACTIONS = {
-    create_trigger = true,
-    update_trigger = true,
-    delete_trigger = true,
+    create_trigger       = true,
+    update_trigger       = true,
+    delete_trigger       = true,
+    set_trigger_purpose  = true,
 }
 
 local function onAction(userId, args)
@@ -157,6 +160,8 @@ local function onAction(userId, args)
         onUpdateTrigger(sys, userId, args)
     elseif actionType == "delete_trigger" then
         onDeleteTrigger(sys, userId, args)
+    elseif actionType == "set_trigger_purpose" then
+        onSetTriggerPurpose(sys, userId, args)
     else
         return
     end
@@ -189,7 +194,23 @@ local function onShiftStart(sys, userId, args)
 
     -- Listen-server: also update single-slot state for the host's own shift
     if g_currentMission and g_currentMission:getIsServer() then
-        local localFarmId = g_currentMission:getFarmId and g_currentMission:getFarmId() or -1
+        -- `g_currentMission:getFarmId and ...` was a COMPILE error: the `:` call syntax
+        -- requires an immediate argument list, so Lua stopped at `and` ("expected '(',
+        -- '{' or <string>"). The whole file failed to load, taking this bridge with it.
+        --
+        -- Resolved with the order proven across the suite (SoilFertilizer, NPCFavor,
+        -- WorkerCosts) rather than a one-character syntax patch: `getFarmId` is not in
+        -- the Community LUADOC, so a guarded probe on it alone would have compiled and
+        -- then silently always yielded -1, meaning the host's own shift state never
+        -- updated. It stays as a last-resort probe, correctly guarded with `.`.
+        local localFarmId = -1
+        if g_localPlayer ~= nil and g_localPlayer.farmId ~= nil then
+            localFarmId = g_localPlayer.farmId
+        elseif g_currentMission.player ~= nil and g_currentMission.player.farmId ~= nil then
+            localFarmId = g_currentMission.player.farmId
+        elseif type(g_currentMission.getFarmId) == "function" then
+            localFarmId = g_currentMission:getFarmId() or -1
+        end
         if farmId == localFarmId then
             pcall(function() sys.shiftTracker:startShift(trigger, true) end)
             sys.shiftTracker.activeFarmId      = farmId
@@ -255,6 +276,7 @@ local function onCreateTrigger(sys, userId, args)
         paySchedule     = args[9] or "hourly",
         timeMultiplier  = args[10] or 0,
         endShiftOnLeave = args[11] ~= false,
+        purpose         = args[12] or "",
         playerInside    = false,
     }
 
@@ -315,6 +337,24 @@ local function onDeleteTrigger(sys, userId, args)
     wtLog("DELETE_TRIGGER: id=" .. triggerId)
 end
 
+local function onSetTriggerPurpose(sys, userId, args)
+    local triggerId = tostring(args[2] or "")
+    -- Distinguish an explicit clear (empty string) from an absent value:
+    -- args[3] is the purpose; nil means "no value supplied", "" means "clear".
+    if args[3] == nil then
+        wtLog("SET_TRIGGER_PURPOSE rejected: no purpose value: id=" .. triggerId)
+        return
+    end
+
+    local ok = sys.triggerManager:setTriggerPurpose(triggerId, args[3])
+    if not ok then
+        wtLog("SET_TRIGGER_PURPOSE rejected: trigger not found: id=" .. triggerId)
+        return
+    end
+
+    wtLog("SET_TRIGGER_PURPOSE: id=" .. triggerId .. " purpose='" .. tostring(args[3]) .. "'")
+end
+
 -- =========================================================
 -- Public: send a client->server action through NetworkSync
 -- =========================================================
@@ -370,6 +410,7 @@ function WTNetworkSyncBridge.sendCreateTrigger(data)
                     paySchedule     = data.paySchedule   or "hourly",
                     timeMultiplier  = data.timeMultiplier or 0,
                     endShiftOnLeave = data.endShiftOnLeave ~= false,
+                    purpose         = data.purpose       or "",
                     playerInside    = false,
                 })
             end)
@@ -387,6 +428,7 @@ function WTNetworkSyncBridge.sendCreateTrigger(data)
         data.paySchedule     or "hourly",
         data.timeMultiplier  or 0,
         data.endShiftOnLeave ~= false,
+        data.purpose         or "",
     })
 end
 
@@ -404,6 +446,16 @@ end
 
 function WTNetworkSyncBridge.sendDeleteTrigger(triggerId)
     return WTNetworkSyncBridge.requestAction({ "delete_trigger", tostring(triggerId) })
+end
+
+-- Server-authoritative designation. Safe to call on both server and client:
+-- requestAction runs locally on the server (under the admin gate) and forwards
+-- on a client. Pass purpose = "" to clear the designation.
+function WTNetworkSyncBridge.sendSetTriggerPurpose(triggerId, purpose)
+    if purpose == nil then return false end
+    return WTNetworkSyncBridge.requestAction({
+        "set_trigger_purpose", tostring(triggerId), tostring(purpose),
+    })
 end
 
 function WTNetworkSyncBridge.sendSyncSettings()
