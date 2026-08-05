@@ -34,7 +34,7 @@ WorkplaceStateLedgerBridge = {}
 -- (Arissani's readiness prose calls it "WorkplaceTriggers_Triggers"; Point-1's actual
 -- registration code names it "WorkplaceTriggers_Data" -- flagged for the lock.)
 WorkplaceStateLedgerBridge.MODULE_ID = "WorkplaceTriggers_Data"
-WorkplaceStateLedgerBridge.SCHEMA    = 1
+WorkplaceStateLedgerBridge.SCHEMA    = 2
 
 WorkplaceStateLedgerBridge.active       = false   -- ledger present and we registered
 WorkplaceStateLedgerBridge.delivered    = false   -- deserialize has fired (once)
@@ -62,6 +62,7 @@ function WorkplaceStateLedgerBridge.buildState(sys)
                 paySchedule     = t.paySchedule or "hourly",
                 timeMultiplier  = t.timeMultiplier or 0,
                 endShiftOnLeave = t.endShiftOnLeave ~= false,
+                purpose         = t.purpose or "",
             }
         end
     end
@@ -99,6 +100,7 @@ function WorkplaceStateLedgerBridge.applyState(sys)
                 paySchedule     = t.paySchedule or "hourly",
                 timeMultiplier  = t.timeMultiplier or 0,
                 endShiftOnLeave = t.endShiftOnLeave ~= false,
+                purpose         = t.purpose or "",
                 playerInside    = false,
             })
             count = count + 1

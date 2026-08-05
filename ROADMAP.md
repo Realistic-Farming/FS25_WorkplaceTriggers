@@ -24,6 +24,7 @@
 ## Mid-term (this season)
 - [~] Bedrock migration: StateLedger + MasterHUD + SettingsHub bridged (939f701, c98a876, delegate-when-present). NetworkSync (WorkplaceMultiplayerEvent) deferred - a money-authority-class request/response protocol (shifts pay wages server-side), needs the NS build-brief.
 - [ ] Expose the companion read surface WorkerCosts consumes.
+- [x] Trigger purpose designation (2026-08-05, ruled yes by Tyson): optional `purpose` string, server-gated `set_trigger_purpose` bridge action, `getTriggersByPurpose`. First consumer: the Co-Op Home Ladder rung 3 (PS-3).
 
 ## Long-term / aspirational
 - [ ] Richer workplace types and job variety.

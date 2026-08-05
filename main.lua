@@ -1,5 +1,5 @@
 -- =========================================================
--- FS25 Workplace Triggers (v0.1.0.0)
+-- FS25 Workplace Triggers (v1.1.1.1)
 -- Placeable Off-Farm Work System
 -- =========================================================
 -- Author: TisonK

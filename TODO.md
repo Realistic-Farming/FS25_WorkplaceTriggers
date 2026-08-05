@@ -21,6 +21,7 @@
 
 ## Features / enhancements
 - [~] BL17 cooldown DONE; the companion read surface for WorkerCosts still open.
+- [x] Trigger purpose designation (2026-08-05): optional `purpose` on the trigger record, server-gated `set_trigger_purpose` bridge action under the existing admin gate, `getTriggersByPurpose`. Persisted through own XML + StateLedger bridge + NetworkSync snapshot/actions. First consumer: Co-Op Home Ladder rung 3. Non-breaking both directions (loader defaults every read).
 
 ## Cross-mod integration
 - [x] StateLedger: `WorkplaceTriggers_Data` bridge live (trigger definitions + HUD layout; commit c98a876, delegate-when-present, own XML kept as the safety copy, force-parseFile timing). Settings go to SettingsHub, NOT a second SL module (state-to-SL / settings-to-SettingsHub split).

@@ -322,6 +322,39 @@ function WorkplaceTriggerManager:getTriggerById(id)
     return nil
 end
 
+-- Return every trigger carrying the given purpose. Empty/absent purpose matches
+-- nothing for a non-empty query, so consumers never trip over un-designated
+-- triggers. Same string-compare idiom as getTriggerById.
+function WorkplaceTriggerManager:getTriggersByPurpose(purpose)
+    if purpose == nil or purpose == "" then return {} end
+    local searchPurpose = tostring(purpose)
+    local result = {}
+    for _, trigger in ipairs(self.triggers) do
+        if tostring(trigger.purpose or "") == searchPurpose then
+            result[#result + 1] = trigger
+        end
+    end
+    return result
+end
+
+-- Set a trigger's purpose. Server-authoritative: call from the server-side
+-- NetworkSync action handler only, never from client-local code. purpose == ""
+-- clears the designation back to no-purpose.
+function WorkplaceTriggerManager:setTriggerPurpose(triggerId, purpose)
+    local trigger = self:getTriggerById(triggerId)
+    if trigger == nil then
+        wtLog("setTriggerPurpose: trigger not found: " .. tostring(triggerId))
+        return false
+    end
+    local nextPurpose = (purpose ~= nil) and tostring(purpose) or nil
+    local was = trigger.purpose or ""
+    if (nextPurpose or "") == was then return true end
+    trigger.purpose = nextPurpose
+    wtLog(string.format("setTriggerPurpose: '%s' (id=%s) purpose '%s' -> '%s'",
+        trigger.workplaceName or "?", tostring(triggerId), was, nextPurpose or ""))
+    return true
+end
+
 -- =========================================================
 -- Geometry
 -- =========================================================
