@@ -173,6 +173,7 @@ function WorkplaceSaveLoad:loadFromXMLFile(missionInfo)
         local savedPosX   = xmlFile:getFloat( key .. "#posX",          0)
         local savedPosY   = xmlFile:getFloat( key .. "#posY",          0)
         local savedPosZ   = xmlFile:getFloat( key .. "#posZ",          0)
+        local savedRotY   = xmlFile:getFloat( key .. "#rotY",          0)
         local savedSched           = xmlFile:getString(key .. "#paySchedule",     "hourly")
         local savedTimeMultiplier  = xmlFile:getInt(   key .. "#timeMultiplier",  0)
         local savedEndShiftOnLeave = xmlFile:getBool(  key .. "#endShiftOnLeave", true)
@@ -187,6 +188,7 @@ function WorkplaceSaveLoad:loadFromXMLFile(missionInfo)
             posX            = savedPosX,
             posY            = savedPosY,
             posZ            = savedPosZ,
+            rotY            = savedRotY,
             paySchedule     = savedSched,
             timeMultiplier  = savedTimeMultiplier or 0,
             endShiftOnLeave = savedEndShiftOnLeave ~= false,

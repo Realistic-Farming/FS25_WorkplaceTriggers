@@ -74,6 +74,24 @@ end
 -- =========================================================
 function WorkplaceTriggerManager:registerTrigger(triggerData)
     if triggerData == nil then return end
+
+    -- De-dup on id (F145): on a load-from-save BOTH the placeable's onLoad and
+    -- the standalone-XML load can register the same trigger. The placeable's
+    -- copy registers first and carries no purpose field, and getTriggerById
+    -- returns the first match, so an admin designation would land on the
+    -- purposeless duplicate while the saved one kept its stale value. Replace
+    -- any existing entry with the same id in place, so the newest data (which
+    -- carries the purpose) wins and the list never holds two copies.
+    local searchId = tostring(triggerData.id)
+    for i = #self.triggers, 1, -1 do
+        if tostring(self.triggers[i].id) == searchId then
+            self:destroyMarkerForTrigger(self.triggers[i])
+            self:destroyMapHotspotForTrigger(self.triggers[i])
+            table.remove(self.triggers, i)
+            break
+        end
+    end
+
     table.insert(self.triggers, triggerData)
     wtLog(string.format("Registered trigger '%s' (id=%s)",
         triggerData.workplaceName or "?", tostring(triggerData.id)))

@@ -140,6 +140,11 @@ local function onAction(userId, args)
 
     -- Trigger CRUD: admin only
     if TRIGGER_ACTIONS[actionType] then
+        -- userId == nil means the local host (listen-server / single-player host).
+        -- The host holds admin rights without belonging to a specific farm, so it
+        -- passes the admin gate directly (SettingsHub AdminControlRegistry pattern).
+        -- A nil id must not silently skip the guard or silently fail; it gets an
+        -- explicit host-admin verdict instead.
         if userId ~= nil then
             local user = g_currentMission.userManager
                 and g_currentMission.userManager:getUserByUserId(userId)
