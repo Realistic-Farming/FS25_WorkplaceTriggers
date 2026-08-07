@@ -36,3 +36,8 @@
 
 ## Blocked / waiting on
 - [~] Bedrock migrations: StateLedger + SettingsHub + MasterHUD DONE (commits 939f701, c98a876). Only the NetworkSync transactional bridge remains (deferred - needs the NS build-brief, see Cross-mod integration).
+
+## Fast-track fixes (2026-08-07)
+- [x] F145: registerTrigger id de-dup. The placeable and standalone-XML load both registered the same trigger; the purpose designation landed on the purposeless duplicate. Replaces in place so the newest data wins.
+- [x] F144: rotY was saved but never read on load, so trigger orientation reset on reload. Read and restore it.
+- [x] Action-guard nil-userId: the trigger CRUD admin check skipped the guard when userId == nil (listen-server host). Nil now resolves as host-admin (SettingsHub pattern).

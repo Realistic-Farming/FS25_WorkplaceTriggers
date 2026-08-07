@@ -36,3 +36,6 @@
 
 ## Deferred / parked
 - TYPE_REQUEST_SYNC / TYPE_SYNC_SETTINGS join handshake: parked for removal once NetworkSync getFullState replaces it.
+
+## 2026-08-07 (Fred): three small fixes (admin nil-host guard, trigger id de-dup, rotY restore)
+- [x] F145 id de-dup, F144 rotY restore, and the nil-userId admin guard, all built and deployed. In-game verification pending on the reload path.
