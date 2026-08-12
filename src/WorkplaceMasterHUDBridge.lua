@@ -30,6 +30,9 @@ end
 -- The WT HUD draw body. Same call the standalone FSBaseMission.draw hook makes;
 -- WorkplaceSystem:draw() self-guards on isInitialized and the HUD on client.
 function WorkplaceMasterHUDBridge.drawStack()
+    -- Suite hide: MasterHUD # key. No-op when MasterHUD absent.
+    local mh = (g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD
+    if mh ~= nil and mh.areHudsHidden ~= nil and mh:areHudsHidden() then return end
     if g_WorkplaceSystem ~= nil then
         g_WorkplaceSystem:draw()
     end
@@ -52,6 +55,23 @@ function WorkplaceMasterHUDBridge.register()
     if ok then
         WorkplaceMasterHUDBridge.active = true
         wtLog("Registered WT HUD with MasterHUD (single draw loop + menu-suspend)")
+        if hud.registerEditListener ~= nil then
+            hud:registerEditListener(WorkplaceMasterHUDBridge.HUD_ID, {
+                enter = function()
+                    local sys = g_WorkplaceSystem
+                    if sys ~= nil and sys.hud ~= nil and sys.hud.enterEditMode ~= nil then
+                        sys.hud:enterEditMode()
+                    end
+                end,
+                exit = function()
+                    local sys = g_WorkplaceSystem
+                    if sys ~= nil and sys.hud ~= nil and sys.hud.editMode
+                        and sys.hud.exitEditMode ~= nil then
+                        sys.hud:exitEditMode()
+                    end
+                end,
+            })
+        end
     else
         wtLog("MasterHUD registration failed: " .. tostring(err) .. " (using own draw hook)")
     end
