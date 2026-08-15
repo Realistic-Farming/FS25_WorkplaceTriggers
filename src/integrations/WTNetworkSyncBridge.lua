@@ -77,9 +77,36 @@ local function applyStateArray(arr)
     local i = 1
     local count = tonumber(arr[i]) or 0; i = i + 1
 
-    -- Clear existing triggers and rebuild from snapshot
-    sys.triggerManager:delete()
-    sys.triggerManager:initialize()
+    -- BUILD 17:59: an empty snapshot is not a reason to tear the manager down. NetworkSync
+    -- reapplies state on a 30s floor, and during a long join that turned into a loop of
+    -- delete + initialize + "Applied 0 trigger(s)" every half minute while the i3ds were
+    -- still streaming. delete() unsubscribes MessageCenter and destroys markers and
+    -- hotspots; initialize() resubscribes. Doing both to arrive back where we started is
+    -- pure load hitch.
+    --
+    -- Nothing to apply, and the manager is already up and empty: keep the settings line
+    -- below and leave. Nothing to apply and not yet initialized: initialize only, no
+    -- teardown of something that was never built. A snapshot with triggers in it still
+    -- rebuilds exactly as before, because that is a real change and the player needs it.
+    local mgr = sys.triggerManager
+    local alreadyEmpty = mgr.isInitialized == true
+        and (type(mgr.triggers) ~= "table" or next(mgr.triggers) == nil)
+
+    if count == 0 and alreadyEmpty then
+        if sys.settings then
+            sys.settings.wageMultiplier = tonumber(arr[i]) or sys.settings.wageMultiplier or 1.0
+        end
+        return
+    end
+
+    if count == 0 then
+        if not mgr.isInitialized then
+            mgr:initialize()
+        end
+    else
+        mgr:delete()
+        mgr:initialize()
+    end
 
     for _ = 1, count do
         local triggerData = {
