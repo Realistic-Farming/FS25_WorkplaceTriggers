@@ -180,7 +180,9 @@ if FSBaseMission and FSBaseMission.draw then
         -- registered as a self-draw via the bridge); stand down so the HUD never
         -- draws twice. Absent MasterHUD, this hook runs the draw as before.
         if WorkplaceMasterHUDBridge ~= nil and WorkplaceMasterHUDBridge.active then return end
-        if workplaceSystem then
+        if WorkplaceMasterHUDBridge ~= nil then
+            WorkplaceMasterHUDBridge.drawStack()
+        elseif workplaceSystem then
             workplaceSystem:draw()
         end
     end)
