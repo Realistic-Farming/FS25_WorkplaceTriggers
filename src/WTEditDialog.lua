@@ -446,8 +446,19 @@ function WTEditDialog:onClickSave()
     if name == "" then name = "Workplace" end
     if self.isNew then
         local farmId = g_currentMission and g_currentMission:getFarmId() or 1
+        -- BUILD 10:17 (Sam DESIGN 09:56): SAVE now has two honest outcomes instead of
+        -- one optimistic close. sendCreateTrigger's result travels up from the actual
+        -- registerTrigger on the synchronous listen-host path (an explicit false means
+        -- the server-side create refused or errored; false also means the bridge is
+        -- inactive and nothing was created at all). A hard fail keeps the form open
+        -- with the player's input intact and raises the standard blinking warning;
+        -- only a success closes the form and reopens the Manager list, which reads
+        -- live from the triggerManager the create just wrote, so the new row is there
+        -- immediately. No success click ships: the Manager has no click-sound
+        -- convention today and inventing one is Sam's call, not mine.
+        local sent = false
         local ok, err = pcall(function()
-            WTNetworkSyncBridge.sendCreateTrigger({
+            sent = WTNetworkSyncBridge.sendCreateTrigger({
                 workplaceName  = name,
                 hourlyWage     = self.wage,
                 triggerRadius  = self.radius,
@@ -460,8 +471,17 @@ function WTEditDialog:onClickSave()
                 farmId         = farmId,
             })
         end)
-        if not ok then
-            print("[WorkplaceTriggers] onClickSave ERROR: " .. tostring(err))
+        if not ok or sent == false then
+            print("[WorkplaceTriggers] onClickSave FAILED"
+                .. (ok and " (bridge refused)" or (": " .. tostring(err))))
+            if g_currentMission ~= nil and g_currentMission.showBlinkingWarning ~= nil then
+                local msg = (g_i18n ~= nil and g_i18n:getText("wt_save_failed")) or nil
+                if msg == nil or msg == "" or msg == "wt_save_failed" then
+                    msg = "Save failed: Invalid trigger parameters."
+                end
+                g_currentMission:showBlinkingWarning(msg, 3000)
+            end
+            return
         end
         print("[WorkplaceTriggers] Requested trigger creation: " .. name)
     else

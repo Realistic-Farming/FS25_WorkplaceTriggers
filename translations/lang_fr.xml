@@ -6,6 +6,7 @@
         <text name="input_WT_MENU"           text="Ouvrir le gestionnaire de lieux de travail"/>
         <text name="input_WT_HUD_EDIT"       text="Activer/Désactiver le mode édition HUD"/>
         <text name="input_WT_TOGGLE_HUD"     text="Afficher/Masquer le HUD de travail"/>
+        <text name="wt_save_failed"          text="Échec de l'enregistrement : paramètres du déclencheur non valides."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="[E] Interagir avec le lieu de travail"/>

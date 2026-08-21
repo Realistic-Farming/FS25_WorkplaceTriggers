@@ -15,7 +15,10 @@
 -- Position/scale are persisted via WorkplaceSaveLoad (XML).
 -- =========================================================
 
-WorkplaceHUD = {}
+-- BUILD 17:57 + ATTN 18:02 (Wizard hot-reload law, FS25-HotReload-Guide.md Part 1):
+-- reuse the existing class table on Ctrl+R reload so updated methods land on the
+-- table live metatables already reference, instead of orphaning it.
+WorkplaceHUD = WorkplaceHUD or {}
 WorkplaceHUD_mt = Class(WorkplaceHUD)
 
 local function wtLog(msg)
@@ -32,8 +35,10 @@ function WorkplaceHUD.new(system)
     -- vertically centered. The old (0.02, 0.12) default sat on the vanilla
     -- bottom-left corner. A saved layout still wins (settings.hudPosX/Y override
     -- these on load).
-    self.posX = 0.76
-    self.posY = 0.50
+    -- BUILD 15:33 (Sam DESIGN 15:30): posX 0.320 - the left-center column, span
+    -- 0.32-0.54 with BASE_WIDTH 0.22, completely clear of Soil at 0.580+.
+    self.posX = 0.32
+    self.posY = 0.55
 
     -- Scale multiplier applied to all dimensions and text
     self.scale = 1.0
@@ -854,4 +859,16 @@ function WorkplaceHUD:drawLeaveWarning()
     setTextBold(false)
     setTextColor(1, 1, 1, 1)
     setTextAlignment(RenderText.ALIGN_LEFT)
+end
+
+-- =========================================================
+-- BUILD 17:57 + ATTN 18:02 (hot-reload guide Part 2): force-patch the live
+-- instance after a Ctrl+R reload - g_WorkplaceSystem global; holds .hud.
+if g_WorkplaceSystem ~= nil and g_WorkplaceSystem.hud ~= nil then
+    local inst = g_WorkplaceSystem.hud
+    for k, v in pairs(WorkplaceHUD) do
+        if type(v) == "function" then
+            inst[k] = v
+        end
+    end
 end
