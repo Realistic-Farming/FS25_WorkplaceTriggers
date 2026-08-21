@@ -5,6 +5,7 @@
         <text name="input_WT_INTERACT"       text="Start/End Shift"/>
         <text name="input_WT_MENU"           text="Open Workplace Manager"/>
         <text name="input_WT_HUD_EDIT"       text="Toggle HUD Edit Mode"/>
+        <text name="input_WT_TOGGLE_HUD"     text="Toggle Workplace HUD"/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="Interact with Workplace"/>
@@ -16,7 +17,7 @@
         <!-- HUD panel -->
         <text name="wt_hud_on_shift"         text="ON SHIFT"/>
         <text name="wt_hud_edit_mode"        text="Move/Scale Workplace HUD"/>
-        <text name="wt_hud_edit_hint"        text="Drag | Corners=Scale | Edges=Width | Shift=Exit"/>
+        <text name="wt_hud_edit_hint"        text="Drag | Corners=Scale | Edges=Width | Edit/Move key to exit"/>
         <text name="wt_hud_location"         text="Location:"/>
         <text name="wt_hud_time"             text="Time:"/>
         <text name="wt_hud_earned"           text="Earned:"/>

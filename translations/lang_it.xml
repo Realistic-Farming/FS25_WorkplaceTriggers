@@ -5,6 +5,7 @@
         <text name="input_WT_INTERACT"       text="Inizia/Termina turno"/>
         <text name="input_WT_MENU"           text="Apri Gestore luoghi di lavoro"/>
         <text name="input_WT_HUD_EDIT"       text="Attiva/Disattiva modalità modifica HUD"/>
+        <text name="input_WT_TOGGLE_HUD"     text="Mostra/Nascondi HUD lavoro"/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="[E] Interagisci con il posto di lavoro"/>

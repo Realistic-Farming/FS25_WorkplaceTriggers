@@ -180,6 +180,11 @@ if FSBaseMission and FSBaseMission.draw then
         -- registered as a self-draw via the bridge); stand down so the HUD never
         -- draws twice. Absent MasterHUD, this hook runs the draw as before.
         if WorkplaceMasterHUDBridge ~= nil and WorkplaceMasterHUDBridge.active then return end
+        -- BUILD 07:18 (same gate SCS gained at BUILD 21:53): when MasterHUD is present
+        -- but the bridge registration failed, this fallback is the path that draws -
+        -- and it must honor the suite hide-all rather than drawing through it.
+        local suiteHud = (g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD
+        if suiteHud ~= nil and suiteHud.hudsHidden == true then return end
         if WorkplaceMasterHUDBridge ~= nil then
             WorkplaceMasterHUDBridge.drawStack()
         elseif workplaceSystem then
@@ -303,6 +308,31 @@ local function wtHudEditActionCallback(self, actionName, inputValue, callbackSta
     end
 end
 
+-- BUILD 07:18 (Sam DESIGN 07:17 + George TASK 06:49): Alt+W visibility toggle.
+-- No new state machine - the flip goes through settings.showHud, the visibility
+-- truth this mod already owns: WorkplaceHUD:draw honors it (keeping the leave-zone
+-- warning and shift flashes, which are money-relevant events, not chrome, and
+-- keeping edit mode paintable as the escape hatch for finding a hidden panel),
+-- WorkplaceSettings persists it to workplace_triggers_settings.xml on game save,
+-- and the SettingsHub bridge lists it. showHud is player-local by that bridge's
+-- own taxonomy (adminOnly=false, "HUD/notification prefs are player-local"), so
+-- there is deliberately NO multiplayer event: a per-player HUD preference has no
+-- shared world truth to sync. The hub's display mirror is soft-updated so the
+-- tablet settings page cannot show a stale value after a keyboard flip.
+local function wtToggleHudActionCallback(self, actionName, inputValue, callbackState, isAnalog)
+    if inputValue <= 0 then return end
+    if not workplaceSystem or workplaceSystem.settings == nil then return end
+    if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
+    local s = workplaceSystem.settings
+    s.showHud = not s.showHud
+    if s.validate then s:validate() end
+    local hub = (g_currentMission ~= nil and g_currentMission.settingsHub) or g_settingsHub
+    if hub ~= nil and type(hub.setValue) == "function" then
+        pcall(function() hub:setValue("WorkplaceTriggers", "showHud", s.showHud) end)
+    end
+    print("[WorkplaceTriggers] HUD " .. (s.showHud and "shown" or "hidden") .. " (WT_TOGGLE_HUD)")
+end
+
 local function hookWTHudEditInput()
     if wtHudEditOriginalFunc ~= nil then return end
     if PlayerInputComponent == nil or PlayerInputComponent.registerActionEvents == nil then return end
@@ -328,6 +358,23 @@ local function hookWTHudEditInput()
                     g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_NORMAL)
                     g_inputBinding:setActionEventText(eventId,
                         g_i18n:getText("wt_input_hud_edit") or "[Shift] HUD Edit Mode")
+                end
+            end
+
+            -- BUILD 07:18: the visibility toggle registers in the same modification
+            -- session as the edit action - one wrap, two rows.
+            local toggleActionId = InputAction.WT_TOGGLE_HUD
+            if toggleActionId ~= nil then
+                local okT, idT = g_inputBinding:registerActionEvent(
+                    toggleActionId,
+                    WorkplaceSystem,
+                    wtToggleHudActionCallback,
+                    false, true, false, true, nil, true
+                )
+                if okT and idT ~= nil then
+                    g_inputBinding:setActionEventTextPriority(idT, GS_PRIO_NORMAL)
+                    g_inputBinding:setActionEventText(idT,
+                        (g_i18n ~= nil and g_i18n:getText("input_WT_TOGGLE_HUD")) or "Toggle Workplace HUD")
                 end
             end
 
