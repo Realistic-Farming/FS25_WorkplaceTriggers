@@ -25,6 +25,11 @@ local function wtLog(msg)
     print("[WorkplaceTriggers] HUD: " .. tostring(msg))
 end
 
+local function getBaseGameRenderer()
+    local hud = (g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD
+    return hud ~= nil and hud.renderer or nil
+end
+
 function WorkplaceHUD.new(system)
     local self = setmetatable({}, WorkplaceHUD_mt)
     self.system = system
@@ -35,16 +40,17 @@ function WorkplaceHUD.new(system)
     -- vertically centered. The old (0.02, 0.12) default sat on the vanilla
     -- bottom-left corner. A saved layout still wins (settings.hudPosX/Y override
     -- these on load).
-    -- BUILD 15:33 (Sam DESIGN 15:30): posX 0.320 - the left-center column, span
-    -- 0.32-0.54 with BASE_WIDTH 0.22, completely clear of Soil at 0.580+.
-    self.posX = 0.32
-    self.posY = 0.55
+    -- BUILD 15:33 (Sam DESIGN 15:30): posX 0.320 - the left-center column.
+    -- Wizard 2026-08-21: factory home updated to the suite layout Wizard
+    -- arranged in-game (bottom-left lane). A saved layout still wins.
+    self.posX = 0.143437
+    self.posY = 0.037963
 
     -- Scale multiplier applied to all dimensions and text
     self.scale = 1.0
 
     -- Width multiplier (adjusted by left/right edge-drag)
-    self.widthMult     = 1.0
+    self.widthMult     = 0.935938   -- factory suite layout (Wizard 2026-08-21)
     self.MIN_WIDTH_MULT = 0.5
     self.MAX_WIDTH_MULT = 2.5
 
@@ -520,28 +526,31 @@ function WorkplaceHUD:drawShiftPanel(tracker, shiftActive)
     local panelY   = self.posY - pad
     local panelW   = w + pad * 2
 
-    -- Drop shadow
-    local so = 0.002 * s
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.SHADOW[1], self.COLORS.SHADOW[2],
-        self.COLORS.SHADOW[3], self.COLORS.SHADOW[4])
-    renderOverlay(self.bgOverlay, panelX + so, panelY - so, panelW, panelH)
+    local renderer = getBaseGameRenderer()
+    local usedNativePanel = renderer ~= nil and renderer.renderPanel ~= nil
+        and renderer:renderPanel(panelX, panelY, panelW, panelH, self.COLORS.BG[4])
+    if not usedNativePanel then
+        -- Standalone fallback: retain the original graph_pixel shadow, fill and border.
+        local so = 0.002 * s
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.SHADOW[1], self.COLORS.SHADOW[2],
+            self.COLORS.SHADOW[3], self.COLORS.SHADOW[4])
+        renderOverlay(self.bgOverlay, panelX + so, panelY - so, panelW, panelH)
 
-    -- Background
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.BG[1], self.COLORS.BG[2],
-        self.COLORS.BG[3], self.COLORS.BG[4])
-    renderOverlay(self.bgOverlay, panelX, panelY, panelW, panelH)
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.BG[1], self.COLORS.BG[2],
+            self.COLORS.BG[3], self.COLORS.BG[4])
+        renderOverlay(self.bgOverlay, panelX, panelY, panelW, panelH)
 
-    -- Normal border
-    local bw = 0.001
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.BORDER_NORM[1], self.COLORS.BORDER_NORM[2],
-        self.COLORS.BORDER_NORM[3], self.COLORS.BORDER_NORM[4])
-    renderOverlay(self.bgOverlay, panelX, panelY + panelH - bw, panelW, bw)  -- top
-    renderOverlay(self.bgOverlay, panelX, panelY, panelW, bw)                -- bottom
-    renderOverlay(self.bgOverlay, panelX, panelY, bw, panelH)                -- left
-    renderOverlay(self.bgOverlay, panelX + panelW - bw, panelY, bw, panelH)  -- right
+        local bw = 0.001
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.BORDER_NORM[1], self.COLORS.BORDER_NORM[2],
+            self.COLORS.BORDER_NORM[3], self.COLORS.BORDER_NORM[4])
+        renderOverlay(self.bgOverlay, panelX, panelY + panelH - bw, panelW, bw)  -- top
+        renderOverlay(self.bgOverlay, panelX, panelY, panelW, bw)                -- bottom
+        renderOverlay(self.bgOverlay, panelX, panelY, bw, panelH)                -- left
+        renderOverlay(self.bgOverlay, panelX + panelW - bw, panelY, bw, panelH)  -- right
+    end
 
     -- ---------------------------------------------------
     -- Edit mode overlay: pulsing border + handles + hint
@@ -612,13 +621,11 @@ function WorkplaceHUD:drawShiftPanel(tracker, shiftActive)
     local headerY = panelY + panelH - pad - tm
     setTextAlignment(RenderText.ALIGN_LEFT)
     setTextBold(true)
+    setTextColor(self.COLORS.HEADER[1], self.COLORS.HEADER[2],
+                 self.COLORS.HEADER[3], self.COLORS.HEADER[4])
     if shiftActive then
-        setTextColor(self.COLORS.EARN_COLOR[1], self.COLORS.EARN_COLOR[2],
-                     self.COLORS.EARN_COLOR[3], self.COLORS.EARN_COLOR[4])
         renderText(self.posX, headerY, tm, g_i18n:getText("wt_hud_on_shift") or "ON SHIFT")
     else
-        setTextColor(self.COLORS.HINT[1], self.COLORS.HINT[2],
-                     self.COLORS.HINT[3], self.COLORS.HINT[4])
         renderText(self.posX, headerY, tm, g_i18n:getText("wt_hud_edit_mode") or "HUD EDIT MODE")
     end
     setTextBold(false)
