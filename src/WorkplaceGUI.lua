@@ -6,7 +6,7 @@
 -- No overlay rendering. No mouse hit-test code.
 -- =========================================================
 
-WorkplaceGUI = {}
+WorkplaceGUI = WorkplaceGUI or {}
 WorkplaceGUI_mt = Class(WorkplaceGUI)
 
 local function wtLog(msg)

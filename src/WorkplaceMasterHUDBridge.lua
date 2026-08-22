@@ -18,7 +18,7 @@
 -- the draw body, shared with the fallback hook so the two paths can never diverge.
 -- =========================================================
 
-WorkplaceMasterHUDBridge = {}
+WorkplaceMasterHUDBridge = WorkplaceMasterHUDBridge or {}
 
 WorkplaceMasterHUDBridge.HUD_ID = "WorkplaceTriggers_HUD"
 WorkplaceMasterHUDBridge.active = false   -- MasterHUD present and we registered

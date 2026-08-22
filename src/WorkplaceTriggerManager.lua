@@ -16,7 +16,7 @@
 --   the trigger origin at world level.
 -- =========================================================
 
-WorkplaceTriggerManager = {}
+WorkplaceTriggerManager = WorkplaceTriggerManager or {}
 WorkplaceTriggerManager_mt = Class(WorkplaceTriggerManager)
 
 WorkplaceTriggerManager.INTERACT_RADIUS = 3.0

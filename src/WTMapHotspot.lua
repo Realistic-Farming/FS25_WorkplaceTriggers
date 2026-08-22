@@ -24,7 +24,7 @@
 -- hotspot:drawOnMap(map) for each one.
 -- =========================================================
 
-WTMapHotspot = {}
+WTMapHotspot = WTMapHotspot or {}
 WTMapHotspot_mt = Class(WTMapHotspot)   -- gives instances isa()
 
 -- Size constants (normalised screen units)

@@ -10,7 +10,7 @@
 --   - g_gui:loadGui() arg 3 = class table, not instance
 -- =========================================================
 
-WTListDialog = {}
+WTListDialog = WTListDialog or {}
 local WTListDialog_mt = Class(WTListDialog, MessageDialog)
 
 WTListDialog.MAX_ROWS = 8

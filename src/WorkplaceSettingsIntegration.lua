@@ -16,7 +16,7 @@
 --   Debug Mode            (BinaryOption)
 -- =========================================================
 
-WorkplaceSettingsIntegration = {}
+WorkplaceSettingsIntegration = WorkplaceSettingsIntegration or {}
 WorkplaceSettingsIntegration_mt = Class(WorkplaceSettingsIntegration)
 
 local function wtLog(msg)

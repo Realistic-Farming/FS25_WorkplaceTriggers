@@ -15,7 +15,7 @@ local function isAdmin()
     return g_currentMission ~= nil and g_currentMission:getIsServer()
 end
 
-WTEditDialog = {}
+WTEditDialog = WTEditDialog or {}
 local WTEditDialog_mt = Class(WTEditDialog, MessageDialog)
 
 WTEditDialog.WAGE_STEPS   = {1, 10, 100}

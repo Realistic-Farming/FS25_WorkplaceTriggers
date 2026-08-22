@@ -10,8 +10,8 @@
 --   - Trigger callback receives (triggerId, otherId, onEnter, onLeave, onStay)
 -- =========================================================
 
-WorkTriggerPlaceable = {}
-WorkTriggerPlaceable.MOD_NAME = g_currentModName
+WorkTriggerPlaceable = WorkTriggerPlaceable or {}
+WorkTriggerPlaceable.MOD_NAME = (WorkplaceTriggersModName or g_currentModName)
 
 local function wtLog(msg)
     print("[WorkplaceTriggers] Placeable: " .. tostring(msg))

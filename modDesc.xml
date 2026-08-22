@@ -30,7 +30,7 @@ FEATURES:
 - Optional FS25_WorkerCosts integration - shift income is tracked alongside AI worker wages
 
 HOW TO USE:
-1. Press [F4] to open the Workplace Manager and click Add to create a new trigger
+1. Open the Workplace Manager (assign a key to "Open Workplace Manager" under Options - Controls) and click Add to create a new trigger
 2. Name the workplace, set a wage, and choose a pay schedule - then confirm
 3. Place the trigger at any location on the map
 4. Walk into the trigger zone - press [E] to start your shift

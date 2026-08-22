@@ -11,7 +11,7 @@
 -- RULES: No unicode, no goto, no continue (Lua 5.1)
 -- =========================================================
 
-WorkerCostsIntegration = {}
+WorkerCostsIntegration = WorkerCostsIntegration or {}
 WorkerCostsIntegration_mt = Class(WorkerCostsIntegration)
 
 local LOG = "[WorkplaceTriggers] WorkerCosts: "
