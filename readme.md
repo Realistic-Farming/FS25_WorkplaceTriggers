@@ -32,9 +32,9 @@
 
 **Zone-leave penalty** — if you leave the trigger zone during a shift, a 10-second countdown appears in the HUD. Step back inside (or within 8 m of the zone edge) to cancel it. If the countdown expires the shift auto-ends and you receive only 20% of your accrued earnings.
 
-**Shift tracking HUD** — while on shift a panel shows the active workplace, time elapsed, and current earnings in real time. Press `F7` to enter edit mode where you can drag and resize the panel; position and scale are saved per savegame.
+**Shift tracking HUD** — while on shift a panel shows the active workplace, time elapsed, and current earnings in real time. Toggle it with `Alt+W`. Enter edit mode with the *Toggle HUD Edit Mode* action (no default key - assign one under Options > Controls > Mods) to drag and resize the panel; position and scale are saved per savegame.
 
-**Workplace Manager (F4)** — a full list dialog showing all placed triggers with name, wage, pay schedule, and coordinates. Add, edit, or delete any trigger from one screen.
+**Workplace Manager** — a full list dialog showing all placed triggers with name, wage, pay schedule, and coordinates. Add, edit, or delete any trigger from one screen. Open it with the *Open Workplace Manager* action (no default key - assign one under Options > Controls > Mods).
 
 **Shift history log** — the last 50 completed shifts are recorded with workplace name, duration, payout, pay schedule, and in-game day.
 
@@ -52,19 +52,20 @@ Both integrations are silently skipped if those mods are not loaded.
 
 ## How to Use
 
-1. Press **[F4]** to open the Workplace Manager and click **Add**
+1. Open the **Workplace Manager** (assign a key to *Open Workplace Manager* under Options > Controls > Mods) and click **Add**
 2. Name the workplace, set a wage, choose a pay schedule, time multiplier, and zone radius — then confirm
 3. The trigger is placed at your current player position
 4. Walk into the trigger zone — an interaction prompt appears
-5. Press **[E]** to start your shift; press **[E]** again to end it and collect wages
+5. Press **Shift+Alt+W** to start your shift; press it again to end the shift and collect wages
 
 **Controls:**
 
 | Key | Action |
 |-----|--------|
-| `E` | Start / end shift (when inside a trigger zone) |
-| `F4` | Open / close Workplace Manager |
-| `F7` | Toggle HUD edit mode (drag and resize the shift panel) |
+| `Shift+Alt+W` | Start / end shift (when inside a trigger zone) |
+| `Alt+W` | Show / hide the shift HUD |
+| *Open Workplace Manager* action | Open / close Workplace Manager (no default key - assign under Options > Controls > Mods) |
+| *Toggle HUD Edit Mode* action | HUD edit mode: drag and resize the shift panel (no default key - assign under Options > Controls > Mods) |
 
 ---
 

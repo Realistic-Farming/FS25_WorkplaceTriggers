@@ -6,7 +6,7 @@
 -- This module holds any additional input-related state.
 -- =========================================================
 
-WorkplaceInputHandler = {}
+WorkplaceInputHandler = WorkplaceInputHandler or {}
 WorkplaceInputHandler_mt = Class(WorkplaceInputHandler)
 
 local function wtLog(msg)

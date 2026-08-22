@@ -15,8 +15,15 @@
 --   7. No goto, no continue (Lua 5.1)
 -- =========================================================
 
-local modDirectory = g_currentModDirectory
-local modName      = g_currentModName
+-- Hot-reload latch (FuelCosts reference): g_currentModDirectory and
+-- g_currentModName are nil on a live re-source, so they are latched into
+-- module globals on first load, with a g_modsDirectory loose-folder fallback.
+WorkplaceTriggersModDirectory = WorkplaceTriggersModDirectory
+    or g_currentModDirectory
+    or (g_modsDirectory ~= nil and (g_modsDirectory .. "FS25_WorkplaceTriggers/") or nil)
+WorkplaceTriggersModName = WorkplaceTriggersModName or g_currentModName or "FS25_WorkplaceTriggers"
+local modDirectory = WorkplaceTriggersModDirectory
+local modName = WorkplaceTriggersModName
 
 local modItem    = g_modManager:getModByName(modName)
 local modVersion = modItem and modItem.version or "0.1.0.0"

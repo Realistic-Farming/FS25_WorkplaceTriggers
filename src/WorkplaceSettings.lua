@@ -7,7 +7,7 @@
 -- Save location: <savegameDir>/workplace_triggers_settings.xml
 -- =========================================================
 
-WorkplaceSettings = {}
+WorkplaceSettings = WorkplaceSettings or {}
 local WorkplaceSettings_mt = Class(WorkplaceSettings)
 
 local function wtLog(msg)

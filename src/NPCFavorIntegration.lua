@@ -10,7 +10,7 @@
 -- RULES: No unicode, no goto, no continue (Lua 5.1)
 -- =========================================================
 
-NPCFavorIntegration = {}
+NPCFavorIntegration = NPCFavorIntegration or {}
 NPCFavorIntegration_mt = Class(NPCFavorIntegration)
 
 local LOG = "[WorkplaceTriggers] NPCFavor: "

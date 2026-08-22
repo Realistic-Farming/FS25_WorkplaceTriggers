@@ -7,7 +7,7 @@
 -- g_currentMission.updateFunds as fallback.
 -- =========================================================
 
-WorkplaceFinanceIntegration = {}
+WorkplaceFinanceIntegration = WorkplaceFinanceIntegration or {}
 WorkplaceFinanceIntegration_mt = Class(WorkplaceFinanceIntegration)
 
 local function wtLog(msg)

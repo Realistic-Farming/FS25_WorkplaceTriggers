@@ -16,7 +16,7 @@
 -- player-local (adminOnly = false).
 -- =========================================================
 
-WorkplaceSettingsHubBridge = {}
+WorkplaceSettingsHubBridge = WorkplaceSettingsHubBridge or {}
 
 local function wtLog(msg)
     print("[WorkplaceTriggers] SettingsHub: " .. tostring(msg))

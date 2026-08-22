@@ -8,7 +8,7 @@
 -- We pass the class, then retrieve the instance g_gui created.
 -- =========================================================
 
-WTDialogLoader = {}
+WTDialogLoader = WTDialogLoader or {}
 
 WTDialogLoader.modDirectory  = nil
 WTDialogLoader.loaded        = false

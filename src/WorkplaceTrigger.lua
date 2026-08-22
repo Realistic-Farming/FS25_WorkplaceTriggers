@@ -4,7 +4,7 @@
 -- Based on ShopTrigger pattern from ShopTrigger.md
 -- =========================================================
 
-WorkplaceTrigger = {}
+WorkplaceTrigger = WorkplaceTrigger or {}
 WorkplaceTrigger_mt = Class(WorkplaceTrigger)
 
 -- BL17 spam cooldown: a trigger's activation (teleport + workplace dialog) cannot
@@ -292,7 +292,7 @@ end
 -- WorkplaceTriggerActivatable (for interaction prompt)
 -- =========================================================
 
-WorkplaceTriggerActivatable = {}
+WorkplaceTriggerActivatable = WorkplaceTriggerActivatable or {}
 -- NOTE: ActivatableObject is only available after mission load, not at source() time.
 -- WorkplaceTriggerActivatable_mt is set lazily on first .new() call to avoid the
 -- "Given base class is not defined" error when the file is first loaded.

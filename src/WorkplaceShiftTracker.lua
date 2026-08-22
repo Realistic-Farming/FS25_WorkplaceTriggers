@@ -7,7 +7,7 @@
 -- Never use os.time() - forbidden in FS25 Lua 5.1 sandbox.
 -- =========================================================
 
-WorkplaceShiftTracker = {}
+WorkplaceShiftTracker = WorkplaceShiftTracker or {}
 WorkplaceShiftTracker_mt = Class(WorkplaceShiftTracker)
 
 -- Pay schedule types

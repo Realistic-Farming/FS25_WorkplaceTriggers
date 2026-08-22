@@ -18,7 +18,7 @@
 --   * NetworkSync absent    -> MP sync is not available (event class removed)
 -- =========================================================
 
-WTNetworkSyncBridge = {}
+WTNetworkSyncBridge = WTNetworkSyncBridge or {}
 
 WTNetworkSyncBridge.MODULE_ID = "WorkplaceTriggers"
 WTNetworkSyncBridge.CHANNEL   = "WorkplaceTriggers_Sync"
