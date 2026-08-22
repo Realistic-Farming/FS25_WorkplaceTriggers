@@ -15,26 +15,42 @@
 -- Position/scale are persisted via WorkplaceSaveLoad (XML).
 -- =========================================================
 
-WorkplaceHUD = {}
+-- BUILD 17:57 + ATTN 18:02 (Wizard hot-reload law, FS25-HotReload-Guide.md Part 1):
+-- reuse the existing class table on Ctrl+R reload so updated methods land on the
+-- table live metatables already reference, instead of orphaning it.
+WorkplaceHUD = WorkplaceHUD or {}
 WorkplaceHUD_mt = Class(WorkplaceHUD)
 
 local function wtLog(msg)
     print("[WorkplaceTriggers] HUD: " .. tostring(msg))
 end
 
+local function getBaseGameRenderer()
+    local hud = (g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD
+    return hud ~= nil and hud.renderer or nil
+end
+
 function WorkplaceHUD.new(system)
     local self = setmetatable({}, WorkplaceHUD_mt)
     self.system = system
 
-    -- Position (normalized 0-1, Y=0 is bottom)
-    self.posX = 0.02
-    self.posY = 0.12   -- just above the default FS25 bottom bar
+    -- Position (normalized 0-1, Y=0 is bottom).
+    -- BUILD 06:43 (Sam DESIGN 06:42): fresh-save home is middle-RIGHT in the suite's
+    -- staggered default layout - right edge at ~0.98 (posX 0.76 + BASE_WIDTH 0.22),
+    -- vertically centered. The old (0.02, 0.12) default sat on the vanilla
+    -- bottom-left corner. A saved layout still wins (settings.hudPosX/Y override
+    -- these on load).
+    -- BUILD 15:33 (Sam DESIGN 15:30): posX 0.320 - the left-center column.
+    -- Wizard 2026-08-21: factory home updated to the suite layout Wizard
+    -- arranged in-game (bottom-left lane). A saved layout still wins.
+    self.posX = 0.143437
+    self.posY = 0.037963
 
     -- Scale multiplier applied to all dimensions and text
     self.scale = 1.0
 
     -- Width multiplier (adjusted by left/right edge-drag)
-    self.widthMult     = 1.0
+    self.widthMult     = 0.935938   -- factory suite layout (Wizard 2026-08-21)
     self.MIN_WIDTH_MULT = 0.5
     self.MAX_WIDTH_MULT = 2.5
 
@@ -449,23 +465,40 @@ function WorkplaceHUD:draw()
     if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
     if g_currentMission and g_currentMission.paused then return end
 
-    -- Respect settings
-    local cfg = self.system and self.system.settings
+    -- BUILD 08:50 (Sam DESIGN 08:49 + Brian TEST 07:31): hide means HIDE. One gate,
+    -- FIRST, over everything this HUD paints - shift panel, leave-zone warning and
+    -- shift flash included. The old order drew the warning and flash before the gate
+    -- as "money-relevant exceptions"; Sam's lock is that a hidden HUD paints nothing,
+    -- and a leaky exception is how Brian read a surviving panel as a broken toggle.
+    -- Edit mode still paints (the escape hatch for placing a hidden panel).
+    --
+    -- The hidden truth is read from BOTH reachable settings handles - the instance
+    -- this HUD was constructed with AND the published g_WorkplaceSystem - because
+    -- Brian's live log showed the toggle callback flipping state while a panel kept
+    -- painting. From source these are one object; if any runtime path ever splits
+    -- them, either handle saying hidden now hides, so the player's press can never
+    -- again be logged and ignored.
+    local cfg  = self.system and self.system.settings
+    local gcfg = (g_WorkplaceSystem ~= nil) and g_WorkplaceSystem.settings or nil
+    local hidden = (cfg ~= nil and cfg.showHud == false)
+        or (gcfg ~= nil and gcfg.showHud == false)
+    if hidden and not self.editMode then return end
 
-    -- Leave-zone warning (always visible when active, regardless of showHud setting)
+    -- Leave-zone warning (visible whenever the HUD itself is not hidden)
     if self.leaveWarnActive then
         self:drawLeaveWarning()
     end
 
-    -- Flash notification always renders (if notifications enabled)
+    -- Flash notification (if notifications enabled)
     if self.flashMessage then
         if not cfg or cfg.showNotifications ~= false then
             self:drawFlash()
         end
     end
 
-    -- Only draw shift panel when showHud is enabled (or in edit mode)
-    if cfg and cfg.showHud == false and not self.editMode then return end
+    -- Reaching here means either not hidden, or hidden-but-editing (the escape
+    -- hatch, which must paint the panel for placement). The shift-or-edit gate
+    -- below still applies as before.
 
     -- Only draw shift panel when a shift is active OR in edit mode
     local tracker     = self.system.shiftTracker
@@ -493,28 +526,31 @@ function WorkplaceHUD:drawShiftPanel(tracker, shiftActive)
     local panelY   = self.posY - pad
     local panelW   = w + pad * 2
 
-    -- Drop shadow
-    local so = 0.002 * s
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.SHADOW[1], self.COLORS.SHADOW[2],
-        self.COLORS.SHADOW[3], self.COLORS.SHADOW[4])
-    renderOverlay(self.bgOverlay, panelX + so, panelY - so, panelW, panelH)
+    local renderer = getBaseGameRenderer()
+    local usedNativePanel = renderer ~= nil and renderer.renderPanel ~= nil
+        and renderer:renderPanel(panelX, panelY, panelW, panelH, self.COLORS.BG[4])
+    if not usedNativePanel then
+        -- Standalone fallback: retain the original graph_pixel shadow, fill and border.
+        local so = 0.002 * s
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.SHADOW[1], self.COLORS.SHADOW[2],
+            self.COLORS.SHADOW[3], self.COLORS.SHADOW[4])
+        renderOverlay(self.bgOverlay, panelX + so, panelY - so, panelW, panelH)
 
-    -- Background
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.BG[1], self.COLORS.BG[2],
-        self.COLORS.BG[3], self.COLORS.BG[4])
-    renderOverlay(self.bgOverlay, panelX, panelY, panelW, panelH)
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.BG[1], self.COLORS.BG[2],
+            self.COLORS.BG[3], self.COLORS.BG[4])
+        renderOverlay(self.bgOverlay, panelX, panelY, panelW, panelH)
 
-    -- Normal border
-    local bw = 0.001
-    setOverlayColor(self.bgOverlay,
-        self.COLORS.BORDER_NORM[1], self.COLORS.BORDER_NORM[2],
-        self.COLORS.BORDER_NORM[3], self.COLORS.BORDER_NORM[4])
-    renderOverlay(self.bgOverlay, panelX, panelY + panelH - bw, panelW, bw)  -- top
-    renderOverlay(self.bgOverlay, panelX, panelY, panelW, bw)                -- bottom
-    renderOverlay(self.bgOverlay, panelX, panelY, bw, panelH)                -- left
-    renderOverlay(self.bgOverlay, panelX + panelW - bw, panelY, bw, panelH)  -- right
+        local bw = 0.001
+        setOverlayColor(self.bgOverlay,
+            self.COLORS.BORDER_NORM[1], self.COLORS.BORDER_NORM[2],
+            self.COLORS.BORDER_NORM[3], self.COLORS.BORDER_NORM[4])
+        renderOverlay(self.bgOverlay, panelX, panelY + panelH - bw, panelW, bw)  -- top
+        renderOverlay(self.bgOverlay, panelX, panelY, panelW, bw)                -- bottom
+        renderOverlay(self.bgOverlay, panelX, panelY, bw, panelH)                -- left
+        renderOverlay(self.bgOverlay, panelX + panelW - bw, panelY, bw, panelH)  -- right
+    end
 
     -- ---------------------------------------------------
     -- Edit mode overlay: pulsing border + handles + hint
@@ -566,7 +602,7 @@ function WorkplaceHUD:drawShiftPanel(tracker, shiftActive)
         setTextBold(false)
         setTextColor(self.COLORS.HINT[1], self.COLORS.HINT[2],
                      self.COLORS.HINT[3], self.COLORS.HINT[4])
-        local hintText = g_i18n:getText("wt_hud_edit_hint") or "Drag | Corners=Scale | Edges=Width | F7=Exit"
+        local hintText = g_i18n:getText("wt_hud_edit_hint") or "Drag | Corners=Scale | Edges=Width | Edit/Move key to exit"
         local scaleStr = string.format(" (%d%%)", math.floor(self.scale * 100 + 0.5))
         renderText(self.posX, panelY - ts * 1.4, ts * 0.85, hintText .. scaleStr)
         setTextColor(1, 1, 1, 1)
@@ -585,13 +621,11 @@ function WorkplaceHUD:drawShiftPanel(tracker, shiftActive)
     local headerY = panelY + panelH - pad - tm
     setTextAlignment(RenderText.ALIGN_LEFT)
     setTextBold(true)
+    setTextColor(self.COLORS.HEADER[1], self.COLORS.HEADER[2],
+                 self.COLORS.HEADER[3], self.COLORS.HEADER[4])
     if shiftActive then
-        setTextColor(self.COLORS.EARN_COLOR[1], self.COLORS.EARN_COLOR[2],
-                     self.COLORS.EARN_COLOR[3], self.COLORS.EARN_COLOR[4])
         renderText(self.posX, headerY, tm, g_i18n:getText("wt_hud_on_shift") or "ON SHIFT")
     else
-        setTextColor(self.COLORS.HINT[1], self.COLORS.HINT[2],
-                     self.COLORS.HINT[3], self.COLORS.HINT[4])
         renderText(self.posX, headerY, tm, g_i18n:getText("wt_hud_edit_mode") or "HUD EDIT MODE")
     end
     setTextBold(false)
@@ -832,4 +866,16 @@ function WorkplaceHUD:drawLeaveWarning()
     setTextBold(false)
     setTextColor(1, 1, 1, 1)
     setTextAlignment(RenderText.ALIGN_LEFT)
+end
+
+-- =========================================================
+-- BUILD 17:57 + ATTN 18:02 (hot-reload guide Part 2): force-patch the live
+-- instance after a Ctrl+R reload - g_WorkplaceSystem global; holds .hud.
+if g_WorkplaceSystem ~= nil and g_WorkplaceSystem.hud ~= nil then
+    local inst = g_WorkplaceSystem.hud
+    for k, v in pairs(WorkplaceHUD) do
+        if type(v) == "function" then
+            inst[k] = v
+        end
+    end
 end
