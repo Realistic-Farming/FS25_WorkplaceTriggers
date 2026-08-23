@@ -43,11 +43,11 @@ function WorkplaceHUD.new(system)
     -- BUILD 15:33 (Sam DESIGN 15:30): posX 0.320 - the left-center column.
     -- Wizard 2026-08-22: factory home updated to the suite layout Wizard
     -- arranged in-game (bottom-left lane). A saved layout still wins.
-    self.posX = 0.140833
+    self.posX = 0.141874
     self.posY = 0.053704
 
     -- Scale multiplier applied to all dimensions and text
-    self.scale = 0.787200   -- factory suite layout (Wizard 2026-08-22)
+    self.scale = 0.777551   -- factory suite layout (Wizard 2026-08-22 21:xx capture)
 
     -- Width multiplier (adjusted by left/right edge-drag)
     self.widthMult     = 0.935938   -- factory suite layout (Wizard 2026-08-21)

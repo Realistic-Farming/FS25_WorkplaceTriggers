@@ -15,6 +15,7 @@ the repo's git history and README.
 
 ### Added
 - Changelog file established (suite ruling 2026-08-22).
+- Playtest fixes: WT_TOGGLE_HUD (RShift+K) and WT_HUD_EDIT (RShift+C) chords, WorkplaceHUD, MasterHUD bridge.
 - Control Center action: WT_MENU opens the workplace menu from the suite Control Center (requires SettingsHub).
 
 ## [1.1.1.2] - 2026-08-22
