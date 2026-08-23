@@ -80,11 +80,11 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
     <actions>
         <action name="WT_INTERACT"/>
         <action name="WT_MENU"/>
-        <action name="WT_HUD_EDIT"/>
+        <action name="WT_HUD_EDIT" category="ONFOOT VEHICLE" />
         <!-- BUILD 07:18 (Sam DESIGN 07:17 + George TASK 06:49): the visibility toggle
              the BUILD 06:43 flag asked for, now sanctioned. Drives settings.showHud,
              the mod's existing player-local visibility truth. -->
-        <action name="WT_TOGGLE_HUD"/>
+        <action name="WT_TOGGLE_HUD" category="ONFOOT VEHICLE" />
     </actions>
     <inputBinding>
         <actionBinding action="WT_INTERACT"/>
@@ -92,11 +92,11 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
         <!-- BUILD 06:43 (Sam DESIGN 06:42): seat-locked non-Function defaults so a
              fresh save can drive the Workplace HUD out of the box - Alt+W toggles
              (BUILD 07:18), Shift+Alt+W edits/moves. -->
-        <actionBinding action="WT_HUD_EDIT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lalt KEY_w" />
-        </actionBinding>
         <actionBinding action="WT_TOGGLE_HUD">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_w" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_k" />
+        </actionBinding>
+        <actionBinding action="WT_HUD_EDIT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_c" />
         </actionBinding>
     </inputBinding>
 
