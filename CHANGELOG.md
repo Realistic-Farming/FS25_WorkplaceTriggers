@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to FS25_WorkplaceTriggers will be documented in this file.
 
@@ -15,6 +15,7 @@ the repo's git history and README.
 
 ### Added
 - Changelog file established (suite ruling 2026-08-22).
+- Control Center action: WT_MENU opens the workplace menu from the suite Control Center (requires SettingsHub).
 
 ## [1.1.1.2] - 2026-08-22
 

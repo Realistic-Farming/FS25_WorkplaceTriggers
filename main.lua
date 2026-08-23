@@ -1,3 +1,12 @@
+-- 2026-08-22 (Wizard): with MasterHUD installed this mod's own HUD hide/move keys must not
+-- merely be inert, they must not REGISTER at all - that is what removes their rows from the
+-- F1 legend and the Controls list. Probed on TaxMod first: skipping registration does remove
+-- the row, so the pattern is used suite-wide. Only HUD hide/move actions are gated; every
+-- other action this mod registers is untouched.
+local function __rfMhOwnsHudKeys()
+    return ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil
+end
+
 -- =========================================================
 -- FS25 Workplace Triggers (v1.1.1.1)
 -- Placeable Off-Farm Work System
@@ -307,6 +316,13 @@ local wtHudEditActionEventId = nil
 local wtHudEditOriginalFunc  = nil
 
 local function wtHudEditActionCallback(self, actionName, inputValue, callbackState, isAnalog)
+    -- 2026-08-22 (Wizard): MasterHUD takeover. When MasterHUD is installed it owns the
+    -- suite-wide hide/move binds, so this mod's own per-mod key is deliberately inert:
+    -- one surface, one way to reach it. Standalone (no MasterHUD) this runs normally.
+    -- Canonical presence check, the same expression the suite's MasterHUD bridges use.
+    if ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil then
+        return
+    end
     if inputValue <= 0 then return end
     if not workplaceSystem then return end
     if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
@@ -327,6 +343,13 @@ end
 -- shared world truth to sync. The hub's display mirror is soft-updated so the
 -- tablet settings page cannot show a stale value after a keyboard flip.
 local function wtToggleHudActionCallback(self, actionName, inputValue, callbackState, isAnalog)
+    -- 2026-08-22 (Wizard): MasterHUD takeover. When MasterHUD is installed it owns the
+    -- suite-wide hide/move binds, so this mod's own per-mod key is deliberately inert:
+    -- one surface, one way to reach it. Standalone (no MasterHUD) this runs normally.
+    -- Canonical presence check, the same expression the suite's MasterHUD bridges use.
+    if ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil then
+        return
+    end
     if inputValue <= 0 then return end
     if not workplaceSystem or workplaceSystem.settings == nil then return end
     if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
@@ -353,6 +376,7 @@ local function hookWTHudEditInput()
             g_inputBinding:beginActionEventsModification(PlayerInputComponent.INPUT_CONTEXT_NAME)
 
             local actionId = InputAction.WT_HUD_EDIT
+            if __rfMhOwnsHudKeys() then actionId = nil end
             if actionId ~= nil then
                 local success, eventId = g_inputBinding:registerActionEvent(
                     actionId,
@@ -364,13 +388,14 @@ local function hookWTHudEditInput()
                     wtHudEditActionEventId = eventId
                     g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_NORMAL)
                     g_inputBinding:setActionEventText(eventId,
-                        g_i18n:getText("wt_input_hud_edit") or "[Shift] HUD Edit Mode")
+                        g_i18n:getText("input_WT_HUD_EDIT") or "Move Workplace HUD")
                 end
             end
 
             -- BUILD 07:18: the visibility toggle registers in the same modification
             -- session as the edit action - one wrap, two rows.
             local toggleActionId = InputAction.WT_TOGGLE_HUD
+            if __rfMhOwnsHudKeys() then toggleActionId = nil end
             if toggleActionId ~= nil then
                 local okT, idT = g_inputBinding:registerActionEvent(
                     toggleActionId,
@@ -502,3 +527,33 @@ print("  Turn any location into a workplace!")
 print("  Pay schedules: Hourly / Flat / Daily")
 print("  Type 'wtHelp' for console commands")
 print("==============================================")
+
+-- ---------------------------------------------------------
+-- Realistic Farming Control Center: publish a runnable delegate.
+--
+-- Calls workplaceSystem:onMenuPressed directly rather than wtMenuActionCallback,
+-- which opens with "if inputValue <= 0 then return end" and would compare nil
+-- when invoked with no arguments.
+--
+-- WT_INTERACT is deliberately absent: it acts on the workplace trigger the
+-- player is standing in. WT_TOGGLE_HUD and WT_HUD_EDIT are absent because
+-- MasterHUD owns the suite HUD keys. All three keep their directory row.
+-- ---------------------------------------------------------
+local function registerControlCenterActions()
+    local registry = g_currentMission ~= nil and g_currentMission.rfActionRegistry or nil
+    if registry == nil then return end
+
+    registry.registerAction({
+        action     = "WT_MENU",
+        button     = "Open",
+        closeFirst = true,
+        run = function()
+            if workplaceSystem ~= nil and workplaceSystem.onMenuPressed ~= nil then
+                workplaceSystem:onMenuPressed()
+            end
+        end,
+    })
+end
+
+Mission00.loadMission00Finished = Utils.appendedFunction(
+    Mission00.loadMission00Finished, registerControlCenterActions)
