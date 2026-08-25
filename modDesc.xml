@@ -78,7 +78,7 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
     </extraSourceFiles>
 
     <actions>
-        <action name="WT_INTERACT"/>
+        <action name="WT_INTERACT" category="ONFOOT"/>
         <action name="WT_MENU"/>
         <action name="WT_HUD_EDIT" category="ONFOOT VEHICLE" />
         <!-- BUILD 07:18 (Sam DESIGN 07:17 + George TASK 06:49): the visibility toggle
@@ -87,7 +87,9 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
         <action name="WT_TOGGLE_HUD" category="ONFOOT VEHICLE" />
     </actions>
     <inputBinding>
-        <actionBinding action="WT_INTERACT"/>
+        <actionBinding action="WT_INTERACT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_e" />
+        </actionBinding>
         <actionBinding action="WT_MENU"/>
         <!-- BUILD 06:43 (Sam DESIGN 06:42): seat-locked non-Function defaults so a
              fresh save can drive the Workplace HUD out of the box - Alt+W toggles
