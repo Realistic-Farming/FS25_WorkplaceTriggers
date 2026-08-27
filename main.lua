@@ -536,8 +536,10 @@ print("==============================================")
 -- when invoked with no arguments.
 --
 -- WT_INTERACT is deliberately absent: it acts on the workplace trigger the
--- player is standing in. WT_TOGGLE_HUD and WT_HUD_EDIT are absent because
--- MasterHUD owns the suite HUD keys. All three keep their directory row.
+-- player is standing in, and WT_HUD_EDIT stays button-less (moving the panel
+-- needs the in-world drag). WT_TOGGLE_HUD now grows a hide/show button below: the
+-- physical key stays gated to MasterHUD, but a per-mod hide is reachable from the
+-- Control Center. All keep their directory row.
 -- ---------------------------------------------------------
 local function registerControlCenterActions()
     local registry = g_currentMission ~= nil and g_currentMission.rfActionRegistry or nil
@@ -551,6 +553,28 @@ local function registerControlCenterActions()
             if workplaceSystem ~= nil and workplaceSystem.onMenuPressed ~= nil then
                 workplaceSystem:onMenuPressed()
             end
+        end,
+    })
+
+    -- Per-mod HUD hide/show. Flips settings.showHud (the visibility truth this mod
+    -- already owns; WorkplaceHUD:draw honours it under both draw paths), mirroring
+    -- the WT_TOGGLE_HUD key minus the MasterHUD gate. Live "Hide"/"Show" caption.
+    registry.registerAction({
+        action = "WT_TOGGLE_HUD",
+        button = function()
+            local s = workplaceSystem ~= nil and workplaceSystem.settings or nil
+            return (s ~= nil and s.showHud ~= false) and "Hide" or "Show"
+        end,
+        run = function()
+            if workplaceSystem == nil or workplaceSystem.settings == nil then return end
+            local s = workplaceSystem.settings
+            s.showHud = not s.showHud
+            if s.validate then s:validate() end
+            local hub = (g_currentMission ~= nil and g_currentMission.settingsHub) or g_settingsHub
+            if hub ~= nil and type(hub.setValue) == "function" then
+                pcall(function() hub:setValue("WorkplaceTriggers", "showHud", s.showHud) end)
+            end
+            return s.showHud and "Workplace HUD shown" or "Workplace HUD hidden"
         end,
     })
 end
