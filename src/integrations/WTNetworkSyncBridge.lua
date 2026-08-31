@@ -285,12 +285,15 @@ onShiftEnd = function(sys, userId, args)
         earned, name = sys.shiftTracker:endShiftForFarm(farmId)
     end
 
-    -- Clear single-slot state if this farm owned it
+    -- Clear mirrored single-slot state if this farm owned it. The per-farm path
+    -- above already paid and recorded this shift, so the single-slot clear must run
+    -- in skipPayout mode: it resets the host's active shift and HUD without paying a
+    -- second time (issue #29 double payout) or writing a duplicate history row.
     if sys.shiftTracker.activeFarmId == farmId
        and sys.shiftTracker:isShiftActive() then
         pcall(function()
-            if isPenalty then sys.shiftTracker:endShiftPenalty()
-            else              sys.shiftTracker:endShift() end
+            if isPenalty then sys.shiftTracker:endShiftPenalty(true)
+            else              sys.shiftTracker:endShift(true) end
         end)
     end
 
@@ -366,11 +369,14 @@ end
 onDeleteTrigger = function(sys, userId, args)
     local triggerId = tostring(args[2] or "")
 
-    -- End any active shifts using this trigger
+    -- End any active shifts using this trigger. The local farm's shift lives in both
+    -- the single-slot mirror and _farmShifts, so the mirror clear must run in
+    -- skipPayout mode (it only resets state/HUD); endShiftForFarm below does the
+    -- single payment and history row (issue #29 double payout).
     if sys.shiftTracker then
         if sys.shiftTracker:isShiftActive()
            and tostring(sys.shiftTracker.activeTriggerId) == triggerId then
-            sys.shiftTracker:endShift()
+            sys.shiftTracker:endShift(true)
         end
         if sys.shiftTracker._farmShifts then
             for farmId, entry in pairs(sys.shiftTracker._farmShifts) do
