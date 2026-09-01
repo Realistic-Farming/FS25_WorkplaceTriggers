@@ -5,6 +5,8 @@
         <text name="input_WT_INTERACT"       text="Dienst beginnen/beëindigen"/>
         <text name="input_WT_MENU"           text="Open Werkplekbeheerder"/>
         <text name="input_WT_HUD_EDIT"       text="HUD-bewerkingsmodus in-/uitschakelen"/>
+        <text name="input_WT_TOGGLE_HUD"     text="Werkplek-HUD tonen/verbergen"/>
+        <text name="wt_save_failed"          text="Opslaan mislukt: ongeldige triggerparameters."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="[E] Interactie met werkplek"/>
@@ -124,7 +126,7 @@
         <!-- ── Getting Started, Page 2: Configure ── -->
         <text name="helpLine_wt_su_p2_title"           text="Stap 2 - Je werkplek configureren"/>
         <text name="helpLine_wt_su_p2_name_title"      text="Je werkplek een naam geven"/>
-        <text name="helpLine_wt_su_p2_name_text"       text="Open na het plaatsen van de trigger de Werkplekbeheerder met F4 en selecteer je nieuwe trigger uit de lijst. Druk op Bewerken. Typ elke gewenste naam in het naamveld - Postkantoor, Voermolen, Houtzagerij, Gemeentehuis, wat dan ook bij je verhaal past. Deze naam verschijnt op het kaartpictogram, in het dienst-HUD-paneel terwijl je werkt, in de in- en uitklokmeldingen en in je meldingsberichten."/>
+        <text name="helpLine_wt_su_p2_name_text"       text="Open na het plaatsen van de trigger de Werkplekbeheerder met Open Werkplekbeheerder en selecteer je nieuwe trigger uit de lijst. Druk op Bewerken. Typ elke gewenste naam in het naamveld - Postkantoor, Voermolen, Houtzagerij, Gemeentehuis, wat dan ook bij je verhaal past. Deze naam verschijnt op het kaartpictogram, in het dienst-HUD-paneel terwijl je werkt, in de in- en uitklokmeldingen en in je meldingsberichten."/>
         <text name="helpLine_wt_su_p2_wage_title"      text="Het uurloon instellen"/>
         <text name="helpLine_wt_su_p2_wage_text"       text="Gebruik de plus- en minknoppen in het bewerkingsdialoogvenster om een uurloon in te stellen tussen 0 en 99.999 per speluur. De standaard is 500. Gebruik de stapselector om te wijzigen of elke druk op de knop met 10, 100 of 1.000 tegelijk aanpast. Een globale loonvermenigvuldiger (0,5x tot 2,0x) is beschikbaar in het spelinstellingenmenu en wordt bovenop het loon van elke trigger toegepast, zodat je het totale inkomensniveau kunt aanpassen zonder elke trigger afzonderlijk te bewerken."/>
         <text name="helpLine_wt_su_p2_radius_title"    text="De triggerradius aanpassen"/>
@@ -161,7 +163,7 @@
         <!-- ── Managing Workplaces, Page 1: The manager ── -->
         <text name="helpLine_wt_mg_p1_title"         text="De Werkplekbeheerder"/>
         <text name="helpLine_wt_mg_p1_open_title"    text="De beheerder openen"/>
-        <text name="helpLine_wt_mg_p1_open_text"     text="Druk op elk moment op F4 (zelfs tijdens een dienst) om het dialoogvenster van de Werkplekbeheerder te openen. Dit is het centrale punt voor het bekijken en beheren van al je geplaatste werkplekken. Het geeft elke trigger die je hebt gemaakt weer met zijn naam, uurloon en huidige status in één oogopslag. De beheerder kan ook worden geopend vanuit de spelconsole door wtGui te typen als je dat liever hebt."/>
+        <text name="helpLine_wt_mg_p1_open_text"     text="Druk op elk moment op Open Werkplekbeheerder (zelfs tijdens een dienst) om het dialoogvenster van de Werkplekbeheerder te openen. Dit is het centrale punt voor het bekijken en beheren van al je geplaatste werkplekken. Het geeft elke trigger die je hebt gemaakt weer met zijn naam, uurloon en huidige status in één oogopslag. De beheerder kan ook worden geopend vanuit de spelconsole door wtGui te typen als je dat liever hebt."/>
         <text name="helpLine_wt_mg_p1_list_title"    text="De lijst lezen"/>
         <text name="helpLine_wt_mg_p1_list_text"     text="Elke rij in de lijst toont links de werkpleknaam en rechts het geconfigureerde uurloon. Als er momenteel een dienst actief is op een werkplek, wordt die rij gemarkeerd. Je kunt door de lijst scrollen als je veel werkplekken hebt. Door op een rij te klikken wordt deze geselecteerd en worden de knoppen Bewerken en Verwijderen onderaan het dialoogvenster beschikbaar voor de geselecteerde werkplek."/>
 

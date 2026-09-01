@@ -16,7 +16,7 @@
 --   the trigger origin at world level.
 -- =========================================================
 
-WorkplaceTriggerManager = {}
+WorkplaceTriggerManager = WorkplaceTriggerManager or {}
 WorkplaceTriggerManager_mt = Class(WorkplaceTriggerManager)
 
 WorkplaceTriggerManager.INTERACT_RADIUS = 3.0
@@ -250,8 +250,7 @@ function WorkplaceTriggerManager:onMarkerI3DLoaded(i3dNode, failedReason, args)
     end
 
     if td._markerRootNode == nil or td._markerRootNode == 0 then
-        g_i3DManager:releaseSharedI3DFile(
-            td._markerI3DResolved or Utils.getFilename(MARKER_I3D_RAW, ""))
+        g_i3DManager:releaseSharedI3DFile(i3dNode)
         return
     end
 

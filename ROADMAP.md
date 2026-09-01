@@ -39,3 +39,6 @@
 
 ## 2026-08-07 (Fred): three small fixes (admin nil-host guard, trigger id de-dup, rotY restore)
 - [x] F145 id de-dup, F144 rotY restore, and the nil-userId admin guard, all built and deployed. In-game verification pending on the reload path.
+
+## 2026-08-31 (Fred): double payout fixed (issue #29)
+- [x] Shift end no longer pays twice. Root cause: the NetworkSync bridge's `onShiftEnd` paid once via `endShiftForFarm`, then cleared the local farm's single-slot mirror by calling `endShift()`/`endShiftPenalty()`, which paid a second time via `addMoney` (server-gated, so both fired on the host). `endShift`/`endShiftPenalty` now take a `skipPayout` flag; the bridge's mirror-clear and the trigger-delete finish pass `true`, so they reset state and update the host HUD without a second payment or duplicate history/integration row. In-game verification pending.

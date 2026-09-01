@@ -15,7 +15,7 @@
 --   </workplaceTriggers>
 -- =========================================================
 
-WorkplaceSaveLoad = {}
+WorkplaceSaveLoad = WorkplaceSaveLoad or {}
 WorkplaceSaveLoad_mt = Class(WorkplaceSaveLoad)
 
 local ROOT = "careerSavegame.workplaceTriggers"

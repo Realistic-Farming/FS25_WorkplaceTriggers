@@ -7,7 +7,7 @@
 -- Never use os.time() - forbidden in FS25 Lua 5.1 sandbox.
 -- =========================================================
 
-WorkplaceShiftTracker = {}
+WorkplaceShiftTracker = WorkplaceShiftTracker or {}
 WorkplaceShiftTracker_mt = Class(WorkplaceShiftTracker)
 
 -- Pay schedule types
@@ -248,7 +248,7 @@ function WorkplaceShiftTracker:startShift(trigger, silentStart)
     end
 end
 
-function WorkplaceShiftTracker:endShift()
+function WorkplaceShiftTracker:endShift(skipPayout)
     if not self:isShiftActive() then
         wtLog("endShift: no active shift")
         return
@@ -260,29 +260,37 @@ function WorkplaceShiftTracker:endShift()
     wtLog(string.format("Shift ended at '%s' | %.2f hrs | $%d earned",
         self.activeWorkplaceName, elapsedHours, earnings))
 
-    -- Record in history
-    self:recordHistory(self.activeWorkplaceName, elapsedHours, earnings, self.activePaySchedule)
+    -- skipPayout=true is used by the NetworkSync bridge when endShiftForFarm has
+    -- already paid this farm (issue #29 double payout). It clears the single-slot
+    -- mirror state and updates the host HUD without paying a second time and without
+    -- writing a duplicate history row or firing the integration hooks twice.
+    if not skipPayout then
+        -- Record in history
+        self:recordHistory(self.activeWorkplaceName, elapsedHours, earnings, self.activePaySchedule)
 
-    -- Pay the farm (use activeFarmId set at shift start from the client's event)
-    if earnings > 0 then
-        self.system.financeIntegration:addMoney(earnings, self.activeWorkplaceName, self.activeFarmId)
+        -- Pay the farm (use activeFarmId set at shift start from the client's event)
+        if earnings > 0 then
+            self.system.financeIntegration:addMoney(earnings, self.activeWorkplaceName, self.activeFarmId)
+        end
+
+        self.totalEarned = self.totalEarned + earnings
     end
-
-    self.totalEarned = self.totalEarned + earnings
 
     -- Notify HUD (client-only: dedicated server has no g_i18n / rendering context)
     if self.system.hud and g_currentMission and g_currentMission:getIsClient() then
         self.system.hud:onShiftEnded(self.activeWorkplaceName, earnings)
     end
 
-    -- Notify integrations
-    local activeTrigger = self.system.triggerManager
-        and self.system.triggerManager:getTriggerById(self.activeTriggerId)
-    if self.system.npcFavorIntegration then
-        self.system.npcFavorIntegration:onShiftCompleted(activeTrigger, elapsedHours)
-    end
-    if self.system.workerCostsInteg then
-        self.system.workerCostsInteg:onShiftCompleted(activeTrigger, earnings)
+    -- Notify integrations (skipped when the per-farm path already fired them)
+    if not skipPayout then
+        local activeTrigger = self.system.triggerManager
+            and self.system.triggerManager:getTriggerById(self.activeTriggerId)
+        if self.system.npcFavorIntegration then
+            self.system.npcFavorIntegration:onShiftCompleted(activeTrigger, elapsedHours)
+        end
+        if self.system.workerCostsInteg then
+            self.system.workerCostsInteg:onShiftCompleted(activeTrigger, earnings)
+        end
     end
 
     -- Reset state
@@ -303,7 +311,7 @@ end
 -- =========================================================
 WorkplaceShiftTracker.ABANDON_PAY_FRACTION = 0.20  -- 20% payout on abandon
 
-function WorkplaceShiftTracker:endShiftPenalty()
+function WorkplaceShiftTracker:endShiftPenalty(skipPayout)
     if not self:isShiftActive() then
         wtLog("endShiftPenalty: no active shift")
         return
@@ -317,29 +325,37 @@ function WorkplaceShiftTracker:endShiftPenalty()
         "Shift ABANDONED at '%s' | %.2f hrs | full=$%d | penalty pay=$%d (20%%)",
         self.activeWorkplaceName, elapsedHours, fullEarnings, penaltyPay))
 
-    -- Record in history with the reduced amount
-    self:recordHistory(self.activeWorkplaceName, elapsedHours, penaltyPay, self.activePaySchedule)
+    -- skipPayout=true is used by the NetworkSync bridge when endShiftPenaltyForFarm
+    -- has already paid this farm (issue #29 double payout). It clears the mirror
+    -- state and notifies the host HUD without paying or recording a second time.
+    if not skipPayout then
+        -- Record in history with the reduced amount
+        self:recordHistory(self.activeWorkplaceName, elapsedHours, penaltyPay, self.activePaySchedule)
 
-    -- Pay only the penalty fraction
-    if penaltyPay > 0 then
-        self.system.financeIntegration:addMoney(penaltyPay, self.activeWorkplaceName, self.activeFarmId)
+        -- Pay only the penalty fraction
+        if penaltyPay > 0 then
+            self.system.financeIntegration:addMoney(penaltyPay, self.activeWorkplaceName, self.activeFarmId)
+        end
+
+        self.totalEarned = self.totalEarned + penaltyPay
     end
-
-    self.totalEarned = self.totalEarned + penaltyPay
 
     -- Notify HUD with the penalty message (client-only)
     if self.system.hud and g_currentMission and g_currentMission:getIsClient() then
         self.system.hud:onShiftAbandonedPenalty(self.activeWorkplaceName, penaltyPay, fullEarnings)
     end
 
-    -- Notify integrations (pass reduced earnings)
-    local activeTrigger = self.system.triggerManager
-        and self.system.triggerManager:getTriggerById(self.activeTriggerId)
-    if self.system.npcFavorIntegration then
-        self.system.npcFavorIntegration:onShiftCompleted(activeTrigger, elapsedHours)
-    end
-    if self.system.workerCostsInteg then
-        self.system.workerCostsInteg:onShiftCompleted(activeTrigger, penaltyPay)
+    -- Notify integrations (pass reduced earnings); skipped when the per-farm path
+    -- already fired them (skipPayout=true from the NetworkSync bridge).
+    if not skipPayout then
+        local activeTrigger = self.system.triggerManager
+            and self.system.triggerManager:getTriggerById(self.activeTriggerId)
+        if self.system.npcFavorIntegration then
+            self.system.npcFavorIntegration:onShiftCompleted(activeTrigger, elapsedHours)
+        end
+        if self.system.workerCostsInteg then
+            self.system.workerCostsInteg:onShiftCompleted(activeTrigger, penaltyPay)
+        end
     end
 
     -- Reset state

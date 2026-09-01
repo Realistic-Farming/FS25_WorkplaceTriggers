@@ -6,7 +6,7 @@
 -- Pattern: NPCSystem.lua from FS25_NPCFavor
 -- =========================================================
 
-WorkplaceSystem = {}
+WorkplaceSystem = WorkplaceSystem or {}
 WorkplaceSystem_mt = Class(WorkplaceSystem)
 
 local LOG_PREFIX = "[WorkplaceTriggers] "

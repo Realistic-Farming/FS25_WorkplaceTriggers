@@ -18,7 +18,7 @@
 --   * NetworkSync absent    -> MP sync is not available (event class removed)
 -- =========================================================
 
-WTNetworkSyncBridge = {}
+WTNetworkSyncBridge = WTNetworkSyncBridge or {}
 
 WTNetworkSyncBridge.MODULE_ID = "WorkplaceTriggers"
 WTNetworkSyncBridge.CHANNEL   = "WorkplaceTriggers_Sync"
@@ -157,6 +157,15 @@ local TRIGGER_ACTIONS = {
     set_trigger_purpose  = true,
 }
 
+-- BUILD 10:17 (George TASK 09:32, Brian TEST 09:03). Forward declarations, and they are
+-- the whole bug: the handlers below are `local function`s defined AFTER onAction, so
+-- onAction's calls compiled as GLOBAL lookups that resolve to nil at runtime - every
+-- create/update/delete/shift action died with "attempt to call a nil value" inside the
+-- caller's pcall, which is why the log showed a swallowed error and the Manager list
+-- stayed at 0 triggers. With the names declared local BEFORE onAction, its calls close
+-- over these locals and the `name = function` definitions below fill them in.
+local onShiftStart, onShiftEnd, onCreateTrigger, onUpdateTrigger, onDeleteTrigger, onSetTriggerPurpose
+
 local function onAction(userId, args)
     if type(args) ~= "table" then return end
     local actionType = args[1]
@@ -182,18 +191,22 @@ local function onAction(userId, args)
         end
     end
 
+    -- BUILD 10:17: handler results propagate so a synchronous caller (the listen-host
+    -- SAVE path) can give Sam's success/fail feel. nil counts as success - only an
+    -- explicit false is a refusal (legacy handlers return nothing).
+    local result
     if actionType == "shift_start" then
-        onShiftStart(sys, userId, args)
+        result = onShiftStart(sys, userId, args)
     elseif actionType == "shift_end" then
-        onShiftEnd(sys, userId, args)
+        result = onShiftEnd(sys, userId, args)
     elseif actionType == "create_trigger" then
-        onCreateTrigger(sys, userId, args)
+        result = onCreateTrigger(sys, userId, args)
     elseif actionType == "update_trigger" then
-        onUpdateTrigger(sys, userId, args)
+        result = onUpdateTrigger(sys, userId, args)
     elseif actionType == "delete_trigger" then
-        onDeleteTrigger(sys, userId, args)
+        result = onDeleteTrigger(sys, userId, args)
     elseif actionType == "set_trigger_purpose" then
-        onSetTriggerPurpose(sys, userId, args)
+        result = onSetTriggerPurpose(sys, userId, args)
     else
         return
     end
@@ -202,12 +215,13 @@ local function onAction(userId, args)
     if WTNetworkSyncBridge.stateActive and WTNetworkSyncBridge._ns ~= nil then
         WTNetworkSyncBridge._ns:markDirty(WTNetworkSyncBridge.MODULE_ID)
     end
+    return result
 end
 
 -- =========================================================
 -- Shift action handlers
 -- =========================================================
-local function onShiftStart(sys, userId, args)
+onShiftStart = function(sys, userId, args)
     local farmId   = args[2] or 1
     local triggerId = tostring(args[3] or "")
 
@@ -255,7 +269,7 @@ local function onShiftStart(sys, userId, args)
     wtLog(string.format("SHIFT_START: farm=%d trigger='%s'", farmId, trigger.workplaceName or "?"))
 end
 
-local function onShiftEnd(sys, userId, args)
+onShiftEnd = function(sys, userId, args)
     local farmId    = args[2] or 1
     local isPenalty = args[3] == true
 
@@ -271,12 +285,15 @@ local function onShiftEnd(sys, userId, args)
         earned, name = sys.shiftTracker:endShiftForFarm(farmId)
     end
 
-    -- Clear single-slot state if this farm owned it
+    -- Clear mirrored single-slot state if this farm owned it. The per-farm path
+    -- above already paid and recorded this shift, so the single-slot clear must run
+    -- in skipPayout mode: it resets the host's active shift and HUD without paying a
+    -- second time (issue #29 double payout) or writing a duplicate history row.
     if sys.shiftTracker.activeFarmId == farmId
        and sys.shiftTracker:isShiftActive() then
         pcall(function()
-            if isPenalty then sys.shiftTracker:endShiftPenalty()
-            else              sys.shiftTracker:endShift() end
+            if isPenalty then sys.shiftTracker:endShiftPenalty(true)
+            else              sys.shiftTracker:endShift(true) end
         end)
     end
 
@@ -294,7 +311,7 @@ local function generateStableId()
     return string.format("wt_%d_%d", t, _serverIdCounter)
 end
 
-local function onCreateTrigger(sys, userId, args)
+onCreateTrigger = function(sys, userId, args)
     local stableId = (args[2] and args[2] ~= "") and tostring(args[2]) or generateStableId()
 
     local triggerData = {
@@ -317,12 +334,17 @@ local function onCreateTrigger(sys, userId, args)
     end)
     if not ok then
         wtLog("CREATE_TRIGGER error: " .. tostring(err))
+        -- BUILD 10:17: an explicit false travels back through onAction/requestAction so
+        -- the SAVE dialog can keep the form open and warn instead of closing onto an
+        -- empty list (Sam DESIGN 09:56 hard-fail feel).
+        return false
     end
 
     wtLog("CREATE_TRIGGER: id=" .. stableId .. " name='" .. (triggerData.workplaceName or "?") .. "'")
+    return true
 end
 
-local function onUpdateTrigger(sys, userId, args)
+onUpdateTrigger = function(sys, userId, args)
     local triggerId = tostring(args[2] or "")
     local trigger = sys.triggerManager:getTriggerById(triggerId)
     if trigger == nil then
@@ -344,14 +366,17 @@ local function onUpdateTrigger(sys, userId, args)
     wtLog("UPDATE_TRIGGER: " .. (trigger.workplaceName or "?"))
 end
 
-local function onDeleteTrigger(sys, userId, args)
+onDeleteTrigger = function(sys, userId, args)
     local triggerId = tostring(args[2] or "")
 
-    -- End any active shifts using this trigger
+    -- End any active shifts using this trigger. The local farm's shift lives in both
+    -- the single-slot mirror and _farmShifts, so the mirror clear must run in
+    -- skipPayout mode (it only resets state/HUD); endShiftForFarm below does the
+    -- single payment and history row (issue #29 double payout).
     if sys.shiftTracker then
         if sys.shiftTracker:isShiftActive()
            and tostring(sys.shiftTracker.activeTriggerId) == triggerId then
-            sys.shiftTracker:endShift()
+            sys.shiftTracker:endShift(true)
         end
         if sys.shiftTracker._farmShifts then
             for farmId, entry in pairs(sys.shiftTracker._farmShifts) do
@@ -369,7 +394,7 @@ local function onDeleteTrigger(sys, userId, args)
     wtLog("DELETE_TRIGGER: id=" .. triggerId)
 end
 
-local function onSetTriggerPurpose(sys, userId, args)
+onSetTriggerPurpose = function(sys, userId, args)
     local triggerId = tostring(args[2] or "")
     -- Distinguish an explicit clear (empty string) from an absent value:
     -- args[3] is the purpose; nil means "no value supplied", "" means "clear".

@@ -5,6 +5,8 @@
         <text name="input_WT_INTERACT"       text="Schicht beginnen/beenden"/>
         <text name="input_WT_MENU"           text="Arbeitsplatz-Manager öffnen"/>
         <text name="input_WT_HUD_EDIT"       text="HUD-Bearbeitungsmodus umschalten"/>
+        <text name="input_WT_TOGGLE_HUD"     text="Arbeitsplatz-HUD ein-/ausblenden"/>
+        <text name="wt_save_failed"          text="Speichern fehlgeschlagen: Ungültige Arbeitsplatz-Parameter."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="[E] Mit Arbeitsplatz interagieren"/>
@@ -119,7 +121,7 @@
         <!-- ── Getting Started, Page 2: Configure ── -->
         <text name="helpLine_wt_su_p2_title"           text="Schritt 2 - Arbeitsplatz konfigurieren"/>
         <text name="helpLine_wt_su_p2_name_title"      text="Arbeitsplatz benennen"/>
-        <text name="helpLine_wt_su_p2_name_text"       text="Öffnen Sie nach dem Platzieren des Triggers den Arbeitsplatz-Manager mit F4 und wählen Sie Ihren neuen Trigger aus der Liste. Drücken Sie Bearbeiten. Geben Sie einen beliebigen Namen in das Namensfeld ein - Postamt, Futtermühle, Sägewerk, Rathaus, was immer zu Ihrer Geschichte passt. Dieser Name erscheint auf dem Kartensymbol, im Schicht-HUD-Panel während der Arbeit, in den Ein- und Ausstempelaufforderungen und in Ihren Benachrichtigungen."/>
+        <text name="helpLine_wt_su_p2_name_text"       text="Öffnen Sie nach dem Platzieren des Triggers den Arbeitsplatz-Manager mit Arbeitsplatz-Manager öffnen und wählen Sie Ihren neuen Trigger aus der Liste. Drücken Sie Bearbeiten. Geben Sie einen beliebigen Namen in das Namensfeld ein - Postamt, Futtermühle, Sägewerk, Rathaus, was immer zu Ihrer Geschichte passt. Dieser Name erscheint auf dem Kartensymbol, im Schicht-HUD-Panel während der Arbeit, in den Ein- und Ausstempelaufforderungen und in Ihren Benachrichtigungen."/>
         <text name="helpLine_wt_su_p2_wage_title"      text="Stundenlohn festlegen"/>
         <text name="helpLine_wt_su_p2_wage_text"       text="Verwenden Sie die Plus- und Minus-Buttons im Bearbeitungsdialog, um einen Stundenlohn zwischen 0 und 99.999 pro Spielstunde festzulegen. Der Standardwert ist 500. Verwenden Sie den Schrittauswahl, um zu ändern, ob jeder Tastendruck um 10, 100 oder 1.000 auf einmal anpasst. Ein globaler Lohnmultiplikator (0,5x bis 2,0x) ist im Spiel-Einstellungsmenü verfügbar und wird auf jeden Trigger-Lohn angewendet, sodass Sie das Gesamteinkommen anpassen können, ohne jeden Trigger einzeln zu bearbeiten."/>
         <text name="helpLine_wt_su_p2_radius_title"    text="Triggerradius anpassen"/>
@@ -156,7 +158,7 @@
         <!-- ── Managing Workplaces, Page 1: The manager ── -->
         <text name="helpLine_wt_mg_p1_title"         text="Der Arbeitsplatz-Manager"/>
         <text name="helpLine_wt_mg_p1_open_title"    text="Manager öffnen"/>
-        <text name="helpLine_wt_mg_p1_open_text"     text="Drücken Sie jederzeit F4 (auch während einer Schicht), um den Arbeitsplatz-Manager-Dialog zu öffnen. Dies ist das zentrale Hub für die Ansicht und Verwaltung aller Ihrer platzierten Arbeitsplätze. Es listet jeden erstellten Trigger mit Namen, Stundenlohn und aktuellem Status auf einen Blick auf. Der Manager kann auch über die Spielkonsole durch Eingabe von wtGui geöffnet werden, wenn Sie das bevorzugen."/>
+        <text name="helpLine_wt_mg_p1_open_text"     text="Drücken Sie jederzeit Arbeitsplatz-Manager öffnen (auch während einer Schicht), um den Arbeitsplatz-Manager-Dialog zu öffnen. Dies ist das zentrale Hub für die Ansicht und Verwaltung aller Ihrer platzierten Arbeitsplätze. Es listet jeden erstellten Trigger mit Namen, Stundenlohn und aktuellem Status auf einen Blick auf. Der Manager kann auch über die Spielkonsole durch Eingabe von wtGui geöffnet werden, wenn Sie das bevorzugen."/>
         <text name="helpLine_wt_mg_p1_list_title"    text="Liste lesen"/>
         <text name="helpLine_wt_mg_p1_list_text"     text="Jede Zeile in der Liste zeigt links den Arbeitsplatznamen und rechts den konfigurierten Stundenlohn. Wenn an einem Arbeitsplatz gerade eine Schicht aktiv ist, wird diese Zeile hervorgehoben. Sie können durch die Liste scrollen, wenn Sie viele Arbeitsplätze haben. Ein Klick auf eine Zeile wählt sie aus, und die Schaltflächen Bearbeiten und Löschen am unteren Rand des Dialogs werden für den ausgewählten Arbeitsplatz verfügbar."/>
 

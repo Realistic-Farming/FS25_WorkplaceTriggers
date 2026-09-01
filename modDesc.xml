@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <modDesc descVersion="106">
     <author>TisonK</author>
-    <version>1.1.1.2</version>
+    <version>1.1.2.0</version>
     <modName>FS25_WorkplaceTriggers</modName>
 
     <title>
@@ -30,7 +30,7 @@ FEATURES:
 - Optional FS25_WorkerCosts integration - shift income is tracked alongside AI worker wages
 
 HOW TO USE:
-1. Press [F4] to open the Workplace Manager and click Add to create a new trigger
+1. Open the Workplace Manager (assign a key to "Open Workplace Manager" under Options - Controls) and click Add to create a new trigger
 2. Name the workplace, set a wage, and choose a pay schedule - then confirm
 3. Place the trigger at any location on the map
 4. Walk into the trigger zone - press [E] to start your shift
@@ -78,14 +78,28 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
     </extraSourceFiles>
 
     <actions>
-        <action name="WT_INTERACT"/>
+        <action name="WT_INTERACT" category="ONFOOT"/>
         <action name="WT_MENU"/>
-        <action name="WT_HUD_EDIT"/>
+        <action name="WT_HUD_EDIT" category="ONFOOT VEHICLE" />
+        <!-- BUILD 07:18 (Sam DESIGN 07:17 + George TASK 06:49): the visibility toggle
+             the BUILD 06:43 flag asked for, now sanctioned. Drives settings.showHud,
+             the mod's existing player-local visibility truth. -->
+        <action name="WT_TOGGLE_HUD" category="ONFOOT VEHICLE" />
     </actions>
     <inputBinding>
-        <actionBinding action="WT_INTERACT"/>
+        <actionBinding action="WT_INTERACT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_e" />
+        </actionBinding>
         <actionBinding action="WT_MENU"/>
-        <actionBinding action="WT_HUD_EDIT"/>
+        <!-- BUILD 06:43 (Sam DESIGN 06:42): seat-locked non-Function defaults so a
+             fresh save can drive the Workplace HUD out of the box - Alt+W toggles
+             (BUILD 07:18), Shift+Alt+W edits/moves. -->
+        <actionBinding action="WT_TOGGLE_HUD">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_k" />
+        </actionBinding>
+        <actionBinding action="WT_HUD_EDIT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_c" />
+        </actionBinding>
     </inputBinding>
 
     <placeableSpecializations>

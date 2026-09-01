@@ -5,6 +5,8 @@
 > Convention: `[ ]` open · `[~]` in progress · `[x]` done · `[!]` blocked. Newest at the top of each section.
 
 ## Bugs
+- [x] 2026-08-31: **DOUBLE PAYOUT fixed (issue #29).** `onShiftEnd` in the NetworkSync bridge paid via `endShiftForFarm`, then cleared the local farm's single-slot mirror by calling `endShift()`/`endShiftPenalty()`, which paid a second time (`addMoney` is server-gated, so both fired on the host). `endShift`/`endShiftPenalty` now accept `skipPayout`; the bridge mirror-clear and the trigger-delete finish pass `true`. In-game verification pending.
+
 - [x] 2026-07-30: `src/integrations/WTNetworkSyncBridge.lua:192` failed to COMPILE - `g_currentMission:getFarmId and ...`. The `:` call syntax requires an immediate argument list, so Lua stopped at `and` ("expected '(', '{' or <string>"). The whole file was rejected and the NetworkSync bridge was dead in every session. Resolved with the suite's proven local-farm-id order (`g_localPlayer.farmId`, then `g_currentMission.player.farmId`) rather than a one-character patch: `getFarmId` is not in the Community LUADOC, so a guarded probe on it alone would have compiled and then silently always yielded -1, leaving the host's own shift state permanently un-updated.
 - [ ] **ROOT CAUSE, still open: `build.sh` has NO Lua 5.1 syntax gate**, which is the only reason the above reached the game. SoilFertilizer catches this class before it ships (pre-commit `luaparse` pinned to 5.1 across all sources, plus lint). Port that gate here or into `build.sh` as a build-failing step.
 

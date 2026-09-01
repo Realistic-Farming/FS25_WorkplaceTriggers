@@ -5,6 +5,8 @@
         <text name="input_WT_INTERACT"       text="Start/End Shift"/>
         <text name="input_WT_MENU"           text="Open Workplace Manager"/>
         <text name="input_WT_HUD_EDIT"       text="Toggle HUD Edit Mode"/>
+        <text name="input_WT_TOGGLE_HUD"     text="Toggle Workplace HUD"/>
+        <text name="wt_save_failed"          text="Save failed: Invalid trigger parameters."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
         <text name="wt_input_interact"       text="Interact with Workplace"/>
@@ -16,7 +18,7 @@
         <!-- HUD panel -->
         <text name="wt_hud_on_shift"         text="ON SHIFT"/>
         <text name="wt_hud_edit_mode"        text="Move/Scale Workplace HUD"/>
-        <text name="wt_hud_edit_hint"        text="Drag | Corners=Scale | Edges=Width | Shift=Exit"/>
+        <text name="wt_hud_edit_hint"        text="Drag | Corners=Scale | Edges=Width | Edit/Move key to exit"/>
         <text name="wt_hud_location"         text="Location:"/>
         <text name="wt_hud_time"             text="Time:"/>
         <text name="wt_hud_earned"           text="Earned:"/>
@@ -117,14 +119,14 @@
         <!-- ── Getting Started, Page 1: Buy and place ── -->
         <text name="helpLine_wt_su_p1_title"         text="Step 1 - Open the Manager and Add"/>
         <text name="helpLine_wt_su_p1_buy_title"     text="Opening the Workplace Manager"/>
-        <text name="helpLine_wt_su_p1_buy_text"      text="You do not buy anything from the shop. Instead, press F4 at any time in-game to open the Workplace Manager. In the Manager click the Add New Trigger button at the bottom. A configuration dialog opens where you enter a name, set a wage, choose a pay schedule, and optionally adjust the trigger radius before confirming. The trigger is created at your player's current location the moment you confirm."/>
+        <text name="helpLine_wt_su_p1_buy_text"      text="You do not buy anything from the shop. Instead, press Open Workplace Manager at any time in-game to open the Workplace Manager. In the Manager click the Add New Trigger button at the bottom. A configuration dialog opens where you enter a name, set a wage, choose a pay schedule, and optionally adjust the trigger radius before confirming. The trigger is created at your player's current location the moment you confirm."/>
         <text name="helpLine_wt_su_p1_place_title"   text="Choosing a Good Location"/>
-        <text name="helpLine_wt_su_p1_place_text"    text="Stand at the spot you want to designate as your workplace BEFORE pressing F4 and adding the trigger, because the trigger spawns at your player position when you confirm. Good spots include near map buildings, at road junctions you pass frequently, beside delivery points, or anywhere that fits the roleplay story of the job. The trigger zone is invisible during normal play so it will not clutter your map visually."/>
+        <text name="helpLine_wt_su_p1_place_text"    text="Stand at the spot you want to designate as your workplace BEFORE pressing Open Workplace Manager and adding the trigger, because the trigger spawns at your player position when you confirm. Good spots include near map buildings, at road junctions you pass frequently, beside delivery points, or anywhere that fits the roleplay story of the job. The trigger zone is invisible during normal play so it will not clutter your map visually."/>
 
         <!-- ── Getting Started, Page 2: Configure ── -->
         <text name="helpLine_wt_su_p2_title"           text="Step 2 - Configure Your Workplace"/>
         <text name="helpLine_wt_su_p2_name_title"      text="Naming Your Workplace"/>
-        <text name="helpLine_wt_su_p2_name_text"       text="After placing the trigger, open the Workplace Manager with F4 and select your new trigger from the list. Press Edit. Type any name you like into the name field - Post Office, Feed Mill, Lumber Yard, Town Hall, whatever fits your story. This name appears on the map icon, in the shift HUD panel while you are working, in the clock-in and clock-out prompts, and in your notification messages."/>
+        <text name="helpLine_wt_su_p2_name_text"       text="After placing the trigger, open the Workplace Manager with Open Workplace Manager and select your new trigger from the list. Press Edit. Type any name you like into the name field - Post Office, Feed Mill, Lumber Yard, Town Hall, whatever fits your story. This name appears on the map icon, in the shift HUD panel while you are working, in the clock-in and clock-out prompts, and in your notification messages."/>
         <text name="helpLine_wt_su_p2_wage_title"      text="Setting the Hourly Wage"/>
         <text name="helpLine_wt_su_p2_wage_text"       text="Use the plus and minus buttons in the Edit dialog to set an hourly wage between 0 and 99,999 per in-game hour. The default is 500. Use the step selector to change whether each button press adjusts by 10, 100, or 1,000 at a time. A global Wage Multiplier setting (0.5x to 2.0x) is available in the game settings menu and applies on top of every trigger's wage, so you can tune the overall income level without editing each trigger individually."/>
         <text name="helpLine_wt_su_p2_radius_title"    text="Adjusting the Trigger Radius"/>
@@ -161,7 +163,7 @@
         <!-- ── Managing Workplaces, Page 1: The manager ── -->
         <text name="helpLine_wt_mg_p1_title"         text="The Workplace Manager"/>
         <text name="helpLine_wt_mg_p1_open_title"    text="Opening the Manager"/>
-        <text name="helpLine_wt_mg_p1_open_text"     text="Press F4 at any time (even while on shift) to open the Workplace Manager dialog. This is the central hub for viewing and administering all your placed workplaces. It lists every trigger you have created with its name, hourly wage, and current status shown at a glance. The manager can also be opened from the game console by typing wtGui if you prefer."/>
+        <text name="helpLine_wt_mg_p1_open_text"     text="Press Open Workplace Manager at any time (even while on shift) to open the Workplace Manager dialog. This is the central hub for viewing and administering all your placed workplaces. It lists every trigger you have created with its name, hourly wage, and current status shown at a glance. The manager can also be opened from the game console by typing wtGui if you prefer."/>
         <text name="helpLine_wt_mg_p1_list_title"    text="Reading the List"/>
         <text name="helpLine_wt_mg_p1_list_text"     text="Each row in the list shows the workplace name on the left and the configured hourly wage on the right. If a shift is currently active at a workplace, that row is highlighted. You can scroll through the list if you have many workplaces. Clicking a row selects it, and the Edit and Delete buttons at the bottom of the dialog become available for the selected workplace."/>
 

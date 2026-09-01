@@ -1,3 +1,12 @@
+-- 2026-08-22 (Wizard): with MasterHUD installed this mod's own HUD hide/move keys must not
+-- merely be inert, they must not REGISTER at all - that is what removes their rows from the
+-- F1 legend and the Controls list. Probed on TaxMod first: skipping registration does remove
+-- the row, so the pattern is used suite-wide. Only HUD hide/move actions are gated; every
+-- other action this mod registers is untouched.
+local function __rfMhOwnsHudKeys()
+    return ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil
+end
+
 -- =========================================================
 -- FS25 Workplace Triggers (v1.1.1.1)
 -- Placeable Off-Farm Work System
@@ -15,8 +24,15 @@
 --   7. No goto, no continue (Lua 5.1)
 -- =========================================================
 
-local modDirectory = g_currentModDirectory
-local modName      = g_currentModName
+-- Hot-reload latch (FuelCosts reference): g_currentModDirectory and
+-- g_currentModName are nil on a live re-source, so they are latched into
+-- module globals on first load, with a g_modsDirectory loose-folder fallback.
+WorkplaceTriggersModDirectory = WorkplaceTriggersModDirectory
+    or g_currentModDirectory
+    or (g_modsDirectory ~= nil and (g_modsDirectory .. "FS25_WorkplaceTriggers/") or nil)
+WorkplaceTriggersModName = WorkplaceTriggersModName or g_currentModName or "FS25_WorkplaceTriggers"
+local modDirectory = WorkplaceTriggersModDirectory
+local modName = WorkplaceTriggersModName
 
 local modItem    = g_modManager:getModByName(modName)
 local modVersion = modItem and modItem.version or "0.1.0.0"
@@ -180,6 +196,11 @@ if FSBaseMission and FSBaseMission.draw then
         -- registered as a self-draw via the bridge); stand down so the HUD never
         -- draws twice. Absent MasterHUD, this hook runs the draw as before.
         if WorkplaceMasterHUDBridge ~= nil and WorkplaceMasterHUDBridge.active then return end
+        -- BUILD 07:18 (same gate SCS gained at BUILD 21:53): when MasterHUD is present
+        -- but the bridge registration failed, this fallback is the path that draws -
+        -- and it must honor the suite hide-all rather than drawing through it.
+        local suiteHud = (g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD
+        if suiteHud ~= nil and suiteHud.hudsHidden == true then return end
         if WorkplaceMasterHUDBridge ~= nil then
             WorkplaceMasterHUDBridge.drawStack()
         elseif workplaceSystem then
@@ -295,12 +316,51 @@ local wtHudEditActionEventId = nil
 local wtHudEditOriginalFunc  = nil
 
 local function wtHudEditActionCallback(self, actionName, inputValue, callbackState, isAnalog)
+    -- 2026-08-22 (Wizard): MasterHUD takeover. When MasterHUD is installed it owns the
+    -- suite-wide hide/move binds, so this mod's own per-mod key is deliberately inert:
+    -- one surface, one way to reach it. Standalone (no MasterHUD) this runs normally.
+    -- Canonical presence check, the same expression the suite's MasterHUD bridges use.
+    if ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil then
+        return
+    end
     if inputValue <= 0 then return end
     if not workplaceSystem then return end
     if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
     if workplaceSystem.hud then
         workplaceSystem.hud:toggleEditMode()
     end
+end
+
+-- BUILD 07:18 (Sam DESIGN 07:17 + George TASK 06:49): Alt+W visibility toggle.
+-- No new state machine - the flip goes through settings.showHud, the visibility
+-- truth this mod already owns: WorkplaceHUD:draw honors it (keeping the leave-zone
+-- warning and shift flashes, which are money-relevant events, not chrome, and
+-- keeping edit mode paintable as the escape hatch for finding a hidden panel),
+-- WorkplaceSettings persists it to workplace_triggers_settings.xml on game save,
+-- and the SettingsHub bridge lists it. showHud is player-local by that bridge's
+-- own taxonomy (adminOnly=false, "HUD/notification prefs are player-local"), so
+-- there is deliberately NO multiplayer event: a per-player HUD preference has no
+-- shared world truth to sync. The hub's display mirror is soft-updated so the
+-- tablet settings page cannot show a stale value after a keyboard flip.
+local function wtToggleHudActionCallback(self, actionName, inputValue, callbackState, isAnalog)
+    -- 2026-08-22 (Wizard): MasterHUD takeover. When MasterHUD is installed it owns the
+    -- suite-wide hide/move binds, so this mod's own per-mod key is deliberately inert:
+    -- one surface, one way to reach it. Standalone (no MasterHUD) this runs normally.
+    -- Canonical presence check, the same expression the suite's MasterHUD bridges use.
+    if ((g_currentMission ~= nil and g_currentMission.masterHUD) or g_masterHUD) ~= nil then
+        return
+    end
+    if inputValue <= 0 then return end
+    if not workplaceSystem or workplaceSystem.settings == nil then return end
+    if g_gui and (g_gui:getIsGuiVisible() or g_gui:getIsDialogVisible()) then return end
+    local s = workplaceSystem.settings
+    s.showHud = not s.showHud
+    if s.validate then s:validate() end
+    local hub = (g_currentMission ~= nil and g_currentMission.settingsHub) or g_settingsHub
+    if hub ~= nil and type(hub.setValue) == "function" then
+        pcall(function() hub:setValue("WorkplaceTriggers", "showHud", s.showHud) end)
+    end
+    print("[WorkplaceTriggers] HUD " .. (s.showHud and "shown" or "hidden") .. " (WT_TOGGLE_HUD)")
 end
 
 local function hookWTHudEditInput()
@@ -316,6 +376,7 @@ local function hookWTHudEditInput()
             g_inputBinding:beginActionEventsModification(PlayerInputComponent.INPUT_CONTEXT_NAME)
 
             local actionId = InputAction.WT_HUD_EDIT
+            if __rfMhOwnsHudKeys() then actionId = nil end
             if actionId ~= nil then
                 local success, eventId = g_inputBinding:registerActionEvent(
                     actionId,
@@ -327,7 +388,25 @@ local function hookWTHudEditInput()
                     wtHudEditActionEventId = eventId
                     g_inputBinding:setActionEventTextPriority(eventId, GS_PRIO_NORMAL)
                     g_inputBinding:setActionEventText(eventId,
-                        g_i18n:getText("wt_input_hud_edit") or "[Shift] HUD Edit Mode")
+                        g_i18n:getText("input_WT_HUD_EDIT") or "Move Workplace HUD")
+                end
+            end
+
+            -- BUILD 07:18: the visibility toggle registers in the same modification
+            -- session as the edit action - one wrap, two rows.
+            local toggleActionId = InputAction.WT_TOGGLE_HUD
+            if __rfMhOwnsHudKeys() then toggleActionId = nil end
+            if toggleActionId ~= nil then
+                local okT, idT = g_inputBinding:registerActionEvent(
+                    toggleActionId,
+                    WorkplaceSystem,
+                    wtToggleHudActionCallback,
+                    false, true, false, true, nil, true
+                )
+                if okT and idT ~= nil then
+                    g_inputBinding:setActionEventTextPriority(idT, GS_PRIO_NORMAL)
+                    g_inputBinding:setActionEventText(idT,
+                        (g_i18n ~= nil and g_i18n:getText("input_WT_TOGGLE_HUD")) or "Toggle Workplace HUD")
                 end
             end
 
@@ -448,3 +527,57 @@ print("  Turn any location into a workplace!")
 print("  Pay schedules: Hourly / Flat / Daily")
 print("  Type 'wtHelp' for console commands")
 print("==============================================")
+
+-- ---------------------------------------------------------
+-- Realistic Farming Control Center: publish a runnable delegate.
+--
+-- Calls workplaceSystem:onMenuPressed directly rather than wtMenuActionCallback,
+-- which opens with "if inputValue <= 0 then return end" and would compare nil
+-- when invoked with no arguments.
+--
+-- WT_INTERACT is deliberately absent: it acts on the workplace trigger the
+-- player is standing in, and WT_HUD_EDIT stays button-less (moving the panel
+-- needs the in-world drag). WT_TOGGLE_HUD now grows a hide/show button below: the
+-- physical key stays gated to MasterHUD, but a per-mod hide is reachable from the
+-- Control Center. All keep their directory row.
+-- ---------------------------------------------------------
+local function registerControlCenterActions()
+    local registry = g_currentMission ~= nil and g_currentMission.rfActionRegistry or nil
+    if registry == nil then return end
+
+    registry.registerAction({
+        action     = "WT_MENU",
+        button     = "Open",
+        closeFirst = true,
+        run = function()
+            if workplaceSystem ~= nil and workplaceSystem.onMenuPressed ~= nil then
+                workplaceSystem:onMenuPressed()
+            end
+        end,
+    })
+
+    -- Per-mod HUD hide/show. Flips settings.showHud (the visibility truth this mod
+    -- already owns; WorkplaceHUD:draw honours it under both draw paths), mirroring
+    -- the WT_TOGGLE_HUD key minus the MasterHUD gate. Live "Hide"/"Show" caption.
+    registry.registerAction({
+        action = "WT_TOGGLE_HUD",
+        button = function()
+            local s = workplaceSystem ~= nil and workplaceSystem.settings or nil
+            return (s ~= nil and s.showHud ~= false) and "Hide" or "Show"
+        end,
+        run = function()
+            if workplaceSystem == nil or workplaceSystem.settings == nil then return end
+            local s = workplaceSystem.settings
+            s.showHud = not s.showHud
+            if s.validate then s:validate() end
+            local hub = (g_currentMission ~= nil and g_currentMission.settingsHub) or g_settingsHub
+            if hub ~= nil and type(hub.setValue) == "function" then
+                pcall(function() hub:setValue("WorkplaceTriggers", "showHud", s.showHud) end)
+            end
+            return s.showHud and "Workplace HUD shown" or "Workplace HUD hidden"
+        end,
+    })
+end
+
+Mission00.loadMission00Finished = Utils.appendedFunction(
+    Mission00.loadMission00Finished, registerControlCenterActions)
