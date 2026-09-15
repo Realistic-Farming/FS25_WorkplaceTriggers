@@ -190,6 +190,17 @@ function WorkplaceTriggerManager:installMapHook()
                     end)
                 end
             end
+            -- WT-8: a second loop over the own-farm site replica with the site
+            -- style. No kind check on a shared list, because there is no
+            -- shared list; the wage loop above is unchanged.
+            local siteClient = mgr.system and mgr.system.siteClient
+            if siteClient ~= nil and siteClient.getHotspotList ~= nil then
+                for _, hs in ipairs(siteClient:getHotspotList()) do
+                    if hs._visible ~= false then
+                        pcall(function() hs:drawOnMap(map) end)
+                    end
+                end
+            end
         end
     )
 

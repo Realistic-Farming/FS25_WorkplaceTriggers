@@ -238,5 +238,32 @@
         <text name="helpLine_wt_ab_p3_license_text"    text="Workplace Triggers jest wydawany na licencji Creative Commons Uznanie autorstwa-Użycie niekomercyjne-Bez utworów zależnych 4.0 Międzynarodowe (CC BY-NC-ND 4.0). Możesz dołączać go do modpacków i udostępniać innym, pod warunkiem podania oryginalnego autora. Nie możesz go sprzedawać, zarabiać na nim ani publikować zmodyfikowanych wersji bez pozwolenia. Pełny tekst licencji jest dostępny na stronie creativecommons.org/licenses/by-nc-nd/4.0."/>
         <text name="helpLine_wt_ab_p3_thanks_title"    text="Specjalne podziękowania"/>
         <text name="helpLine_wt_ab_p3_thanks_text"     text="Podziękowania dla społeczności modderskiej FS25 za dokumentację, implementacje referencyjne i opinie, które umożliwiły powstanie tego moda. Specjalne podziękowania dla autorów NPCFavor za ich otwarty i dobrze skomentowany kod, który posłużył jako odniesienie dla kilku wzorców API FS25 użytych w tym modzie. Dziękujemy wszystkim, którzy testowali wczesne wersje i zgłaszali błędy - wasza cierpliwość do niedoskonałości podczas rozwoju jest bardzo doceniana."/>
+
+        <!-- WT-8 named farm sites -->
+        <text name="wt_site_list_title" text="Miejsca gospodarstwa"/>
+        <text name="wt_site_list_admin" text="Zarządzanie gospodarstwem %d"/>
+        <text name="wt_site_list_not_ready" text="Miejsca nie są jeszcze dostępne"/>
+        <text name="wt_site_list_no_farm" text="Dołącz do gospodarstwa, aby zarządzać jego miejscami"/>
+        <text name="wt_site_list_subtitle_one" text="1 miejsce w twoim gospodarstwie"/>
+        <text name="wt_site_list_subtitle_many" text="Miejsca w twoim gospodarstwie: %d"/>
+        <text name="wt_site_list_empty" text="Brak miejsc. Kliknij &apos;+ Nowe miejsce&apos;, aby nazwać miejsce w swoim gospodarstwie."/>
+        <text name="wt_site_admin_own" text="Admin: własne gospodarstwo"/>
+        <text name="wt_site_admin_next" text="Admin: gospodarstwo %d"/>
+        <text name="wt_site_purpose_none" text="brak"/>
+        <text name="wt_site_state_unavailable" text="niedostępne"/>
+        <text name="wt_site_btn_edit" text="Edytuj"/>
+        <text name="wt_site_btn_del" text="Usuń"/>
+        <text name="wt_site_btn_transfer" text="Przenieś"/>
+        <text name="wt_site_result_ok" text="Gotowe."/>
+        <text name="wt_site_result_refused" text="Odrzucono: %s"/>
+        <text name="wt_site_edit_title_new" text="Nowe miejsce"/>
+        <text name="wt_site_edit_title_edit" text="Edytuj miejsce"/>
+        <text name="wt_site_edit_name_default" text="Główne podwórze"/>
+        <text name="wt_site_edit_name_required" text="Miejsce musi mieć nazwę."/>
+        <text name="wt_site_edit_centre" text="Środek: X=%.1f  Z=%.1f"/>
+        <text name="wt_menu_sites" text="Miejsca gospodarstwa"/>
+        <text name="wt_site_hdr_name" text="Miejsce"/>
+        <text name="wt_site_hdr_purpose" text="Cel"/>
+        <text name="wt_site_hdr_state" text="Promień / Stan"/>
     </texts>
 </l10n>
