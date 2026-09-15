@@ -151,6 +151,11 @@
             <Text   profile="wtPageText" id="nextText" position="-215px -256px" text="Next &gt;"/>
             <Button profile="wtPageHit"  id="nextBtn"  position="-215px -254px" onClick="onClickNext"/>
 
+            <!-- ===== SITES (WT-8): opens the site manager ===== -->
+            <Bitmap profile="wtSitesBg"   id="sitesBg"  position="130px -254px"/>
+            <Text   profile="wtSitesText" id="sitesTxt" position="130px -256px" text="Farm Sites"/>
+            <Button profile="wtSitesHit"  id="sitesBtn" position="130px -254px" onClick="onClickSites"/>
+
             <!-- ===== NEW TRIGGER BUTTON (admin-only, 3-layer for Lua show/hide) ===== -->
             <Bitmap profile="wtNewBg"   id="newBg"  position="300px -254px"/>
             <Text   profile="wtNewText" id="newTxt" position="300px -256px" text="+ New Trigger"/>
@@ -231,6 +236,11 @@
         <Profile name="wtNewBg"   extends="baseReference"   with="anchorTopCenter"> <size value="130px 20px"/> <imageColor value="0.12 0.28 0.15 0.95"/> </Profile>
         <Profile name="wtNewText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="130px 16px"/> <textSize value="11px"/> <textBold value="true"/> <textColor value="0.7 1 0.7 1"/> <textAlignment value="center"/> </Profile>
         <Profile name="wtNewHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="130px 20px"/> <isFocusable value="true"/> </Profile>
+
+        <!-- Sites button (WT-8, blue) -->
+        <Profile name="wtSitesBg"   extends="baseReference"   with="anchorTopCenter"> <size value="120px 20px"/> <imageColor value="0.10 0.20 0.40 0.95"/> </Profile>
+        <Profile name="wtSitesText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="120px 16px"/> <textSize value="11px"/> <textBold value="true"/> <textColor value="0.7 0.85 1 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtSitesHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="120px 20px"/> <isFocusable value="true"/> </Profile>
 
         <!-- Footer -->
         <Profile name="wtFooter" extends="fs25_textDefault" with="anchorTopCenter">

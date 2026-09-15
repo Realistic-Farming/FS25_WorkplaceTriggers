@@ -321,6 +321,14 @@ function WTListDialog:onClickNext()
     end
 end
 
+-- WT-8: the WorkplaceTriggers menu's second entry.
+function WTListDialog:onClickSites()
+    self:close()
+    if WTDialogLoader and WTDialogLoader.showSiteList then
+        WTDialogLoader.showSiteList(self.system)
+    end
+end
+
 function WTListDialog:onClickClose()
     self:close()
 end

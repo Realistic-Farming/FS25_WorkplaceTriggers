@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!--
+    WTSiteEditDialog (WT-8): create or edit one site. Sibling of WTEditDialog
+    with the site field set only. Width 620px, top-center anchor.
+      -12  Title
+      -32  Divider
+      -44  "Site Name" label
+      -62  Name TextInput
+      -92  "Radius" label
+      -112 Radius row: [-] value [+]
+      -140 "Step:" caption
+      -156 Step buttons x1 / x10 / x50
+      -184 "Purpose" label
+      -204 Purpose row: [<] label [>]
+      -236 Divider
+      -250 Centre text
+      -268 Snap button
+      -296 Status text
+-->
+<GUI onOpen="onOpen" onClose="wtOnClose" onCreate="onCreate">
+    <GuiElement profile="newLayer" />
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+
+    <GuiElement profile="dialogBg" id="dialogElement" size="620px 420px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
+        <ThreePartBitmap profile="fs25_dialogBgTop" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text   profile="wtseTitle"   id="titleText" position="0px -12px" text=""/>
+            <Bitmap profile="wtseDivider"                position="0px -32px"/>
+
+            <Text      profile="wtseSectionLabel"               position="0px -44px" text="Site Name"/>
+            <TextInput profile="wtseNameInput"   id="nameInput" position="0px -62px" onEnterPress="onClickSave"/>
+
+            <Text profile="wtseSectionLabel" position="0px -92px" text="Radius"/>
+            <Bitmap profile="wtseAdjBtnBg"   id="radDecBg"  position="-100px -112px"/>
+            <Text   profile="wtseAdjBtnText" id="radDecTxt" position="-100px -113px" text="-"/>
+            <Button profile="wtseAdjBtnHit"  id="radDec"    position="-100px -112px" onClick="onClickRadDec"/>
+            <Text profile="wtseValueText" id="radText" position="0px -112px" text="100 m"/>
+            <Bitmap profile="wtseAdjBtnBg"   id="radIncBg"  position="100px -112px"/>
+            <Text   profile="wtseAdjBtnText" id="radIncTxt" position="100px -113px" text="+"/>
+            <Button profile="wtseAdjBtnHit"  id="radInc"    position="100px -112px" onClick="onClickRadInc"/>
+
+            <Text profile="wtseStepCaption" position="0px -140px" text="Step:"/>
+            <Bitmap profile="wtseStepBg"   id="step1bg"   position="-76px -156px"/>
+            <Text   profile="wtseStepText" id="step1txt"  position="-76px -157px" text="x1"/>
+            <Button profile="wtseStepHit"  id="step1"     position="-76px -156px" onClick="onClickStep1"/>
+            <Bitmap profile="wtseStepBg"   id="step10bg"  position="0px -156px"/>
+            <Text   profile="wtseStepText" id="step10txt" position="0px -157px"   text="x10"/>
+            <Button profile="wtseStepHit"  id="step10"    position="0px -156px"   onClick="onClickStep10"/>
+            <Bitmap profile="wtseStepBg"   id="step50bg"  position="76px -156px"/>
+            <Text   profile="wtseStepText" id="step50txt" position="76px -157px"  text="x50"/>
+            <Button profile="wtseStepHit"  id="step50"    position="76px -156px"  onClick="onClickStep50"/>
+
+            <Text profile="wtseSectionLabel" position="0px -184px" text="Purpose"/>
+            <Bitmap profile="wtseAdjBtnBg"   id="purpPrevBg"  position="-100px -204px"/>
+            <Text   profile="wtseAdjBtnText" id="purpPrevTxt" position="-100px -205px" text="&lt;"/>
+            <Button profile="wtseAdjBtnHit"  id="purpPrev"    position="-100px -204px" onClick="onClickPurposePrev"/>
+            <Text profile="wtseValueText" id="purposeText" position="0px -204px" text="none"/>
+            <Bitmap profile="wtseAdjBtnBg"   id="purpNextBg"  position="100px -204px"/>
+            <Text   profile="wtseAdjBtnText" id="purpNextTxt" position="100px -205px" text="&gt;"/>
+            <Button profile="wtseAdjBtnHit"  id="purpNext"    position="100px -204px" onClick="onClickPurposeNext"/>
+
+            <Bitmap profile="wtseDivider" position="0px -236px"/>
+            <Text profile="wtsePosText" id="posText" position="0px -250px" text="Centre: X=0  Z=0"/>
+            <Bitmap profile="wtseSnapBg"   id="snapBg"  position="0px -268px"/>
+            <Text   profile="wtseSnapText" id="snapTxt" position="0px -269px" text="Snap to Player Position"/>
+            <Button profile="wtseSnapHit"  id="snapBtn" position="0px -268px" onClick="onClickSnap"/>
+            <Text profile="wtseStatusText" id="statusText" position="0px -296px" text=""/>
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonOK"   id="btnSave"   text="Save"   onClick="onClickSave"/>
+            <Button profile="buttonBack" id="btnCancel" text="Cancel" onClick="onClickCancel"/>
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="fs25_guiElement" extends="baseReference"/>
+        <Profile name="wtseTitle" extends="fs25_textDefault" with="anchorTopCenter"> <size value="560px 24px"/> <textSize value="18px"/> <textBold value="true"/> <textColor value="1 1 1 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseDivider" extends="baseReference" with="anchorTopCenter"> <size value="560px 1px"/> <imageColor value="0.28 0.38 0.55 0.7"/> </Profile>
+        <Profile name="wtseSectionLabel" extends="fs25_textDefault" with="anchorTopCenter"> <size value="540px 14px"/> <textSize value="12px"/> <textBold value="false"/> <textColor value="0.55 0.65 0.82 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseNameInput" extends="fs25_textInput" with="anchorTopCenter"> <size value="480px 24px"/> </Profile>
+        <Profile name="wtseAdjBtnBg" extends="baseReference" with="anchorTopCenter"> <size value="76px 26px"/> <imageColor value="0.14 0.26 0.50 1"/> </Profile>
+        <Profile name="wtseAdjBtnText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="76px 24px"/> <textSize value="16px"/> <textBold value="true"/> <textColor value="1 1 1 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseAdjBtnHit" extends="emptyPanel" with="anchorTopCenter"> <size value="76px 26px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtseValueText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="140px 26px"/> <textSize value="16px"/> <textBold value="true"/> <textColor value="0.55 0.80 1 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseStepCaption" extends="fs25_textDefault" with="anchorTopCenter"> <size value="400px 12px"/> <textSize value="11px"/> <textColor value="0.40 0.46 0.58 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseStepBg" extends="baseReference" with="anchorTopCenter"> <size value="52px 20px"/> <imageColor value="0.10 0.14 0.28 1"/> </Profile>
+        <Profile name="wtseStepText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="52px 18px"/> <textSize value="10px"/> <textBold value="true"/> <textColor value="0.70 0.80 0.95 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseStepHit" extends="emptyPanel" with="anchorTopCenter"> <size value="52px 20px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsePosText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="540px 14px"/> <textSize value="11px"/> <textColor value="0.52 0.60 0.72 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseSnapBg" extends="baseReference" with="anchorTopCenter"> <size value="240px 24px"/> <imageColor value="0.30 0.20 0.03 1"/> </Profile>
+        <Profile name="wtseSnapText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="240px 22px"/> <textSize value="11px"/> <textBold value="true"/> <textColor value="1.0 0.84 0.28 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtseSnapHit" extends="emptyPanel" with="anchorTopCenter"> <size value="240px 24px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtseStatusText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="540px 14px"/> <textSize value="10px"/> <textColor value="0.38 0.92 0.50 1"/> <textAlignment value="center"/> </Profile>
+    </GUIProfiles>
+</GUI>

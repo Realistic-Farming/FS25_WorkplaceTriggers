@@ -243,5 +243,29 @@
         <text name="helpLine_wt_ab_p3_license_text"    text="Workplace Triggers wordt uitgebracht onder de Creative Commons Naamsvermelding-NietCommercieel-GeenAfgeleideWerken 4.0 Internationale licentie (CC BY-NC-ND 4.0). Je bent vrij om het op te nemen in modpacks en het met anderen te delen, op voorwaarde dat de oorspronkelijke auteur wordt vermeld. Je mag het niet verkopen, commercialiseren of gewijzigde versies publiceren zonder toestemming. De volledige licentietekst is beschikbaar op creativecommons.org/licenses/by-nc-nd/4.0."/>
         <text name="helpLine_wt_ab_p3_thanks_title"    text="Speciale dank"/>
         <text name="helpLine_wt_ab_p3_thanks_text"     text="Dank aan de FS25-moddengemeenschap voor documentatie, referentie-implementaties en feedback die deze mod mogelijk hebben gemaakt. Speciale dank aan de auteurs van NPCFavor voor hun open en goed becommentarieerde code die als referentie diende voor verschillende FS25 API-patronen die in deze mod worden gebruikt. Dank aan iedereen die vroege versies heeft getest en bugs heeft gemeld - jullie geduld met de ruwe randjes tijdens de ontwikkeling wordt zeer gewaardeerd."/>
+
+        <!-- WT-8 named farm sites -->
+        <text name="wt_site_list_title" text="Farm Sites"/>
+        <text name="wt_site_list_admin" text="Administering farm %d"/>
+        <text name="wt_site_list_not_ready" text="Sites are not available yet"/>
+        <text name="wt_site_list_no_farm" text="Join a farm to manage its sites"/>
+        <text name="wt_site_list_subtitle_one" text="1 site on your farm"/>
+        <text name="wt_site_list_subtitle_many" text="%d sites on your farm"/>
+        <text name="wt_site_list_empty" text="No sites yet. Click &apos;+ New Site&apos; to name a place on your farm."/>
+        <text name="wt_site_admin_own" text="Admin: own farm"/>
+        <text name="wt_site_admin_next" text="Admin: farm %d"/>
+        <text name="wt_site_purpose_none" text="none"/>
+        <text name="wt_site_state_unavailable" text="unavailable"/>
+        <text name="wt_site_btn_edit" text="Edit"/>
+        <text name="wt_site_btn_del" text="Del"/>
+        <text name="wt_site_btn_transfer" text="Move"/>
+        <text name="wt_site_result_ok" text="Done."/>
+        <text name="wt_site_result_refused" text="Refused: %s"/>
+        <text name="wt_site_edit_title_new" text="New Site"/>
+        <text name="wt_site_edit_title_edit" text="Edit Site"/>
+        <text name="wt_site_edit_name_default" text="Main Yard"/>
+        <text name="wt_site_edit_name_required" text="A site needs a name."/>
+        <text name="wt_site_edit_centre" text="Centre: X=%.1f  Z=%.1f"/>
+        <text name="wt_menu_sites" text="Farm Sites"/>
     </texts>
 </l10n>

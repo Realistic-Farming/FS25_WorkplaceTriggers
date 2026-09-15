@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!--
+    WTSiteListDialog (WT-8): the site manager. Sibling of WTListDialog: same
+    structure, profiles and 8-row pagination, the site field set instead of
+    wage columns (Name / Purpose / Radius or state), plus an administration
+    switch for master users.
+      Name    (200px): center=-270px
+      Purpose (140px): center=-70px
+      Radius  (150px): center=90px
+      Edit     (44px): center=285px
+      Del      (44px): center=333px
+-->
+<GUI onOpen="onOpen" onClose="wtOnClose" onCreate="onCreate">
+    <GuiElement profile="newLayer" />
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+
+    <GuiElement profile="dialogBg" id="dialogElement" size="880px 580px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
+        <ThreePartBitmap profile="fs25_dialogBgTop" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="wtsTitle" id="titleText" position="0px -12px" text="Farm Sites"/>
+            <Text profile="wtsSubtitle" id="subtitleText" position="0px -36px" text=""/>
+            <Bitmap profile="wtsDivider" position="0px -54px"/>
+            <Text profile="wtsHdrName"    position="-270px -58px" text="Site"/>
+            <Text profile="wtsHdrPurpose" position="-70px -58px" text="Purpose"/>
+            <Text profile="wtsHdrState"   position="90px -58px" text="Radius / State"/>
+            <Bitmap profile="wtsDivider" position="0px -73px"/>
+
+            <Bitmap profile="wtsRowOdd"    id="r1bg"      position="0px -76px"/>
+            <Text   profile="wtsCellName"  id="r1name"    position="-270px -77px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r1purpose" position="-70px -77px" text=""/>
+            <Text   profile="wtsCellState" id="r1state"   position="90px -77px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r1editbg"  position="285px -77px"/>
+            <Text   profile="wtsBtnText"   id="r1edittxt" position="285px -78px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r1edit"    position="285px -77px" onClick="onClickEdit1" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r1delbg"   position="333px -77px"/>
+            <Text   profile="wtsDelText"   id="r1deltxt"  position="333px -78px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r1del"     position="333px -77px" onClick="onClickDel1" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowEven"   id="r2bg"      position="0px -95px"/>
+            <Text   profile="wtsCellName"  id="r2name"    position="-270px -96px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r2purpose" position="-70px -96px" text=""/>
+            <Text   profile="wtsCellState" id="r2state"   position="90px -96px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r2editbg"  position="285px -96px"/>
+            <Text   profile="wtsBtnText"   id="r2edittxt" position="285px -97px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r2edit"    position="285px -96px" onClick="onClickEdit2" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r2delbg"   position="333px -96px"/>
+            <Text   profile="wtsDelText"   id="r2deltxt"  position="333px -97px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r2del"     position="333px -96px" onClick="onClickDel2" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowOdd"    id="r3bg"      position="0px -114px"/>
+            <Text   profile="wtsCellName"  id="r3name"    position="-270px -115px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r3purpose" position="-70px -115px" text=""/>
+            <Text   profile="wtsCellState" id="r3state"   position="90px -115px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r3editbg"  position="285px -115px"/>
+            <Text   profile="wtsBtnText"   id="r3edittxt" position="285px -116px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r3edit"    position="285px -115px" onClick="onClickEdit3" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r3delbg"   position="333px -115px"/>
+            <Text   profile="wtsDelText"   id="r3deltxt"  position="333px -116px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r3del"     position="333px -115px" onClick="onClickDel3" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowEven"   id="r4bg"      position="0px -133px"/>
+            <Text   profile="wtsCellName"  id="r4name"    position="-270px -134px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r4purpose" position="-70px -134px" text=""/>
+            <Text   profile="wtsCellState" id="r4state"   position="90px -134px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r4editbg"  position="285px -134px"/>
+            <Text   profile="wtsBtnText"   id="r4edittxt" position="285px -135px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r4edit"    position="285px -134px" onClick="onClickEdit4" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r4delbg"   position="333px -134px"/>
+            <Text   profile="wtsDelText"   id="r4deltxt"  position="333px -135px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r4del"     position="333px -134px" onClick="onClickDel4" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowOdd"    id="r5bg"      position="0px -152px"/>
+            <Text   profile="wtsCellName"  id="r5name"    position="-270px -153px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r5purpose" position="-70px -153px" text=""/>
+            <Text   profile="wtsCellState" id="r5state"   position="90px -153px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r5editbg"  position="285px -153px"/>
+            <Text   profile="wtsBtnText"   id="r5edittxt" position="285px -154px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r5edit"    position="285px -153px" onClick="onClickEdit5" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r5delbg"   position="333px -153px"/>
+            <Text   profile="wtsDelText"   id="r5deltxt"  position="333px -154px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r5del"     position="333px -153px" onClick="onClickDel5" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowEven"   id="r6bg"      position="0px -171px"/>
+            <Text   profile="wtsCellName"  id="r6name"    position="-270px -172px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r6purpose" position="-70px -172px" text=""/>
+            <Text   profile="wtsCellState" id="r6state"   position="90px -172px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r6editbg"  position="285px -172px"/>
+            <Text   profile="wtsBtnText"   id="r6edittxt" position="285px -173px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r6edit"    position="285px -172px" onClick="onClickEdit6" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r6delbg"   position="333px -172px"/>
+            <Text   profile="wtsDelText"   id="r6deltxt"  position="333px -173px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r6del"     position="333px -172px" onClick="onClickDel6" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowOdd"    id="r7bg"      position="0px -190px"/>
+            <Text   profile="wtsCellName"  id="r7name"    position="-270px -191px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r7purpose" position="-70px -191px" text=""/>
+            <Text   profile="wtsCellState" id="r7state"   position="90px -191px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r7editbg"  position="285px -191px"/>
+            <Text   profile="wtsBtnText"   id="r7edittxt" position="285px -192px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r7edit"    position="285px -191px" onClick="onClickEdit7" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r7delbg"   position="333px -191px"/>
+            <Text   profile="wtsDelText"   id="r7deltxt"  position="333px -192px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r7del"     position="333px -191px" onClick="onClickDel7" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsRowEven"   id="r8bg"      position="0px -209px"/>
+            <Text   profile="wtsCellName"  id="r8name"    position="-270px -210px" text=""/>
+            <Text   profile="wtsCellPurp"  id="r8purpose" position="-70px -210px" text=""/>
+            <Text   profile="wtsCellState" id="r8state"   position="90px -210px" text=""/>
+            <Bitmap profile="wtsBtnBg"     id="r8editbg"  position="285px -210px"/>
+            <Text   profile="wtsBtnText"   id="r8edittxt" position="285px -211px" text="Edit"/>
+            <Button profile="wtsBtnHit"    id="r8edit"    position="285px -210px" onClick="onClickEdit8" toolTip="Edit site"/>
+            <Bitmap profile="wtsDelBg"     id="r8delbg"   position="333px -210px"/>
+            <Text   profile="wtsDelText"   id="r8deltxt"  position="333px -211px" text="Del"/>
+            <Button profile="wtsDelHit"    id="r8del"     position="333px -210px" onClick="onClickDel8" toolTip="Delete site"/>
+
+            <Bitmap profile="wtsDivider" position="0px -228px"/>
+            <Text profile="wtsFooter" id="statusText" position="-150px -233px" text=""/>
+
+            <Bitmap profile="wtsPageBg"   id="prevBg"   position="-385px -254px"/>
+            <Text   profile="wtsPageText" id="prevText" position="-385px -256px" text="&lt; Prev"/>
+            <Button profile="wtsPageHit"  id="prevBtn"  position="-385px -254px" onClick="onClickPrev"/>
+            <Text   profile="wtsPageInfo" id="pageInfo" position="-310px -256px" text="1 / 1"/>
+            <Bitmap profile="wtsPageBg"   id="nextBg"   position="-215px -254px"/>
+            <Text   profile="wtsPageText" id="nextText" position="-215px -256px" text="Next &gt;"/>
+            <Button profile="wtsPageHit"  id="nextBtn"  position="-215px -254px" onClick="onClickNext"/>
+
+            <!-- Administration switch (master users only) -->
+            <Bitmap profile="wtsAdminBg"   id="adminBg"  position="80px -254px"/>
+            <Text   profile="wtsAdminText" id="adminTxt" position="80px -256px" text="Admin: own farm"/>
+            <Button profile="wtsAdminHit"  id="adminBtn" position="80px -254px" onClick="onClickAdmin"/>
+
+            <!-- New Site (3-layer for Lua show/hide) -->
+            <Bitmap profile="wtsNewBg"   id="newBg"  position="300px -254px"/>
+            <Text   profile="wtsNewText" id="newTxt" position="300px -256px" text="+ New Site"/>
+            <Button profile="wtsNewHit"  id="newBtn" position="300px -254px" onClick="onClickNew"/>
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonBack" id="btnClose" text="Close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="fs25_guiElement" extends="baseReference"/>
+        <Profile name="wtsTitle" extends="fs25_textDefault" with="anchorTopCenter">
+            <size value="820px 22px"/> <textSize value="20px"/> <textBold value="true"/> <textColor value="1 1 1 1"/> <textAlignment value="center"/>
+        </Profile>
+        <Profile name="wtsSubtitle" extends="fs25_textDefault" with="anchorTopCenter">
+            <size value="820px 16px"/> <textSize value="12px"/> <textColor value="0.55 0.75 0.9 1"/> <textAlignment value="center"/>
+        </Profile>
+        <Profile name="wtsDivider" extends="baseReference" with="anchorTopCenter">
+            <size value="820px 1px"/> <imageColor value="0.3 0.35 0.45 0.8"/>
+        </Profile>
+        <Profile name="wtsHdrBase" extends="fs25_textDefault" with="anchorTopCenter">
+            <textSize value="11px"/> <textBold value="true"/> <textColor value="0.55 0.7 0.9 1"/>
+        </Profile>
+        <Profile name="wtsHdrName"    extends="wtsHdrBase"> <size value="200px 14px"/> <textAlignment value="left"/> </Profile>
+        <Profile name="wtsHdrPurpose" extends="wtsHdrBase"> <size value="140px 14px"/> <textAlignment value="left"/> </Profile>
+        <Profile name="wtsHdrState"   extends="wtsHdrBase"> <size value="150px 14px"/> <textAlignment value="left"/> </Profile>
+        <Profile name="wtsRowOdd"  extends="baseReference" with="anchorTopCenter"> <size value="820px 18px"/> <imageColor value="0.08 0.09 0.12 0.6"/> </Profile>
+        <Profile name="wtsRowEven" extends="baseReference" with="anchorTopCenter"> <size value="820px 18px"/> <imageColor value="0.06 0.06 0.09 0.4"/> </Profile>
+        <Profile name="wtsCellBase" extends="fs25_textDefault" with="anchorTopCenter"> <textSize value="12px"/> <textColor value="0.82 0.82 0.82 1"/> </Profile>
+        <Profile name="wtsCellName"  extends="wtsCellBase"> <size value="200px 16px"/> <textAlignment value="left"/> <textBold value="true"/> <textColor value="1 1 1 1"/> </Profile>
+        <Profile name="wtsCellPurp"  extends="wtsCellBase"> <size value="140px 16px"/> <textAlignment value="left"/> <textColor value="0.55 0.80 1 1"/> </Profile>
+        <Profile name="wtsCellState" extends="wtsCellBase"> <size value="150px 16px"/> <textAlignment value="left"/> <textColor value="0.62 0.72 0.85 1"/> </Profile>
+        <Profile name="wtsBtnBg"   extends="baseReference"   with="anchorTopCenter"> <size value="44px 16px"/> <imageColor value="0.10 0.16 0.32 0.95"/> </Profile>
+        <Profile name="wtsBtnText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="44px 14px"/> <textSize value="10px"/> <textBold value="true"/> <textColor value="0.6 0.8 1 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtsBtnHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="44px 16px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsDelBg"   extends="baseReference"   with="anchorTopCenter"> <size value="44px 16px"/> <imageColor value="0.28 0.08 0.08 0.95"/> </Profile>
+        <Profile name="wtsDelText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="44px 14px"/> <textSize value="10px"/> <textBold value="true"/> <textColor value="1 0.6 0.6 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtsDelHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="44px 16px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsNewBg"   extends="baseReference"   with="anchorTopCenter"> <size value="130px 20px"/> <imageColor value="0.12 0.28 0.15 0.95"/> </Profile>
+        <Profile name="wtsNewText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="130px 16px"/> <textSize value="11px"/> <textBold value="true"/> <textColor value="0.7 1 0.7 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtsNewHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="130px 20px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsAdminBg"   extends="baseReference"   with="anchorTopCenter"> <size value="150px 20px"/> <imageColor value="0.28 0.20 0.06 0.95"/> </Profile>
+        <Profile name="wtsAdminText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="150px 16px"/> <textSize value="11px"/> <textBold value="true"/> <textColor value="1 0.85 0.4 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtsAdminHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="150px 20px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsFooter" extends="fs25_textDefault" with="anchorTopCenter"> <size value="400px 16px"/> <textSize value="11px"/> <textColor value="0.45 0.5 0.6 1"/> <textAlignment value="left"/> </Profile>
+        <Profile name="wtsPageBg"   extends="baseReference"   with="anchorTopCenter"> <size value="60px 16px"/> <imageColor value="0.10 0.12 0.20 0.90"/> </Profile>
+        <Profile name="wtsPageText" extends="fs25_textDefault" with="anchorTopCenter"> <size value="60px 14px"/> <textSize value="10px"/> <textBold value="true"/> <textColor value="0.6 0.7 0.9 1"/> <textAlignment value="center"/> </Profile>
+        <Profile name="wtsPageHit"  extends="emptyPanel"       with="anchorTopCenter"> <size value="60px 16px"/> <isFocusable value="true"/> </Profile>
+        <Profile name="wtsPageInfo" extends="fs25_textDefault" with="anchorTopCenter"> <size value="80px 14px"/> <textSize value="10px"/> <textColor value="0.5 0.55 0.65 1"/> <textAlignment value="center"/> </Profile>
+    </GUIProfiles>
+</GUI>
