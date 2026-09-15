@@ -153,7 +153,7 @@
 
             <!-- ===== SITES (WT-8): opens the site manager ===== -->
             <Bitmap profile="wtSitesBg"   id="sitesBg"  position="130px -254px"/>
-            <Text   profile="wtSitesText" id="sitesTxt" position="130px -256px" text="Farm Sites"/>
+            <Text   profile="wtSitesText" id="sitesTxt" position="130px -256px" text="$l10n_wt_menu_sites"/>
             <Button profile="wtSitesHit"  id="sitesBtn" position="130px -254px" onClick="onClickSites"/>
 
             <!-- ===== NEW TRIGGER BUTTON (admin-only, 3-layer for Lua show/hide) ===== -->

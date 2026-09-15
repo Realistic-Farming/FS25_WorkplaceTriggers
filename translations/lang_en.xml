@@ -267,5 +267,8 @@
         <text name="wt_site_edit_name_required" text="A site needs a name."/>
         <text name="wt_site_edit_centre" text="Centre: X=%.1f  Z=%.1f"/>
         <text name="wt_menu_sites" text="Farm Sites"/>
+        <text name="wt_site_hdr_name" text="Site"/>
+        <text name="wt_site_hdr_purpose" text="Purpose"/>
+        <text name="wt_site_hdr_state" text="Radius / State"/>
     </texts>
 </l10n>

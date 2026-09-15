@@ -60,14 +60,17 @@ local function copySite(s)
         revision = s.revision, state = s.state, reason = s.reason }
 end
 
---- Detached copies of the replica's sites (ACTIVE only outside administration).
+--- Detached copies of the ordinary replica's ACTIVE sites. The ordinary
+--- replica is the actor's own farm; a retained administration context lives in
+--- a separate replica (adminView) that only the site manager reads, so a
+--- nil-context consumer read never sees another farm's rows or orphans.
 function WorkplaceSiteClient:getSites()
     if self.view == nil or self.view.availability ~= "READY" then
         return nil, (self.view and self.view.reason) or "NOT_READY"
     end
     local out = {}
     for _, s in ipairs(self.view.sites) do
-        if self.view.administrationTargetFarmId ~= nil or s.state == "ACTIVE" then
+        if s.state == "ACTIVE" then
             out[#out + 1] = copySite(s)
         end
     end
@@ -80,7 +83,7 @@ function WorkplaceSiteClient:getSite(siteId)
     end
     for _, s in ipairs(self.view.sites) do
         if s.siteId == siteId then
-            if s.state ~= "ACTIVE" and self.view.administrationTargetFarmId == nil then
+            if s.state ~= "ACTIVE" then
                 return nil, s.reason == "MAP_MISMATCH" and "MAP_MISMATCH" or "SITE_UNAVAILABLE"
             end
             return copySite(s), "OK"
@@ -89,10 +92,58 @@ function WorkplaceSiteClient:getSite(siteId)
     return nil, "NOT_FOUND"
 end
 
---- Replace the replica atomically; old rows are cleared before the new ones
---- land, hotspots follow, consumers get UPSERT/DELETE notices.
+--- The administration replica (master users, inside an explicit context) or
+--- nil. Read by the site manager dialog only.
+function WorkplaceSiteClient:getAdministrationView()
+    return self.adminView
+end
+
+--- The view the site manager shows: the administration replica while one is
+--- held, otherwise the ordinary own-farm replica.
+function WorkplaceSiteClient:getManagerView()
+    return self.adminView or self.view
+end
+
+--- Whether this player may issue site commands for the manager's current
+--- context: a master user inside an administration context, otherwise the
+--- same native right the server enforces, UPDATE_FARM on the own farm
+--- (FSBaseMission:getHasPlayerPermission, FSBaseMission.lua:2070).
+function WorkplaceSiteClient:hasCommandRight()
+    local v = self:getManagerView()
+    if v == nil or v.availability ~= "READY" or v.commandSessionId == nil then return false end
+    if self.adminView ~= nil then
+        if g_currentMission == nil then return false end
+        if g_currentMission:getIsServer() then return true end
+        return g_currentMission.isMasterUser == true
+    end
+    if g_currentMission == nil or g_currentMission.getHasPlayerPermission == nil then return false end
+    local farmId = nil
+    if g_currentMission.getFarmId ~= nil then
+        local ok, id = pcall(g_currentMission.getFarmId, g_currentMission)
+        if ok then farmId = id end
+    end
+    local perm = (Farm ~= nil and Farm.PERMISSION ~= nil and Farm.PERMISSION.UPDATE_FARM) or "updateFarm"
+    local ok, allowed = pcall(g_currentMission.getHasPlayerPermission, g_currentMission, perm, nil, farmId)
+    return ok and allowed == true
+end
+
+--- Replace a replica atomically. An administration view (a target farm is
+--- set) only replaces the administration replica and refreshes an open
+--- manager: no hotspots, no consumer notices. The ordinary view replaces the
+--- own-farm replica: old rows are cleared before the new ones land, hotspots
+--- follow, consumers get UPSERT/DELETE notices, and when it says the actor
+--- holds no administration context any more the administration replica is
+--- dropped.
 function WorkplaceSiteClient:applyView(view)
     if type(view) ~= "table" then return end
+    if view.administrationTargetFarmId ~= nil then
+        self.adminView = view
+        if WTDialogLoader ~= nil and WTDialogLoader.refreshSiteList ~= nil then
+            WTDialogLoader.refreshSiteList()
+        end
+        return
+    end
+    if view.administrationActive ~= true then self.adminView = nil end
     local old = self.view
     self.view = view
     self.needsView = false
@@ -102,15 +153,16 @@ function WorkplaceSiteClient:applyView(view)
     local newIds = {}
     for _, s in ipairs(view.sites or {}) do newIds[s.siteId] = s end
 
-    -- Hotspots: only the own-farm ACTIVE view draws on the map.
+    -- Hotspots: the own-farm ACTIVE rows draw on the map; the host still sees
+    -- its own yards while administering another farm.
     for id, hs in pairs(self.hotspots) do
         local s = newIds[id]
-        if s == nil or s.state ~= "ACTIVE" or view.administrationTargetFarmId ~= nil then
+        if s == nil or s.state ~= "ACTIVE" then
             hs:delete()
             self.hotspots[id] = nil
         end
     end
-    if view.availability == "READY" and view.administrationTargetFarmId == nil then
+    if view.availability == "READY" then
         for _, s in ipairs(view.sites or {}) do
             if s.state == "ACTIVE" and WTMapHotspot ~= nil then
                 local hs = self.hotspots[s.siteId]
@@ -288,8 +340,19 @@ function WorkplaceSiteClient:onCommandResult(result)
         if result.reasonCode == "SESSION_WITHDRAWN" then
             self.view.commandSessionId = nil
             self.view.nextSequence = nil
-        elseif result.nextSequence ~= nil and self.view.commandSessionId == result.commandSessionId then
-            self.view.nextSequence = result.nextSequence
+            if self.adminView ~= nil then
+                self.adminView.commandSessionId = nil
+                self.adminView.nextSequence = nil
+            end
+            -- The server republishes after a withdrawal; a pure client also asks
+            -- again so a lost publication cannot leave it stuck.
+            if not self:isServer() then self:requestView() end
+        else
+            for _, v in ipairs({ self.view, self.adminView }) do
+                if result.nextSequence ~= nil and v.commandSessionId == result.commandSessionId then
+                    v.nextSequence = result.nextSequence
+                end
+            end
         end
     end
     local cb = self.pendingResult
@@ -315,6 +378,7 @@ function WorkplaceSiteClient:delete()
         self.hotspots[id] = nil
     end
     self.view = nil
+    self.adminView = nil
     self.isInitialized = false
 end
 

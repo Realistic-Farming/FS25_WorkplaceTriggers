@@ -240,27 +240,30 @@
         <text name="helpLine_wt_ab_p3_thanks_text"     text="Grazie alla comunità di modding di FS25 per la documentazione, le implementazioni di riferimento e il feedback che hanno reso possibile questo mod. Un ringraziamento speciale agli autori di NPCFavor per il loro codice aperto e ben commentato che è servito come riferimento per diversi pattern API FS25 utilizzati in questo mod. Grazie a tutti coloro che hanno testato le prime versioni e segnalato bug - la vostra pazienza con le imperfezioni durante lo sviluppo è molto apprezzata."/>
 
         <!-- WT-8 named farm sites -->
-        <text name="wt_site_list_title" text="Farm Sites"/>
-        <text name="wt_site_list_admin" text="Administering farm %d"/>
-        <text name="wt_site_list_not_ready" text="Sites are not available yet"/>
-        <text name="wt_site_list_no_farm" text="Join a farm to manage its sites"/>
-        <text name="wt_site_list_subtitle_one" text="1 site on your farm"/>
-        <text name="wt_site_list_subtitle_many" text="%d sites on your farm"/>
-        <text name="wt_site_list_empty" text="No sites yet. Click &apos;+ New Site&apos; to name a place on your farm."/>
-        <text name="wt_site_admin_own" text="Admin: own farm"/>
-        <text name="wt_site_admin_next" text="Admin: farm %d"/>
-        <text name="wt_site_purpose_none" text="none"/>
-        <text name="wt_site_state_unavailable" text="unavailable"/>
-        <text name="wt_site_btn_edit" text="Edit"/>
-        <text name="wt_site_btn_del" text="Del"/>
-        <text name="wt_site_btn_transfer" text="Move"/>
-        <text name="wt_site_result_ok" text="Done."/>
-        <text name="wt_site_result_refused" text="Refused: %s"/>
-        <text name="wt_site_edit_title_new" text="New Site"/>
-        <text name="wt_site_edit_title_edit" text="Edit Site"/>
-        <text name="wt_site_edit_name_default" text="Main Yard"/>
-        <text name="wt_site_edit_name_required" text="A site needs a name."/>
-        <text name="wt_site_edit_centre" text="Centre: X=%.1f  Z=%.1f"/>
-        <text name="wt_menu_sites" text="Farm Sites"/>
+        <text name="wt_site_list_title" text="Aree della fattoria"/>
+        <text name="wt_site_list_admin" text="Amministrazione della fattoria %d"/>
+        <text name="wt_site_list_not_ready" text="Le aree non sono ancora disponibili"/>
+        <text name="wt_site_list_no_farm" text="Unisciti a una fattoria per gestirne le aree"/>
+        <text name="wt_site_list_subtitle_one" text="1 area nella tua fattoria"/>
+        <text name="wt_site_list_subtitle_many" text="%d aree nella tua fattoria"/>
+        <text name="wt_site_list_empty" text="Nessuna area ancora. Premi &apos;+ Nuova area&apos; per dare un nome a un luogo della tua fattoria."/>
+        <text name="wt_site_admin_own" text="Admin: fattoria propria"/>
+        <text name="wt_site_admin_next" text="Admin: fattoria %d"/>
+        <text name="wt_site_purpose_none" text="nessuno"/>
+        <text name="wt_site_state_unavailable" text="non disponibile"/>
+        <text name="wt_site_btn_edit" text="Modifica"/>
+        <text name="wt_site_btn_del" text="Elim."/>
+        <text name="wt_site_btn_transfer" text="Sposta"/>
+        <text name="wt_site_result_ok" text="Fatto."/>
+        <text name="wt_site_result_refused" text="Rifiutato: %s"/>
+        <text name="wt_site_edit_title_new" text="Nuova area"/>
+        <text name="wt_site_edit_title_edit" text="Modifica area"/>
+        <text name="wt_site_edit_name_default" text="Cortile principale"/>
+        <text name="wt_site_edit_name_required" text="Un&apos;area ha bisogno di un nome."/>
+        <text name="wt_site_edit_centre" text="Centro: X=%.1f  Z=%.1f"/>
+        <text name="wt_menu_sites" text="Aree della fattoria"/>
+        <text name="wt_site_hdr_name" text="Area"/>
+        <text name="wt_site_hdr_purpose" text="Scopo"/>
+        <text name="wt_site_hdr_state" text="Raggio / Stato"/>
     </texts>
 </l10n>

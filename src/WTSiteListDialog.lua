@@ -3,8 +3,9 @@
 -- MessageDialog subclass: the site manager. A SIBLING of WTListDialog that
 -- copies its patterns (8 rows, pagination, 3-layer buttons) and none of its
 -- wage semantics. Reads only the local site replica (WorkplaceSiteClient),
--- never the world store. Controls gate on the replica's command capability
--- (the server-issued session), never on isLocalPlayerAdmin.
+-- never the world store. Controls gate on the same native right the server
+-- enforces (UPDATE_FARM on the own farm, or master user inside an explicit
+-- administration context), read through WorkplaceSiteClient:hasCommandRight.
 -- =========================================================
 
 WTSiteListDialog = WTSiteListDialog or {}
@@ -55,9 +56,13 @@ function WTSiteListDialog:onOpen()
     self:refresh()
 end
 
+--- The manager reads the administration replica while one is held, else the
+--- ordinary own-farm replica (the two never mix).
 function WTSiteListDialog:getView()
     local c = self.system and self.system.siteClient
-    return c and c.view or nil
+    if c == nil then return nil end
+    if c.getManagerView ~= nil then return c:getManagerView() end
+    return c.view
 end
 
 function WTSiteListDialog:getSites()
@@ -67,6 +72,9 @@ function WTSiteListDialog:getSites()
 end
 
 function WTSiteListDialog:canCommand()
+    local c = self.system and self.system.siteClient
+    if c == nil then return false end
+    if c.hasCommandRight ~= nil then return c:hasCommandRight() end
     local v = self:getView()
     return v ~= nil and v.availability == "READY" and v.commandSessionId ~= nil
 end
@@ -280,8 +288,10 @@ end
 
 function WTSiteListDialog:onClickNew()
     if not self:canCommand() then return end
+    local v = self:getView()
+    local adminFarmId = v and v.administrationTargetFarmId or nil
     self:close()
-    if WTDialogLoader then WTDialogLoader.showSiteEdit(self.system, nil, true) end
+    if WTDialogLoader then WTDialogLoader.showSiteEdit(self.system, nil, true, adminFarmId) end
 end
 
 --- Cycle the administration context: own farm, then each existing ordinary farm.

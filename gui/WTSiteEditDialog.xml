@@ -31,7 +31,7 @@
             <Bitmap profile="wtseDivider"                position="0px -32px"/>
 
             <Text      profile="wtseSectionLabel"               position="0px -44px" text="Site Name"/>
-            <TextInput profile="wtseNameInput"   id="nameInput" position="0px -62px" onEnterPress="onClickSave"/>
+            <TextInput profile="wtseNameInput"   id="nameInput" position="0px -62px" maxCharacters="128" onEnterPress="onClickSave"/>
 
             <Text profile="wtseSectionLabel" position="0px -92px" text="Radius"/>
             <Bitmap profile="wtseAdjBtnBg"   id="radDecBg"  position="-100px -112px"/>

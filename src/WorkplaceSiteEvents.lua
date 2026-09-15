@@ -102,6 +102,10 @@ function WTSiteViewStateEvent:writeStream(streamId, connection)
     writeStr(streamId, v.commandSessionId or "")
     writeStr(streamId, v.nextSequence or "")
     writeStr(streamId, v.administrationTargetFarmId ~= nil and tostring(v.administrationTargetFarmId) or "")
+    -- Whether the actor's session currently holds an administration context.
+    -- The ordinary view carries it so the client can drop its administration
+    -- replica when the context ends (the admin view itself has a target).
+    streamWriteBool(streamId, v.administrationActive == true)
     local sites = v.sites or {}
     streamWriteInt32(streamId, #sites)
     for _, s in ipairs(sites) do
@@ -128,6 +132,7 @@ function WTSiteViewStateEvent:readStream(streamId, connection)
     v.nextSequence = streamReadString(streamId)
     local admin = streamReadString(streamId)
     v.administrationTargetFarmId = tonumber(admin)
+    v.administrationActive = streamReadBool(streamId)
     local n = streamReadInt32(streamId)
     v.sites = {}
     if n < 0 or n > 4096 then n = 0 end

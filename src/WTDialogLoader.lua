@@ -171,10 +171,10 @@ function WTDialogLoader.showSiteList(system, focusSiteId, clearAdmin)
     return true
 end
 
-function WTDialogLoader.showSiteEdit(system, site, isNew)
+function WTDialogLoader.showSiteEdit(system, site, isNew, adminFarmId)
     if not WTDialogLoader.ensureSiteLoaded() then return false end
     local inst = WTDialogLoader.siteEditInstance
-    if inst and inst.setData then inst:setData(system, site, isNew) end
+    if inst and inst.setData then inst:setData(system, site, isNew, adminFarmId) end
     local ok, err = pcall(function() g_gui:showDialog("WTSiteEditDialog") end)
     if not ok then
         wtLog("ERROR showing WTSiteEditDialog: " .. tostring(err))

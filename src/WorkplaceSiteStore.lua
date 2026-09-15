@@ -40,7 +40,6 @@ WorkplaceSiteStore.MAX_PURPOSE_BYTES = 64
 WorkplaceSiteStore.MIN_RADIUS        = 1
 WorkplaceSiteStore.DEFAULT_RADIUS    = 100
 WorkplaceSiteStore.COUNTER_LIMIT     = "2147483647"
-WorkplaceSiteStore.FALLBACK_TERRAIN  = 2048 * 2   -- when g_terrainSize is nil, diagonal falls back to 2048 * sqrt(2)
 
 local SPECTATOR = 0
 
@@ -130,7 +129,9 @@ function WorkplaceSiteStore.validateFields(fields, terrainSize)
     if type(name) ~= "string" or name == "" or #name > WorkplaceSiteStore.MAX_NAME_BYTES then
         return false, "INVALID_FIELDS"
     end
-    if name:find("[<>&%c]") ~= nil then return false, "INVALID_FIELDS" end
+    -- The brief's bound is UTF-8 1..128 bytes; XMLFile and StateLedger escape
+    -- markup, so only control characters are refused ("Smith & Sons" is a name).
+    if name:find("%c") ~= nil then return false, "INVALID_FIELDS" end
     local purpose = fields.purpose
     if purpose == nil then purpose = "" end
     if type(purpose) ~= "string" or #purpose > WorkplaceSiteStore.MAX_PURPOSE_BYTES or purpose:find("[<>&\"'%c]") ~= nil then
@@ -358,9 +359,14 @@ function WorkplaceSiteStore:stageContainer(c, liveMapId, liveTerrainSize)
     self.terrainSize = isFinite(c.terrainSize) and c.terrainSize > 0 and c.terrainSize or nil
 
     local highest = "0"
-    for _, s in ipairs(c.sites or {}) do
-        if type(s) == "table" and type(s.siteId) == "string" and s.siteId ~= "" and self.byId[s.siteId] == nil
-            and isFinite(s.centreX) and isFinite(s.centreZ) and isFinite(s.radiusMetres) then
+    for i, s in ipairs(c.sites or {}) do
+        if type(s) ~= "table" or type(s.siteId) ~= "string" or s.siteId == "" then
+            wtLog(string.format("dropped loaded site record %d: no site id", i))
+        elseif self.byId[s.siteId] ~= nil then
+            wtLog(string.format("dropped loaded site record '%s': duplicate id (first occurrence kept)", tostring(s.siteId)))
+        elseif not (isFinite(s.centreX) and isFinite(s.centreZ) and isFinite(s.radiusMetres)) then
+            wtLog(string.format("dropped loaded site record '%s': non-finite geometry", tostring(s.siteId)))
+        else
             local r = {
                 siteId = s.siteId,
                 ownerFarmId = tonumber(s.ownerFarmId) or -1,

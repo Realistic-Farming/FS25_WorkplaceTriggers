@@ -20,12 +20,12 @@
         <ThreePartBitmap profile="fs25_dialogBgBottom" />
 
         <GuiElement profile="fs25_dialogContentContainer">
-            <Text profile="wtsTitle" id="titleText" position="0px -12px" text="Farm Sites"/>
+            <Text profile="wtsTitle" id="titleText" position="0px -12px" text="$l10n_wt_site_list_title"/>
             <Text profile="wtsSubtitle" id="subtitleText" position="0px -36px" text=""/>
             <Bitmap profile="wtsDivider" position="0px -54px"/>
-            <Text profile="wtsHdrName"    position="-270px -58px" text="Site"/>
-            <Text profile="wtsHdrPurpose" position="-70px -58px" text="Purpose"/>
-            <Text profile="wtsHdrState"   position="90px -58px" text="Radius / State"/>
+            <Text profile="wtsHdrName"    position="-270px -58px" text="$l10n_wt_site_hdr_name"/>
+            <Text profile="wtsHdrPurpose" position="-70px -58px" text="$l10n_wt_site_hdr_purpose"/>
+            <Text profile="wtsHdrState"   position="90px -58px" text="$l10n_wt_site_hdr_state"/>
             <Bitmap profile="wtsDivider" position="0px -73px"/>
 
             <Bitmap profile="wtsRowOdd"    id="r1bg"      position="0px -76px"/>
@@ -33,10 +33,10 @@
             <Text   profile="wtsCellPurp"  id="r1purpose" position="-70px -77px" text=""/>
             <Text   profile="wtsCellState" id="r1state"   position="90px -77px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r1editbg"  position="285px -77px"/>
-            <Text   profile="wtsBtnText"   id="r1edittxt" position="285px -78px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r1edittxt" position="285px -78px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r1edit"    position="285px -77px" onClick="onClickEdit1" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r1delbg"   position="333px -77px"/>
-            <Text   profile="wtsDelText"   id="r1deltxt"  position="333px -78px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r1deltxt"  position="333px -78px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r1del"     position="333px -77px" onClick="onClickDel1" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowEven"   id="r2bg"      position="0px -95px"/>
@@ -44,10 +44,10 @@
             <Text   profile="wtsCellPurp"  id="r2purpose" position="-70px -96px" text=""/>
             <Text   profile="wtsCellState" id="r2state"   position="90px -96px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r2editbg"  position="285px -96px"/>
-            <Text   profile="wtsBtnText"   id="r2edittxt" position="285px -97px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r2edittxt" position="285px -97px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r2edit"    position="285px -96px" onClick="onClickEdit2" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r2delbg"   position="333px -96px"/>
-            <Text   profile="wtsDelText"   id="r2deltxt"  position="333px -97px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r2deltxt"  position="333px -97px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r2del"     position="333px -96px" onClick="onClickDel2" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowOdd"    id="r3bg"      position="0px -114px"/>
@@ -55,10 +55,10 @@
             <Text   profile="wtsCellPurp"  id="r3purpose" position="-70px -115px" text=""/>
             <Text   profile="wtsCellState" id="r3state"   position="90px -115px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r3editbg"  position="285px -115px"/>
-            <Text   profile="wtsBtnText"   id="r3edittxt" position="285px -116px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r3edittxt" position="285px -116px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r3edit"    position="285px -115px" onClick="onClickEdit3" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r3delbg"   position="333px -115px"/>
-            <Text   profile="wtsDelText"   id="r3deltxt"  position="333px -116px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r3deltxt"  position="333px -116px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r3del"     position="333px -115px" onClick="onClickDel3" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowEven"   id="r4bg"      position="0px -133px"/>
@@ -66,10 +66,10 @@
             <Text   profile="wtsCellPurp"  id="r4purpose" position="-70px -134px" text=""/>
             <Text   profile="wtsCellState" id="r4state"   position="90px -134px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r4editbg"  position="285px -134px"/>
-            <Text   profile="wtsBtnText"   id="r4edittxt" position="285px -135px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r4edittxt" position="285px -135px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r4edit"    position="285px -134px" onClick="onClickEdit4" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r4delbg"   position="333px -134px"/>
-            <Text   profile="wtsDelText"   id="r4deltxt"  position="333px -135px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r4deltxt"  position="333px -135px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r4del"     position="333px -134px" onClick="onClickDel4" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowOdd"    id="r5bg"      position="0px -152px"/>
@@ -77,10 +77,10 @@
             <Text   profile="wtsCellPurp"  id="r5purpose" position="-70px -153px" text=""/>
             <Text   profile="wtsCellState" id="r5state"   position="90px -153px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r5editbg"  position="285px -153px"/>
-            <Text   profile="wtsBtnText"   id="r5edittxt" position="285px -154px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r5edittxt" position="285px -154px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r5edit"    position="285px -153px" onClick="onClickEdit5" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r5delbg"   position="333px -153px"/>
-            <Text   profile="wtsDelText"   id="r5deltxt"  position="333px -154px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r5deltxt"  position="333px -154px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r5del"     position="333px -153px" onClick="onClickDel5" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowEven"   id="r6bg"      position="0px -171px"/>
@@ -88,10 +88,10 @@
             <Text   profile="wtsCellPurp"  id="r6purpose" position="-70px -172px" text=""/>
             <Text   profile="wtsCellState" id="r6state"   position="90px -172px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r6editbg"  position="285px -172px"/>
-            <Text   profile="wtsBtnText"   id="r6edittxt" position="285px -173px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r6edittxt" position="285px -173px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r6edit"    position="285px -172px" onClick="onClickEdit6" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r6delbg"   position="333px -172px"/>
-            <Text   profile="wtsDelText"   id="r6deltxt"  position="333px -173px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r6deltxt"  position="333px -173px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r6del"     position="333px -172px" onClick="onClickDel6" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowOdd"    id="r7bg"      position="0px -190px"/>
@@ -99,10 +99,10 @@
             <Text   profile="wtsCellPurp"  id="r7purpose" position="-70px -191px" text=""/>
             <Text   profile="wtsCellState" id="r7state"   position="90px -191px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r7editbg"  position="285px -191px"/>
-            <Text   profile="wtsBtnText"   id="r7edittxt" position="285px -192px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r7edittxt" position="285px -192px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r7edit"    position="285px -191px" onClick="onClickEdit7" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r7delbg"   position="333px -191px"/>
-            <Text   profile="wtsDelText"   id="r7deltxt"  position="333px -192px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r7deltxt"  position="333px -192px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r7del"     position="333px -191px" onClick="onClickDel7" toolTip="Delete site"/>
 
             <Bitmap profile="wtsRowEven"   id="r8bg"      position="0px -209px"/>
@@ -110,10 +110,10 @@
             <Text   profile="wtsCellPurp"  id="r8purpose" position="-70px -210px" text=""/>
             <Text   profile="wtsCellState" id="r8state"   position="90px -210px" text=""/>
             <Bitmap profile="wtsBtnBg"     id="r8editbg"  position="285px -210px"/>
-            <Text   profile="wtsBtnText"   id="r8edittxt" position="285px -211px" text="Edit"/>
+            <Text   profile="wtsBtnText"   id="r8edittxt" position="285px -211px" text="$l10n_wt_site_btn_edit"/>
             <Button profile="wtsBtnHit"    id="r8edit"    position="285px -210px" onClick="onClickEdit8" toolTip="Edit site"/>
             <Bitmap profile="wtsDelBg"     id="r8delbg"   position="333px -210px"/>
-            <Text   profile="wtsDelText"   id="r8deltxt"  position="333px -211px" text="Del"/>
+            <Text   profile="wtsDelText"   id="r8deltxt"  position="333px -211px" text="$l10n_wt_site_btn_del"/>
             <Button profile="wtsDelHit"    id="r8del"     position="333px -210px" onClick="onClickDel8" toolTip="Delete site"/>
 
             <Bitmap profile="wtsDivider" position="0px -228px"/>

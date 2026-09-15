@@ -289,6 +289,21 @@ local function farmExistsLive(farmId)
     return g_farmManager ~= nil and g_farmManager.getFarmById ~= nil and g_farmManager:getFarmById(farmId) ~= nil
 end
 
+--- A remote connection the server can still reach. isConnected is only ever
+--- cleared on a client's server connection (network/Client.lua:155, 176, 440),
+--- so on the server the user record is the liveness test: the user manager
+--- drops it when the connection closes (users/UserManager.lua:74).
+local function connectionIsLive(connection)
+    if connection == nil then return false end
+    if connection.isConnected == false then return false end
+    local um = g_currentMission ~= nil and g_currentMission.userManager or nil
+    if um ~= nil and um.getUserByConnection ~= nil then
+        return um:getUserByConnection(connection) ~= nil
+    end
+    return true
+end
+WorkplaceSiteService.connectionIsLive = connectionIsLive
+
 --- Native UPDATE_FARM permission on a target farm.
 function WorkplaceSiteService:hasNativePermission(actor, targetFarmId)
     if g_currentMission == nil or g_currentMission.getHasPlayerPermission == nil then
@@ -338,11 +353,20 @@ function WorkplaceSiteService:isEligibleForCommands(actor)
 end
 
 --- Issue (or keep) the session for an actor's current binding.
+--- The permission snapshot a session is bound to: a change (the farm manager
+--- right granted or revoked) withdraws the session at the next republish.
+function WorkplaceSiteService:permissionSnapshot(actor)
+    if actor.isMasterUser then return true end
+    if not Store.isOrdinaryFarmId(actor.farmId) then return false end
+    return self:hasNativePermission(actor, actor.farmId)
+end
+
 function WorkplaceSiteService:issueSession(actor, adminTarget)
     local key = sessionKey(actor)
     local s = self.sessions[key]
-    if s ~= nil and s.userId == actor.userId and s.farmId == actor.farmId and s.isMasterUser == actor.isMasterUser
-        and s.administrationTargetFarmId == adminTarget then
+    local perm = self:permissionSnapshot(actor)
+    if s ~= nil and not s.reissue and s.userId == actor.userId and s.farmId == actor.farmId and s.isMasterUser == actor.isMasterUser
+        and s.administrationTargetFarmId == adminTarget and s.hasPermission == perm then
         return s
     end
     self.sessionSerial = Store.incrementDecimal(self.sessionSerial)
@@ -350,6 +374,7 @@ function WorkplaceSiteService:issueSession(actor, adminTarget)
         commandSessionId = "s" .. self.sessionSerial,
         userId = actor.userId, farmId = actor.farmId, isMasterUser = actor.isMasterUser,
         administrationTargetFarmId = adminTarget,
+        hasPermission = perm,
         nextSequence = 1,
         lastSequence = nil,
         lastResult = nil,
@@ -362,6 +387,32 @@ function WorkplaceSiteService:withdrawSession(actor)
     self.sessions[sessionKey(actor)] = nil
 end
 
+--- Withdraw every session bound to a farm (an owner change): the session is
+--- flagged for reissue, so a command against it is SESSION_WITHDRAWN and the
+--- next republish issues a fresh id while the actor's administration context
+--- is kept. Returns the number withdrawn.
+function WorkplaceSiteService:withdrawSessionsOnFarms(farmIds)
+    local set = {}
+    for _, id in ipairs(farmIds) do if id ~= nil then set[id] = true end end
+    local n = 0
+    for _, session in pairs(self.sessions) do
+        if set[session.farmId] or (session.administrationTargetFarmId ~= nil and set[session.administrationTargetFarmId]) then
+            session.reissue = true
+            n = n + 1
+        end
+    end
+    return n
+end
+
+--- Republish to the actor after any real session change, so nothing is stuck.
+function WorkplaceSiteService:republishActor(actor)
+    if actor.connection == nil then
+        self:publishLocal()
+    else
+        self:publishTo(actor.connection)
+    end
+end
+
 -- =========================================================
 -- Views
 -- =========================================================
@@ -372,8 +423,13 @@ end
 
 --- Build the private WT_SITE_VALUES_1 view for an actor. Ordinary: own farm,
 --- ACTIVE only. Administration: the target farm, every record with its state.
-function WorkplaceSiteService:buildView(actor, adminTarget)
-    local view = { format = WTSiteEvents.VIEW_FORMAT, definitionRevision = self.store.containerRevision, sites = {} }
+--- `session` is the session already issued for this publish (the same one
+--- stamps the ordinary and the administration view); nil issues one here.
+--- `adminActive` marks the ordinary view of an actor whose session holds an
+--- administration context.
+function WorkplaceSiteService:buildView(actor, adminTarget, session, adminActive)
+    local view = { format = WTSiteEvents.VIEW_FORMAT, definitionRevision = self.store.containerRevision, sites = {},
+                   administrationActive = adminActive == true or adminTarget ~= nil }
     if not self.store:isReady() then
         view.availability = "NOT_READY"
         view.reason = "NOT_READY"
@@ -394,7 +450,7 @@ function WorkplaceSiteService:buildView(actor, adminTarget)
     end
     view.administrationTargetFarmId = adminTarget
     if self:isEligibleForCommands(actor) then
-        local s = self:issueSession(actor, adminTarget)
+        local s = session or self:issueSession(actor, adminTarget)
         view.commandSessionId = s.commandSessionId
         view.nextSequence = tostring(s.nextSequence)
     end
@@ -406,6 +462,7 @@ end
 function WorkplaceSiteService:onViewRequest(connection, administrationRequest)
     if connection == nil then return end
     if connection.streamId ~= nil and NetworkNode ~= nil and connection.streamId == NetworkNode.LOCAL_STREAM_ID then return end
+    if not connectionIsLive(connection) then return end
     self.subscribers[connection] = true
     if administrationRequest == false then
         self:setAdministrationContext(connection, nil)
@@ -417,19 +474,37 @@ function WorkplaceSiteService:onViewRequest(connection, administrationRequest)
     self:publishTo(connection)
 end
 
-function WorkplaceSiteService:publishTo(connection)
-    if connection.isConnected == false then
-        self.subscribers[connection] = nil
-        return
-    end
-    local actor = self:resolveActor(connection)
+--- The two views of one actor: the ordinary own-farm replica always, and the
+--- administration replica in addition while the session holds a context.
+--- One session stamps both.
+function WorkplaceSiteService:buildViewsFor(actor)
     local admin = nil
-    local s = self.sessions[connection]
+    local s = self.sessions[sessionKey(actor)]
     if s ~= nil and s.administrationTargetFarmId ~= nil and actor.isMasterUser then
         admin = self:administrationTarget(actor, s.administrationTargetFarmId)
     end
-    local view = self:buildView(actor, admin)
-    pcall(function() connection:sendEvent(WTSiteViewStateEvent.new(view)) end)
+    local session = nil
+    if self.store:isReady() and self:isEligibleForCommands(actor) then
+        session = self:issueSession(actor, admin)
+    end
+    local ordinary = self:buildView(actor, nil, session, admin ~= nil)
+    local adminView = nil
+    if admin ~= nil then adminView = self:buildView(actor, admin, session, true) end
+    return ordinary, adminView
+end
+
+function WorkplaceSiteService:publishTo(connection)
+    if not connectionIsLive(connection) then
+        self.subscribers[connection] = nil
+        self.sessions[connection] = nil
+        return
+    end
+    local actor = self:resolveActor(connection)
+    local ordinary, adminView = self:buildViewsFor(actor)
+    pcall(function() connection:sendEvent(WTSiteViewStateEvent.new(ordinary)) end)
+    if adminView ~= nil then
+        pcall(function() connection:sendEvent(WTSiteViewStateEvent.new(adminView)) end)
+    end
 end
 
 --- Every remote subscriber, and the local context's view in process.
@@ -437,6 +512,10 @@ function WorkplaceSiteService:publishAll()
     if not self:isServer() then return end
     for connection in pairs(self.subscribers) do
         self:publishTo(connection)
+    end
+    -- Sessions of connections that are gone (never published to again).
+    for key in pairs(self.sessions) do
+        if key ~= "local" and not connectionIsLive(key) then self.sessions[key] = nil end
     end
     self:publishLocal()
 end
@@ -447,12 +526,9 @@ function WorkplaceSiteService:publishLocal()
     local sys = self.system
     if sys == nil or sys.siteClient == nil then return end
     local actor = self:resolveActor(nil)
-    local admin = nil
-    local s = self.sessions["local"]
-    if s ~= nil and s.administrationTargetFarmId ~= nil then
-        admin = self:administrationTarget(actor, s.administrationTargetFarmId)
-    end
-    sys.siteClient:applyView(self:buildView(actor, admin))
+    local ordinary, adminView = self:buildViewsFor(actor)
+    sys.siteClient:applyView(ordinary)
+    if adminView ~= nil then sys.siteClient:applyView(adminView) end
 end
 
 --- Enter or leave the administration context for the local host / a client.
@@ -551,16 +627,33 @@ end
 
 --- Handle a command for an actor. Returns the typed result table.
 function WorkplaceSiteService:handleCommand(actor, req)
-    local result = { commandSessionId = req.commandSessionId or "", sequence = req.sequence or "", outcome = "REFUSED", reasonCode = "INVALID_FIELDS", resultingRevision = nil, nextSequence = nil, currentTarget = nil }
-    if type(req) ~= "table" or not WorkplaceSiteService.ACTIONS[req.actionId] then return result end
+    local result = { commandSessionId = "", sequence = "", outcome = "REFUSED", reasonCode = "INVALID_FIELDS", resultingRevision = nil, nextSequence = nil, currentTarget = nil }
+    if type(req) ~= "table" then return result end
+    result.commandSessionId = req.commandSessionId or ""
+    result.sequence = req.sequence or ""
+    if not WorkplaceSiteService.ACTIONS[req.actionId] then return result end
     if not self.store:isReady() then result.reasonCode = "NOT_READY" return result end
 
-    -- Session binding: the session must be this actor's current one.
+    -- Session binding. A request naming a stale or foreign session id is
+    -- refused without touching the actor's current session; only a changed
+    -- binding (user, farm, master flag, permission) or no session at all is a
+    -- real withdrawal. Either way the actor is republished so nothing is stuck.
     local s = self.sessions[sessionKey(actor)]
-    if s == nil or s.commandSessionId ~= req.commandSessionId
-        or s.userId ~= actor.userId or s.farmId ~= actor.farmId or s.isMasterUser ~= actor.isMasterUser then
-        self:withdrawSession(actor)
+    if s == nil or s.reissue or s.userId ~= actor.userId or s.farmId ~= actor.farmId or s.isMasterUser ~= actor.isMasterUser
+        or s.hasPermission ~= self:permissionSnapshot(actor) then
+        if s ~= nil and s.reissue then
+            -- Keep the administration context; the republish reissues the id.
+            self:republishActor(actor)
+        else
+            self:withdrawSession(actor)
+            self:republishActor(actor)
+        end
         result.reasonCode = "SESSION_WITHDRAWN"
+        return result
+    end
+    if s.commandSessionId ~= req.commandSessionId then
+        result.reasonCode = "SESSION_WITHDRAWN"
+        self:republishActor(actor)
         return result
     end
     local seq = parseSequence(req.sequence)
@@ -587,14 +680,18 @@ function WorkplaceSiteService:handleCommand(actor, req)
     local action = req.actionId
 
     if action == "CREATE_SITE" then
-        if req.administrationTargetFarmId ~= nil and req.administrationTargetFarmId ~= adminTarget then
+        -- The owner rides the wire explicitly: a named farm must equal the
+        -- session's administration context; without the field the site is
+        -- the actor's own, never the retained context.
+        local requested = req.administrationTargetFarmId
+        if requested ~= nil and requested ~= adminTarget then
             result.reasonCode = "UNAUTHORIZED"
         else
-            local owner = adminTarget or actor.farmId
+            local owner = requested or actor.farmId
             if not Store.isOrdinaryFarmId(owner) or not farmExistsLive(owner) then
                 result.reasonCode = "INVALID_FARM"
             else
-                local ok, why = self:mayEditFarm(actor, owner, adminTarget)
+                local ok, why = self:mayEditFarm(actor, owner, requested)
                 if not ok then
                     result.reasonCode = why
                 else
@@ -619,10 +716,29 @@ function WorkplaceSiteService:handleCommand(actor, req)
             if r == nil then
                 result.reasonCode = "NOT_FOUND"
             else
-                local ok, why = self:mayEditFarm(actor, r.ownerFarmId, adminTarget)
+                -- Record state first: farm ids are reused (farms/FarmManager.lua:368),
+                -- so a manager on a reused id never reshapes or deletes a dead
+                -- farm's UNAVAILABLE sites. UNAVAILABLE is cleared only by
+                -- TRANSFER_SITE, or DELETE_SITE by a master user inside an
+                -- administration context (brief 4.2 / 4.7).
+                local effState = self.store:effectiveState(r)
+                local unavailable = effState ~= Store.STATE_ACTIVE
+                local ok, why
+                if unavailable then
+                    -- A reused farm id never counts as the owner (FarmManager.lua:368):
+                    -- the record is recoverable only by a master user inside an
+                    -- explicit administration context, and only by deletion.
+                    if action == "DELETE_SITE" and actor.isMasterUser and adminTarget ~= nil then
+                        ok, why = true, "OK"
+                    else
+                        ok, why = false, "SITE_UNAVAILABLE"
+                    end
+                else
+                    ok, why = self:mayEditFarm(actor, r.ownerFarmId, adminTarget)
+                end
                 if not ok then
                     result.reasonCode = why
-                    result.currentTarget = nil
+                    result.currentTarget = (why == "SITE_UNAVAILABLE" and actor.isMasterUser and adminTarget ~= nil) and targetOf(self.store, r) or nil
                 elseif req.expectedRevision ~= r.revision then
                     result.reasonCode = "STALE_REVISION"
                     result.currentTarget = targetOf(self.store, r)
@@ -665,6 +781,7 @@ function WorkplaceSiteService:handleCommand(actor, req)
                 result.reasonCode = "STALE_REVISION"
                 result.currentTarget = targetOf(self.store, r)
             else
+                local oldOwner = r.ownerFarmId
                 local moved, reason = self.store:transfer(r.siteId, target)
                 if moved == nil then
                     result.reasonCode = reason
@@ -675,13 +792,19 @@ function WorkplaceSiteService:handleCommand(actor, req)
                     result.resultingRevision = moved.revision
                     result.currentTarget = targetOf(self.store, moved)
                     self:notify(moved.siteId, moved.revision, "UPSERT", moved.ownerFarmId)
+                    -- Ownership moved: sessions bound to the old and the new
+                    -- owner farm are withdrawn (brief 4.7 withdrawal triggers);
+                    -- the republish below reissues them against the new state.
+                    self:withdrawSessionsOnFarms({ oldOwner, moved.ownerFarmId })
                 end
             end
         end
     end
 
     if self.sessions[sessionKey(actor)] == s then s.lastResult = result end
-    if result.outcome == "APPLIED" then self:publishAll() end
+    if result.outcome == "APPLIED" then
+        self:publishAll()
+    end
     return result
 end
 

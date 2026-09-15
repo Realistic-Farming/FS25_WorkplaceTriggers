@@ -252,10 +252,9 @@ do
     T.eq("D13 a sequence that is not next is COMMAND_OUTSTANDING", skip.reasonCode, "COMMAND_OUTSTANDING")
     T.eq("D14 and consumed nothing", sys.siteService.sessions["local"].nextSequence, 2)
     local bad = sys.siteService:handleLocalCommand({ commandSessionId = "nope", sequence = "2", actionId = "DELETE_SITE", targetId = "site_1", expectedRevision = "1" })
-    T.eq("D15 a foreign session is SESSION_WITHDRAWN", bad.reasonCode, "SESSION_WITHDRAWN")
-    sys.siteService:publishLocal()   -- a fresh session after the withdrawal
+    T.eq("D15 a foreign session id is SESSION_WITHDRAWN", bad.reasonCode, "SESSION_WITHDRAWN")
     local v2 = sys.siteClient.view
-    T.ok("D16 the next READY view issues a fresh session", v2.commandSessionId ~= s.commandSessionId)
+    T.eq("D16 but the actor's current session is retained and republished", v2.commandSessionId, s.commandSessionId)
 
     -- Stale revision: two edits against one revision.
     local site = sys.siteClient.view.sites[1]
@@ -275,13 +274,16 @@ do
     T.eq("D22 administrationTargetFarmId on DELETE is INVALID_FIELDS", badField.reasonCode, "INVALID_FIELDS")
     -- Administration context: the host administers farm 2.
     T.eq("D23 host enters administration of farm 2", (sys.siteService:setAdministrationContext(nil, 2)), true)
-    T.eq("D24 admin view lists farm 2", sys.siteClient.view.administrationTargetFarmId, 2)
-    T.eq("D25 admin view carries farm 2's site", sys.siteClient.view.sites[1].name, "Theirs")
+    T.eq("D24 the administration replica lists farm 2", sys.siteClient.adminView.administrationTargetFarmId, 2)
+    T.eq("D25 the administration replica carries farm 2's site", sys.siteClient.adminView.sites[1].name, "Theirs")
+    T.eq("D25b the ordinary replica stays the own farm", sys.siteClient.view.administrationTargetFarmId, nil)
+    T.eq("D25c the ordinary replica marks the context active", sys.siteClient.view.administrationActive, true)
     local adminDel = sys.siteClient:sendCommand("DELETE_SITE", { targetId = other.siteId, expectedRevision = other.revision })
     T.eq("D26 in administration the delete applies", adminDel.outcome, "APPLIED")
     T.eq("D27 administering a missing farm is refused", (sys.siteService:setAdministrationContext(nil, 9)), false)
     sys.siteService:setAdministrationContext(nil, nil)
-    T.eq("D28 leaving administration returns to the own farm view", sys.siteClient.view.administrationTargetFarmId, nil)
+    T.eq("D28 leaving administration drops the administration replica", sys.siteClient.adminView, nil)
+    T.eq("D28b the manager view is the own farm again", sys.siteClient:getManagerView().administrationTargetFarmId, nil)
     T.eq("D29 spectator farm cannot own a site", (sys.siteService.store:create(0, { name = "x", centreX = 0, centreZ = 0, radiusMetres = 5 })), nil)
 end
 
@@ -384,18 +386,27 @@ do
     deliver(WTSiteViewRequestEvent.new("1"), true, admin)
     local adminClient = newSystem()
     g_WorkplaceSystem = adminClient
+    -- Two views travel: the ordinary own-farm replica, then the administration replica.
+    deliver(admin.sent[#admin.sent - 1], false, nil)
     deliver(admin.sent[#admin.sent], false, nil)
-    local av = adminClient.siteClient.view
+    local av = adminClient.siteClient.adminView
     T.eq("E23 admin view administers farm 1", av.administrationTargetFarmId, 1)
     T.eq("E24 admin view lists farm 1's site plus the orphans", #av.sites, 3)
     local orphan
     for _, s in ipairs(av.sites) do if s.siteId == "site_2" then orphan = s end end
     T.eq("E25 orphan shows UNAVAILABLE with its reason", orphan.reason, "FARM_DELETED")
     g_WorkplaceSystem = server
+    g_currentMission._isServer = true
     local sa = server.siteService.sessions[admin]
     local moved = server.siteService:handleCommandFromConnection(admin, { commandSessionId = sa.commandSessionId, sequence = tostring(sa.nextSequence), actionId = "TRANSFER_SITE", targetId = "site_2", expectedRevision = orphan.revision, administrationTargetFarmId = 1 })
     T.eq("E26 transfer applied", moved.outcome, "APPLIED")
     T.eq("E27 site now owned by farm 1 and ACTIVE", moved.currentTarget.ownerFarmId .. "/" .. moved.currentTarget.state, "1/ACTIVE")
+    -- The transfer withdrew the sessions on farm 1 (the new owner), the acting master's included;
+    -- the republish reissued it with the administration context kept.
+    local saOld = sa
+    sa = server.siteService.sessions[admin]
+    T.ok("E27b the acting master's session was reissued", sa ~= nil and sa ~= saOld)
+    T.eq("E27c with its administration context kept", sa.administrationTargetFarmId, 1)
     local noAdmin = server.siteService:handleCommandFromConnection(admin, { commandSessionId = sa.commandSessionId, sequence = tostring(sa.nextSequence), actionId = "TRANSFER_SITE", targetId = "site_3", expectedRevision = "1", administrationTargetFarmId = 9 })
     T.eq("E28 transfer to a missing farm is INVALID_FARM", noAdmin.reasonCode, "INVALID_FARM")
     -- A non-master cannot transfer.
@@ -514,4 +525,281 @@ do
     T.eq("H9 request route SITE", rx2.request.route, "SITE")
     T.eq("H10 request fields", rx2.request.targetId .. "/" .. rx2.request.expectedRevision .. "/" .. rx2.request.radiusMetres, "site_1/2/7")
     T.eq("H11 absent admin target stays nil", rx2.request.administrationTargetFarmId, nil)
+end
+
+
+-- =====================================================================
+-- PART 3: Bob's cold review of PR #37 (2026-09-15), fixed on the branch
+-- =====================================================================
+
+-- (I) BLOCKER 1 / MAJOR 3: two replicas; nil-context reads never see the administration view.
+do
+    setFarms({ 1, 2 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    g_currentMission.isLoaded = true
+    g_currentMission.numLoadingTasks = 0
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    server.siteService.store:create(1, { name = "Own Yard", centreX = 1, centreZ = 1, radiusMetres = 50 })
+    server.siteService.store:create(2, { name = "Their Yard", centreX = 2, centreZ = 2, radiusMetres = 50 })
+    local master = newConn(30)
+    ACTORS[master] = { farmId = 1, user = user(300, true) }
+    local notices = {}
+    local client = newSystem()
+    client.siteClient:subscribe("stockguard", function(id, rev, kind, owner) notices[#notices + 1] = kind .. ":" .. id .. ":" .. tostring(owner) end)
+    -- Ordinary view first.
+    g_WorkplaceSystem = server
+    deliver(WTSiteViewRequestEvent.new(""), true, master)
+    g_WorkplaceSystem = client
+    deliver(master.sent[#master.sent], false, nil)
+    T.eq("I1 ordinary replica holds the own farm's site", client.siteClient:getSites()[1].name, "Own Yard")
+    T.eq("I2 no administration replica yet", client.siteClient.adminView, nil)
+    T.eq("I3 one hotspot for the own site", #client.siteClient:getHotspotList(), 1)
+    local noticesBefore = #notices
+    -- Enter administration of farm 2: two views travel.
+    g_WorkplaceSystem = server
+    local before = #master.sent
+    deliver(WTSiteViewRequestEvent.new("2"), true, master)
+    T.eq("I4 entering administration sends the ordinary and the administration view", #master.sent - before, 2)
+    g_WorkplaceSystem = client
+    deliver(master.sent[before + 1], false, nil)
+    deliver(master.sent[before + 2], false, nil)
+    T.eq("I5 administration replica targets farm 2", client.siteClient.adminView.administrationTargetFarmId, 2)
+    T.eq("I6 administration replica carries farm 2's site", client.siteClient.adminView.sites[1].name, "Their Yard")
+    T.eq("I7 nil-context read still returns only the own farm", client.siteClient:getSites()[1].name, "Own Yard")
+    T.eq("I7b and exactly one row", #client.siteClient:getSites(), 1)
+    T.eq("I8 getSite on the other farm's id is NOT_FOUND outside the manager", select(2, client.siteClient:getSite("site_2")), "NOT_FOUND")
+    T.eq("I9 the own hotspot survives administration", #client.siteClient:getHotspotList(), 1)
+    T.eq("I10 no UPSERT/DELETE notices for the administration replica", #notices, noticesBefore)
+    T.eq("I11 the manager reads the administration replica", client.siteClient:getManagerView().administrationTargetFarmId, 2)
+    T.eq("I12 the adapter's nil-context read is the ordinary replica", (client.getSitesForFarm())[1].name, "Own Yard")
+    -- Leave administration: the ordinary view says the context is gone.
+    g_WorkplaceSystem = server
+    before = #master.sent
+    deliver(WTSiteViewRequestEvent.new("0"), true, master)
+    T.eq("I13 leaving sends one ordinary view", #master.sent - before, 1)
+    g_WorkplaceSystem = client
+    deliver(master.sent[#master.sent], false, nil)
+    T.eq("I14 administration replica dropped", client.siteClient.adminView, nil)
+    T.eq("I15 no DELETE notice for the own site on leaving", #notices, noticesBefore)
+    -- A plain member's own-farm right gates the manager's controls.
+    local member = newConn(31)
+    ACTORS[member] = { farmId = 1, user = user(301, false), isFarmManager = false }
+    g_WorkplaceSystem = server
+    deliver(WTSiteViewRequestEvent.new(""), true, member)
+    local memberClient = newSystem()
+    g_WorkplaceSystem = memberClient
+    deliver(member.sent[#member.sent], false, nil)
+    g_currentMission._isServer = false
+    g_currentMission.isMasterUser = false
+    local savedGetHas = g_currentMission.getHasPlayerPermission
+    g_currentMission.getHasPlayerPermission = function(_, perm, conn, farmId) return conn == nil and farmId == 1 and LOCAL.isFarmManager == true end
+    LOCAL.isFarmManager = false
+    T.ok("I16 plain member has a session", memberClient.siteClient.view.commandSessionId ~= nil)
+    T.eq("I17 but no command right without UPDATE_FARM", memberClient.siteClient:hasCommandRight(), false)
+    LOCAL.isFarmManager = true
+    T.eq("I18 a farm manager has the command right", memberClient.siteClient:hasCommandRight(), true)
+    LOCAL.isFarmManager = nil
+    g_currentMission.getHasPlayerPermission = savedGetHas
+    g_currentMission._isServer = true
+end
+
+-- (J) BLOCKER 2: UNAVAILABLE records are never reshaped; only a master in administration deletes them.
+do
+    setFarms({ 1, 2 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    local dead = server.siteService.store:create(2, { name = "Dead Farm Yard", centreX = 2, centreZ = 2, radiusMetres = 50 })
+    server.siteService:onFarmDeleted(2)
+    setFarms({ 1 })
+    T.eq("J1 orphan is UNAVAILABLE", server.siteService.store:get(dead.siteId).state, "UNAVAILABLE")
+    -- Farm id 2 is reused by a new farm with a manager.
+    setFarms({ 1, 2 })
+    local reuse = newConn(40)
+    ACTORS[reuse] = { farmId = 2, user = user(400, false), isFarmManager = true }
+    server.siteService:publishTo(reuse)
+    local sr = server.siteService.sessions[reuse]
+    local rec = server.siteService.store:get(dead.siteId)
+    local upd = server.siteService:handleCommandFromConnection(reuse, { commandSessionId = sr.commandSessionId, sequence = tostring(sr.nextSequence), actionId = "UPDATE_SITE", targetId = dead.siteId, expectedRevision = rec.revision, name = "Mine now", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 9 })
+    T.eq("J2 a manager on the reused id cannot reshape the dead farm's site", upd.reasonCode, "SITE_UNAVAILABLE")
+    T.eq("J3 the record is unchanged", server.siteService.store:get(dead.siteId).name, "Dead Farm Yard")
+    sr = server.siteService.sessions[reuse]
+    local del = server.siteService:handleCommandFromConnection(reuse, { commandSessionId = sr.commandSessionId, sequence = tostring(sr.nextSequence), actionId = "DELETE_SITE", targetId = dead.siteId, expectedRevision = rec.revision })
+    T.eq("J4 nor delete it", del.reasonCode, "SITE_UNAVAILABLE")
+    T.ok("J5 the record still exists", server.siteService.store:get(dead.siteId) ~= nil)
+    -- A master user outside administration cannot delete it either.
+    local master = newConn(41)
+    ACTORS[master] = { farmId = 1, user = user(410, true) }
+    server.siteService:publishTo(master)
+    local sm = server.siteService.sessions[master]
+    local delOut = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "DELETE_SITE", targetId = dead.siteId, expectedRevision = rec.revision })
+    T.eq("J6 a master outside administration cannot delete an UNAVAILABLE record", delOut.reasonCode, "SITE_UNAVAILABLE")
+    -- Inside administration of any farm the master may.
+    server.siteService:setAdministrationContext(master, 1)
+    sm = server.siteService.sessions[master]
+    local updAdmin = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "UPDATE_SITE", targetId = dead.siteId, expectedRevision = rec.revision, name = "x", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 9 })
+    T.eq("J7 UPDATE on an orphan is refused even in administration", updAdmin.reasonCode, "SITE_UNAVAILABLE")
+    sm = server.siteService.sessions[master]
+    local delAdmin = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "DELETE_SITE", targetId = dead.siteId, expectedRevision = rec.revision })
+    T.eq("J8 DELETE of an orphan by a master in administration applies", delAdmin.outcome, "APPLIED")
+    T.eq("J9 the record is gone", server.siteService.store:get(dead.siteId), nil)
+end
+
+-- (K) MAJOR 4: a stale or foreign session id never withdraws the current session; withdrawals republish.
+do
+    setFarms({ 1, 2 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    local conn = newConn(50)
+    ACTORS[conn] = { farmId = 1, user = user(500, false), isFarmManager = true }
+    server.siteService.subscribers[conn] = true
+    server.siteService:publishTo(conn)
+    local s = server.siteService.sessions[conn]
+    local sentBefore = #conn.sent
+    local stale = server.siteService:handleCommandFromConnection(conn, { commandSessionId = "s0", sequence = "1", actionId = "CREATE_SITE", name = "x", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    T.eq("K1 stale id refused SESSION_WITHDRAWN", stale.reasonCode, "SESSION_WITHDRAWN")
+    T.eq("K2 the current session is retained", server.siteService.sessions[conn], s)
+    T.eq("K3 the actor was republished", #conn.sent, sentBefore + 1)
+    -- Binding change: the user lost the farm; the session is withdrawn and a fresh one published.
+    ACTORS[conn].farmId = 2
+    sentBefore = #conn.sent
+    local changed = server.siteService:handleCommandFromConnection(conn, { commandSessionId = s.commandSessionId, sequence = tostring(s.nextSequence), actionId = "CREATE_SITE", name = "x", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    T.eq("K4 changed binding is SESSION_WITHDRAWN", changed.reasonCode, "SESSION_WITHDRAWN")
+    T.ok("K5 a fresh session was issued by the republish", server.siteService.sessions[conn] ~= nil and server.siteService.sessions[conn] ~= s)
+    T.eq("K6 republished", #conn.sent, sentBefore + 1)
+    -- Permission change (manager right revoked) also reissues at the next republish.
+    local s2 = server.siteService.sessions[conn]
+    ACTORS[conn].isFarmManager = false
+    server.siteService:publishTo(conn)
+    T.ok("K7 a permission change reissues the session", server.siteService.sessions[conn] ~= s2)
+    -- Pure client: SESSION_WITHDRAWN makes it ask for a view again.
+    local client = newSystem()
+    client.siteClient.isInitialized = true
+    client.siteClient.view = { availability = "READY", commandSessionId = "s9", nextSequence = "1", sites = {} }
+    client.siteClient.needsView = false
+    g_currentMission._isServer = false
+    client.siteClient:onCommandResult({ commandSessionId = "s9", sequence = "1", outcome = "REFUSED", reasonCode = "SESSION_WITHDRAWN" })
+    T.eq("K8 client clears its session", client.siteClient.view.commandSessionId, nil)
+    T.eq("K9 client requests a view again", client.siteClient.needsView, true)
+    g_currentMission._isServer = true
+end
+
+-- (L) MAJOR 6: CREATE names its owner explicitly.
+do
+    setFarms({ 1, 2 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    local master = newConn(60)
+    ACTORS[master] = { farmId = 1, user = user(600, true) }
+    server.siteService:setAdministrationContext(master, 2)
+    local sm = server.siteService.sessions[master]
+    T.eq("L0 session administers farm 2", sm.administrationTargetFarmId, 2)
+    local own = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "CREATE_SITE", name = "Own", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    T.eq("L1 CREATE without the field applies", own.outcome, "APPLIED")
+    T.eq("L2 on the actor's own farm, not the retained context", own.currentTarget.ownerFarmId, 1)
+    sm = server.siteService.sessions[master]
+    local theirs = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "CREATE_SITE", administrationTargetFarmId = 2, name = "Theirs", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    T.eq("L3 CREATE naming the administered farm applies", theirs.outcome, "APPLIED")
+    T.eq("L4 on that farm", theirs.currentTarget.ownerFarmId, 2)
+    sm = server.siteService.sessions[master]
+    local wrong = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "CREATE_SITE", administrationTargetFarmId = 1, name = "Wrong", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    T.eq("L5 naming a farm other than the context is UNAUTHORIZED", wrong.reasonCode, "UNAUTHORIZED")
+end
+
+-- (M) MAJOR 7: names are bytes and control characters only.
+do
+    local ok = WorkplaceSiteStore.validateFields({ name = "Smith & Sons <Yard>", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 }, 2048)
+    T.eq("M1 markup characters in a name are accepted", ok, true)
+    local ok2 = WorkplaceSiteStore.validateFields({ name = "bad\nname", purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 }, 2048)
+    T.eq("M2 a control character is refused", ok2, false)
+    local ok3 = WorkplaceSiteStore.validateFields({ name = string.rep("é", 65), purpose = "", centreX = 0, centreZ = 0, radiusMetres = 5 }, 2048)
+    T.eq("M3 130 bytes of UTF-8 exceed the 128-byte bound", ok3, false)
+    T.eq("M4 FALLBACK_TERRAIN is gone", WorkplaceSiteStore.FALLBACK_TERRAIN, nil)
+end
+
+-- (N) MAJOR 8: a connection whose user record is gone is pruned on the server.
+do
+    setFarms({ 1 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    local conn = newConn(70)
+    ACTORS[conn] = { farmId = 1, user = user(700, false), isFarmManager = true }
+    deliver(WTSiteViewRequestEvent.new(""), true, conn)
+    T.eq("N1 subscribed", server.siteService.subscribers[conn], true)
+    T.ok("N2 session issued", server.siteService.sessions[conn] ~= nil)
+    ACTORS[conn] = nil   -- the user manager no longer knows the connection
+    local sentBefore = #conn.sent
+    server.siteService:publishAll()
+    T.eq("N3 dead subscriber dropped", server.siteService.subscribers[conn], nil)
+    T.eq("N4 dead session dropped", server.siteService.sessions[conn], nil)
+    T.eq("N5 nothing sent to it", #conn.sent, sentBefore)
+    T.eq("N6 a dead connection cannot subscribe", (function() deliver(WTSiteViewRequestEvent.new(""), true, conn) return server.siteService.subscribers[conn] end)(), nil)
+end
+
+-- (O) MAJOR 9: TRANSFER withdraws the sessions of the old and the new owner farm.
+do
+    setFarms({ 1, 2 })
+    LOCAL.farmId = 1
+    g_currentMission._isServer = true
+    local server = newSystem()
+    g_WorkplaceSystem = server
+    server.siteService:initialize()
+    local site = server.siteService.store:create(2, { name = "Moving", centreX = 0, centreZ = 0, radiusMetres = 5 })
+    local farm2 = newConn(80)
+    ACTORS[farm2] = { farmId = 2, user = user(800, false), isFarmManager = true }
+    local farm1 = newConn(81)
+    ACTORS[farm1] = { farmId = 1, user = user(810, false), isFarmManager = true }
+    server.siteService.subscribers[farm1] = true
+    server.siteService.subscribers[farm2] = true
+    server.siteService:publishTo(farm1)
+    server.siteService:publishTo(farm2)
+    local s1, s2 = server.siteService.sessions[farm1], server.siteService.sessions[farm2]
+    local master = newConn(82)
+    ACTORS[master] = { farmId = 1, user = user(820, true) }
+    server.siteService:setAdministrationContext(master, 1)
+    local sm = server.siteService.sessions[master]
+    local moved = server.siteService:handleCommandFromConnection(master, { commandSessionId = sm.commandSessionId, sequence = tostring(sm.nextSequence), actionId = "TRANSFER_SITE", targetId = site.siteId, expectedRevision = site.revision, administrationTargetFarmId = 1 })
+    T.eq("O1 transfer applied", moved.outcome, "APPLIED")
+    T.ok("O2 farm 1's session was withdrawn and reissued", server.siteService.sessions[farm1] ~= s1)
+    T.ok("O3 farm 2's session was withdrawn and reissued", server.siteService.sessions[farm2] ~= s2)
+    T.ok("O4 both were republished with a session", server.siteService.sessions[farm1] ~= nil and server.siteService.sessions[farm2] ~= nil)
+end
+
+-- (P) MINOR 11 / 12: guard order and dropped-record logging.
+do
+    local server = newSystem()
+    local r = server.siteService:handleCommand({ isLocal = true }, nil)
+    T.eq("P1 a nil request is refused, not an error", r.reasonCode, "INVALID_FIELDS")
+    local logged = {}
+    local savedPrint = print
+    print = function(msg) logged[#logged + 1] = tostring(msg) end
+    local st = WorkplaceSiteStore.new()
+    st:stageContainer({ siteSchemaVersion = WorkplaceSiteStore.SCHEMA_VERSION, mapId = "m", terrainSize = 2048, nextSiteCounter = "1", sites = {
+        { siteId = "site_1", ownerFarmId = 1, name = "a", centreX = 0, centreZ = 0, radiusMetres = 5, revision = "1", state = "ACTIVE" },
+        { siteId = "site_1", ownerFarmId = 1, name = "dup", centreX = 0, centreZ = 0, radiusMetres = 5, revision = "1", state = "ACTIVE" },
+        { siteId = "site_2", ownerFarmId = 1, name = "nan", centreX = 0/0, centreZ = 0, radiusMetres = 5, revision = "1", state = "ACTIVE" },
+    } }, "m", 2048)
+    print = savedPrint
+    local dup, nan = false, false
+    for _, l in ipairs(logged) do
+        if l:find("duplicate id", 1, true) then dup = true end
+        if l:find("non%-finite geometry") then nan = true end
+    end
+    T.eq("P2 one record kept", #st.records, 1)
+    T.eq("P3 the duplicate was logged", dup, true)
+    T.eq("P4 the non-finite record was logged", nan, true)
 end

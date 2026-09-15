@@ -33,6 +33,7 @@ function WTSiteEditDialog.new(target, custom_mt)
     self.purposeOptions = { { token = "", label = "none" } }
     self.centreX = 0
     self.centreZ = 0
+    self.adminFarmId = nil     -- CREATE inside an administration context names its owner explicitly
     return self
 end
 
@@ -67,9 +68,10 @@ function WTSiteEditDialog:buildPurposeOptions(current)
     end
 end
 
-function WTSiteEditDialog:setData(system, site, isNew)
+function WTSiteEditDialog:setData(system, site, isNew, adminFarmId)
     self.system = system
     self.isNew = isNew
+    self.adminFarmId = isNew and adminFarmId or nil
     if isNew or site == nil then
         self.site = nil
         self.radius = WTSiteEditDialog.RADIUS_DEFAULT
@@ -211,6 +213,9 @@ function WTSiteEditDialog:onClickSave()
         action = "UPDATE_SITE"
         fields.targetId = self.site.siteId
         fields.expectedRevision = self.site.revision
+    elseif self.adminFarmId ~= nil then
+        -- The owner rides the wire; the server checks it against the session.
+        fields.administrationTargetFarmId = self.adminFarmId
     end
     local dialog = self
     c:sendCommand(action, fields, function(result)

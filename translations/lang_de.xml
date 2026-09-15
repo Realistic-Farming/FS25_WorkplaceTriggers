@@ -240,27 +240,30 @@
         <text name="helpLine_wt_ab_p3_thanks_text"     text="Dank an die FS25-Modding-Community für Dokumentation, Referenzimplementierungen und Feedback, die diesen Mod ermöglicht haben. Besonderer Dank gilt den Autoren von NPCFavor für ihren offenen und gut kommentierten Code, der als Referenz für mehrere in diesem Mod verwendete FS25-API-Muster diente. Dank an alle, die frühe Versionen getestet und Fehler gemeldet haben - Ihre Geduld mit den groben Kanten während der Entwicklung wird sehr geschätzt."/>
 
         <!-- WT-8 named farm sites -->
-        <text name="wt_site_list_title" text="Farm Sites"/>
-        <text name="wt_site_list_admin" text="Administering farm %d"/>
-        <text name="wt_site_list_not_ready" text="Sites are not available yet"/>
-        <text name="wt_site_list_no_farm" text="Join a farm to manage its sites"/>
-        <text name="wt_site_list_subtitle_one" text="1 site on your farm"/>
-        <text name="wt_site_list_subtitle_many" text="%d sites on your farm"/>
-        <text name="wt_site_list_empty" text="No sites yet. Click &apos;+ New Site&apos; to name a place on your farm."/>
-        <text name="wt_site_admin_own" text="Admin: own farm"/>
-        <text name="wt_site_admin_next" text="Admin: farm %d"/>
-        <text name="wt_site_purpose_none" text="none"/>
-        <text name="wt_site_state_unavailable" text="unavailable"/>
-        <text name="wt_site_btn_edit" text="Edit"/>
-        <text name="wt_site_btn_del" text="Del"/>
-        <text name="wt_site_btn_transfer" text="Move"/>
-        <text name="wt_site_result_ok" text="Done."/>
-        <text name="wt_site_result_refused" text="Refused: %s"/>
-        <text name="wt_site_edit_title_new" text="New Site"/>
-        <text name="wt_site_edit_title_edit" text="Edit Site"/>
-        <text name="wt_site_edit_name_default" text="Main Yard"/>
-        <text name="wt_site_edit_name_required" text="A site needs a name."/>
-        <text name="wt_site_edit_centre" text="Centre: X=%.1f  Z=%.1f"/>
-        <text name="wt_menu_sites" text="Farm Sites"/>
+        <text name="wt_site_list_title" text="Hofplätze"/>
+        <text name="wt_site_list_admin" text="Verwaltung von Hof %d"/>
+        <text name="wt_site_list_not_ready" text="Plätze sind noch nicht verfügbar"/>
+        <text name="wt_site_list_no_farm" text="Tritt einem Hof bei, um seine Plätze zu verwalten"/>
+        <text name="wt_site_list_subtitle_one" text="1 Platz auf deinem Hof"/>
+        <text name="wt_site_list_subtitle_many" text="%d Plätze auf deinem Hof"/>
+        <text name="wt_site_list_empty" text="Noch keine Plätze. Klicke &apos;+ Neuer Platz&apos;, um einen Ort auf deinem Hof zu benennen."/>
+        <text name="wt_site_admin_own" text="Admin: eigener Hof"/>
+        <text name="wt_site_admin_next" text="Admin: Hof %d"/>
+        <text name="wt_site_purpose_none" text="keiner"/>
+        <text name="wt_site_state_unavailable" text="nicht verfügbar"/>
+        <text name="wt_site_btn_edit" text="Ändern"/>
+        <text name="wt_site_btn_del" text="Entf."/>
+        <text name="wt_site_btn_transfer" text="Verschieben"/>
+        <text name="wt_site_result_ok" text="Erledigt."/>
+        <text name="wt_site_result_refused" text="Abgelehnt: %s"/>
+        <text name="wt_site_edit_title_new" text="Neuer Platz"/>
+        <text name="wt_site_edit_title_edit" text="Platz bearbeiten"/>
+        <text name="wt_site_edit_name_default" text="Haupthof"/>
+        <text name="wt_site_edit_name_required" text="Ein Platz braucht einen Namen."/>
+        <text name="wt_site_edit_centre" text="Mitte: X=%.1f  Z=%.1f"/>
+        <text name="wt_menu_sites" text="Hofplätze"/>
+        <text name="wt_site_hdr_name" text="Platz"/>
+        <text name="wt_site_hdr_purpose" text="Zweck"/>
+        <text name="wt_site_hdr_state" text="Radius / Status"/>
     </texts>
 </l10n>
