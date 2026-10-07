@@ -56,7 +56,7 @@
         <!-- Store item -->
         <text name="storePack_wt_title"       text="Workplace Triggers"/>
         <text name="wt_store_name"           text="Arbeitsbereich-Trigger"/>
-        <text name="wt_store_desc"           text="Überall platzierbar. Betreten Sie den Bereich und drücken Sie [E] um Ihre Schicht zu beginnen und Einkommen zu verdienen."/>
+        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and use your Interact control to start your shift and earn income."/>
         <text name="wt_store_function"       text="Bezeichnet einen platzierbaren Arbeitsort mit konfigurierbarem Namen und Stundenlohn"/>
 
         <!-- Notifications -->
@@ -139,19 +139,19 @@
         <text name="helpLine_wt_sh_p1_enter_title"    text="Arbeitszone betreten"/>
         <text name="helpLine_wt_sh_p1_enter_text"     text="Gehen oder fahren Sie zum Standort Ihres Arbeitsplatzes. Wenn Ihr Charakter den Triggerradius betritt, sehen Sie unten auf dem Bildschirm eine Aktionsaufforderung mit dem Namen des Arbeitsplatzes. Dies bestätigt, dass Sie sich in der Zone befinden und bereit sind zu beginnen. Wenn die Aufforderung nicht erscheint, überprüfen Sie, ob Sie nah genug am Zentrum der Zone stehen, oder erhöhen Sie den Triggerradius im Bearbeitungsdialog."/>
         <text name="helpLine_wt_sh_p1_start_title"    text="Schicht beginnen"/>
-        <text name="helpLine_wt_sh_p1_start_text"     text="Drücken Sie E (oder Ihre neu belegte Interaktionstaste), während Sie sich in der Zone befinden. Sie hören einen Bestätigungston, eine kurze Benachrichtigung erscheint auf dem Bildschirm, und das Schicht-HUD-Panel öffnet sich in der Ecke des Bildschirms. Das Panel zeigt Ihren Arbeitsplatznamen, die aktuelle Spielzeit und einen Live-Verdienstzähler, der sich mit der Zeit aktualisiert. Ab diesem Moment wird die Spielzeit verfolgt und Löhne werden angesammelt."/>
+        <text name="helpLine_wt_sh_p1_start_text"     text="Use your Interact control while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
 
         <!-- ── Working a Shift, Page 2: During and leaving ── -->
         <text name="helpLine_wt_sh_p2_title"          text="Während Ihrer Schicht"/>
         <text name="helpLine_wt_sh_p2_hud_title"      text="Das Schicht-HUD-Panel"/>
-        <text name="helpLine_wt_sh_p2_hud_text"       text="Das HUD-Panel bleibt für die gesamte Dauer Ihrer Schicht in der Ecke des Bildschirms sichtbar. Es zeigt den Namen des Arbeitsplatzes, an dem Sie gerade arbeiten, einen Schicht-Timer, der in Spielstunden und -minuten hochzählt, und den Gesamtbetrag, den Sie bisher in dieser Schicht verdient haben. Sie können das Panel jederzeit verschieben und in der Größe anpassen, indem Sie Umschalt drücken, um in den HUD-Bearbeitungsmodus zu gelangen. Ihre Panel-Position und -Größe werden zwischen Spielsitzungen gespeichert."/>
+        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time with the HUD Edit Mode control. Your panel position and size are remembered between play sessions."/>
         <text name="helpLine_wt_sh_p2_leave_title"    text="Verlassen der Zone während einer Schicht"/>
         <text name="helpLine_wt_sh_p2_leave_text"     text="Wenn Sie während der Schicht den Triggerradius verlassen, erscheint eine Warnung auf dem Bildschirm mit einem Countdown-Timer. Sie haben eine kurze Gnadenfrist, um zurückzukehren, bevor die Schicht automatisch abgebrochen wird. Wenn Sie rechtzeitig zurückkehren, läuft die Schicht ohne Strafe normal weiter. Wenn der Countdown Null erreicht, endet die Schicht und Sie werden für die bis dahin gearbeitete Zeit bezahlt. Dieses Verhalten kann in den Einstellungen geändert werden - Sie können das automatische Beenden deaktivieren und auch außerhalb der Zone im Dienst bleiben."/>
 
         <!-- ── Working a Shift, Page 3: Clocking out ── -->
         <text name="helpLine_wt_sh_p3_title"          text="Ausstempeln"/>
         <text name="helpLine_wt_sh_p3_end_title"      text="Schicht manuell beenden"/>
-        <text name="helpLine_wt_sh_p3_end_text"       text="Um Ihre Schicht freiwillig zu beenden, stellen Sie sich in die Triggerzone und drücken Sie erneut E. Die Aufforderung lautet jetzt Schicht beenden. Durch Drücken wird der Timer sofort gestoppt, der endgültige Lohn berechnet und auf Ihr Farmkonto eingezahlt. Eine zusammenfassende Benachrichtigung erscheint kurz und zeigt, wie viel Sie verdient haben. Das HUD-Panel schließt sich und das Kartensymbol wird wieder grün. Sie können sofort eine neue Schicht am selben oder einem anderen Arbeitsplatz beginnen."/>
+        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and use your Interact control again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
         <text name="helpLine_wt_sh_p3_pay_title"      text="Wie die Auszahlung berechnet wird"/>
         <text name="helpLine_wt_sh_p3_pay_text"       text="Die Formel ist einfach: Auszahlung = Stundenlohn des Arbeitsplatzes × Anzahl der gearbeiteten Spielstunden × globaler Lohnmultiplikator aus den Einstellungen. Zum Beispiel: Ein Arbeitsplatz mit 500 pro Stunde, 2 Spielstunden gearbeitet, mit 1,0x Multiplikator zahlt 1.000. Mit 1,5x Multiplikator zahlt dieselbe Schicht 1.500. Bruchteile einer Stunde werden berücksichtigt - eine 30-minütige Schicht bei 500 pro Stunde zahlt 250."/>
 
@@ -181,7 +181,7 @@
         <text name="helpLine_wt_hd_p1_panel_title"   text="Was das Panel anzeigt"/>
         <text name="helpLine_wt_hd_p1_panel_text"    text="Das Schicht-HUD-Panel erscheint automatisch, wenn Sie eine Schicht beginnen, und schließt sich, wenn die Schicht endet. Es zeigt drei Informationszeilen: den Namen des Arbeitsplatzes, an dem Sie gerade arbeiten, die vergangene Schichtzeit in Spielstunden und -minuten und den Gesamtbetrag, der bisher in dieser Schicht in Ihrer Farmwährung verdient wurde. Alle drei Werte aktualisieren sich in Echtzeit alle paar Sekunden. Wenn Sie die Verdienstzeile nicht sehen möchten, können Sie sie im Einstellungsmenü ausblenden."/>
         <text name="helpLine_wt_hd_p1_edit_title"    text="HUD-Bearbeitungsmodus aktivieren"/>
-        <text name="helpLine_wt_hd_p1_edit_text"     text="Drücken Sie jederzeit die linke Umschalttaste (auch wenn Sie nicht im Dienst sind), um in den HUD-Bearbeitungsmodus zu gelangen. Der Panel-Rahmen wird gelb hervorgehoben und der Text BEARBEITUNGSMODUS erscheint darüber, um zu bestätigen, dass Sie sich im Bearbeitungsmodus befinden. In diesem Modus stoppt die Spielkamera die Drehung, wenn Sie die Maus bewegen, sodass Sie frei mit dem Panel interagieren können. Drücken Sie erneut Umschalt, um den Bearbeitungsmodus zu verlassen und zum Normalzustand zurückzukehren. Ihre Layoutänderungen werden automatisch gespeichert, wenn Sie den Bearbeitungsmodus verlassen."/>
+        <text name="helpLine_wt_hd_p1_edit_text"     text="Use the HUD Edit Mode control at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Use it again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
 
         <!-- ── HUD and Settings, Page 2: Repositioning ── -->
         <text name="helpLine_wt_hd_p2_title"           text="HUD verschieben und skalieren"/>
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Platz"/>
         <text name="wt_site_hdr_purpose" text="Zweck"/>
         <text name="wt_site_hdr_state" text="Radius / Status"/>
+        <text name="rf_live_key_unbound" text="Nicht belegt"/>
+        <text name="rf_live_key_keyboard_unbound" text="Tastatur nicht belegt"/>
+        <text name="rf_live_key_unavailable" text="nicht verfügbar"/>
     </texts>
 </l10n>

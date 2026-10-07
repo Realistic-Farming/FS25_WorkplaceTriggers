@@ -56,7 +56,7 @@
         <!-- Store item -->
         <text name="storePack_wt_title"       text="Workplace Triggers"/>
         <text name="wt_store_name"           text="Strefa pracy"/>
-        <text name="wt_store_desc"           text="Umieść w dowolnym miejscu, aby wyznaczyć miejsce pracy. Wejdź do strefy i naciśnij [E], aby rozpocząć zmianę i zarabiać."/>
+        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and use your Interact control to start your shift and earn income."/>
         <text name="wt_store_function"       text="Wyznacza miejsce pracy z konfigurowalną nazwą i stawką godzinową"/>
 
         <!-- Notifications -->
@@ -139,19 +139,19 @@
         <text name="helpLine_wt_sh_p1_enter_title"    text="Wchodzenie do strefy pracy"/>
         <text name="helpLine_wt_sh_p1_enter_text"     text="Podejdź lub podjedź do lokalizacji swojego miejsca pracy. Gdy twoja postać wejdzie w promień triggera, na dole ekranu pojawi się monit akcji z nazwą miejsca pracy. To potwierdza, że jesteś w strefie i gotowy do rozpoczęcia. Jeśli monit się nie pojawi, sprawdź, czy stoisz wystarczająco blisko centrum strefy, lub zwiększ promień triggera w oknie dialogowym Edycji."/>
         <text name="helpLine_wt_sh_p1_start_title"    text="Rozpoczynanie zmiany"/>
-        <text name="helpLine_wt_sh_p1_start_text"     text="Naciśnij E (lub swój ponownie przypisany klawisz interakcji), będąc w strefie. Usłyszysz dźwięk potwierdzenia, na ekranie pojawi się krótkie powiadomienie, a panel HUD zmiany otworzy się w rogu ekranu. Panel pokazuje nazwę twojego miejsca pracy, bieżący czas gry i licznik zarobków na żywo, który aktualizuje się w miarę upływu czasu. Od tego momentu czas gry jest śledzony, a wynagrodzenia są gromadzone."/>
+        <text name="helpLine_wt_sh_p1_start_text"     text="Use your Interact control while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
 
         <!-- ── Working a Shift, Page 2: During and leaving ── -->
         <text name="helpLine_wt_sh_p2_title"          text="Podczas twojej zmiany"/>
         <text name="helpLine_wt_sh_p2_hud_title"      text="Panel HUD zmiany"/>
-        <text name="helpLine_wt_sh_p2_hud_text"       text="Panel HUD pozostaje widoczny w rogu ekranu przez cały czas trwania twojej zmiany. Wyświetla nazwę miejsca pracy, w którym aktualnie pracujesz, minutnik zmiany odliczający w górę w godzinach i minutach gry oraz całkowitą kwotę zarobioną do tej pory podczas tej zmiany. Możesz w dowolnym momencie przesunąć i zmienić rozmiar panelu, naciskając Shift, aby wejść w tryb edycji HUD. Pozycja i rozmiar panelu są zapamiętywane między sesjami gry."/>
+        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time with the HUD Edit Mode control. Your panel position and size are remembered between play sessions."/>
         <text name="helpLine_wt_sh_p2_leave_title"    text="Opuszczanie strefy podczas zmiany"/>
         <text name="helpLine_wt_sh_p2_leave_text"     text="Jeśli podczas zmiany wyjdziesz poza promień triggera, na ekranie pojawi się ostrzeżenie z licznikiem czasu. Masz krótki okres łaski na powrót, zanim zmiana zostanie automatycznie anulowana. Jeśli wrócisz na czas, zmiana przebiega normalnie, bez kary. Jeśli licznik osiągnie zero, zmiana kończy się i otrzymujesz zapłatę za czas przepracowany do tego momentu. To zachowanie można zmienić w ustawieniach - możesz wyłączyć automatyczne kończenie i pozostać na zmianie nawet poza strefą."/>
 
         <!-- ── Working a Shift, Page 3: Clocking out ── -->
         <text name="helpLine_wt_sh_p3_title"          text="Kończenie zmiany"/>
         <text name="helpLine_wt_sh_p3_end_title"      text="Ręczne kończenie zmiany"/>
-        <text name="helpLine_wt_sh_p3_end_text"       text="Aby dobrowolnie zakończyć zmianę, stań w strefie triggera i ponownie naciśnij E. Monit będzie teraz brzmiał Zakończ zmianę. Naciśnięcie go natychmiast zatrzymuje minutnik, oblicza końcowe wynagrodzenie i wpłaca je na twoje konto gospodarstwa. Pojawia się krótkie podsumowanie pokazujące, ile zarobiłeś. Panel HUD zamyka się, a ikona na mapie wraca do zielonej. Możesz natychmiast rozpocząć nową zmianę w tym samym lub innym miejscu pracy."/>
+        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and use your Interact control again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
         <text name="helpLine_wt_sh_p3_pay_title"      text="Jak obliczana jest wypłata"/>
         <text name="helpLine_wt_sh_p3_pay_text"       text="Formuła jest prosta: wypłata = stawka godzinowa miejsca pracy × liczba przepracowanych godzin gry × globalny mnożnik wynagrodzenia z ustawień. Na przykład, miejsce pracy z 500 za godzinę przepracowane przez 2 godziny gry z mnożnikiem 1,0x wypłaca 1 000. Przy mnożniku 1,5x ta sama zmiana wypłaca 1 500. Ułamki godzin są wliczone - 30-minutowa zmiana przy stawce 500 za godzinę wypłaca 250."/>
 
@@ -181,7 +181,7 @@
         <text name="helpLine_wt_hd_p1_panel_title"   text="Co pokazuje panel"/>
         <text name="helpLine_wt_hd_p1_panel_text"    text="Panel HUD zmiany pojawia się automatycznie po rozpoczęciu zmiany i zamyka się po jej zakończeniu. Pokazuje trzy wiersze informacji: nazwę miejsca pracy, w którym aktualnie pracujesz, upływający czas zmiany w godzinach i minutach gry oraz całkowitą kwotę zarobioną do tej pory podczas tej zmiany w walucie twojego gospodarstwa. Wszystkie trzy wartości aktualizują się w czasie rzeczywistym co kilka sekund. Jeśli nie chcesz widzieć wiersza zarobków, możesz go ukryć w menu ustawień."/>
         <text name="helpLine_wt_hd_p1_edit_title"    text="Wchodzenie w tryb edycji HUD"/>
-        <text name="helpLine_wt_hd_p1_edit_text"     text="Naciśnij lewy Shift w dowolnym momencie (nawet gdy nie jesteś na zmianie), aby wejść w tryb edycji HUD. Ramka panelu podświetla się na żółto, a nad nim pojawia się tekst TRYB EDYCJI, potwierdzając, że jesteś w trybie edycji. W tym trybie kamera gry przestaje się obracać, gdy poruszasz myszą, więc możesz swobodnie interagować z panelem. Naciśnij ponownie Shift, aby opuścić tryb edycji i wrócić do normalności. Twoje zmiany układu są automatycznie zapisywane po wyjściu z trybu edycji."/>
+        <text name="helpLine_wt_hd_p1_edit_text"     text="Use the HUD Edit Mode control at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Use it again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
 
         <!-- ── HUD and Settings, Page 2: Repositioning ── -->
         <text name="helpLine_wt_hd_p2_title"           text="Przesuwanie i skalowanie HUD"/>
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Miejsce"/>
         <text name="wt_site_hdr_purpose" text="Cel"/>
         <text name="wt_site_hdr_state" text="Promień / Stan"/>
+        <text name="rf_live_key_unbound" text="Nieprzypisane"/>
+        <text name="rf_live_key_keyboard_unbound" text="Klawiatura nieprzypisana"/>
+        <text name="rf_live_key_unavailable" text="niedostępne"/>
     </texts>
 </l10n>

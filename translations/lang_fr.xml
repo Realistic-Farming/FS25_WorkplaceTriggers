@@ -56,7 +56,7 @@
         <!-- Store item -->
         <text name="storePack_wt_title"       text="Workplace Triggers"/>
         <text name="wt_store_name"           text="Zone de travail"/>
-        <text name="wt_store_desc"           text="Placez n'importe où pour désigner un lieu de travail. Entrez dans la zone et appuyez sur [E] pour commencer votre quart et gagner un revenu."/>
+        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and use your Interact control to start your shift and earn income."/>
         <text name="wt_store_function"       text="Désigne un lieu de travail plaçable avec un nom et un salaire horaire configurables"/>
 
         <!-- Notifications -->
@@ -139,19 +139,19 @@
         <text name="helpLine_wt_sh_p1_enter_title"    text="Entrer dans la zone de travail"/>
         <text name="helpLine_wt_sh_p1_enter_text"     text="Marchez ou conduisez jusqu'à l'emplacement de votre lieu de travail. Lorsque votre personnage entre dans le rayon du déclencheur, vous verrez une invite d'action apparaître en bas de l'écran indiquant le nom du lieu de travail. Cela confirme que vous êtes dans la zone et prêt à commencer. Si l'invite n'apparaît pas, vérifiez que vous êtes assez près du centre de la zone ou augmentez le rayon du déclencheur dans la boîte de dialogue Modifier."/>
         <text name="helpLine_wt_sh_p1_start_title"    text="Commencer le quart"/>
-        <text name="helpLine_wt_sh_p1_start_text"     text="Appuyez sur E (ou votre touche d'interaction réaffectée) pendant que vous êtes dans la zone. Vous entendrez un son de confirmation, un bref message de notification apparaîtra à l'écran, et le panneau HUD du quart s'ouvrira dans le coin de l'écran. Le panneau montre le nom de votre lieu de travail, l'heure de jeu actuelle et un compteur de gains en direct qui se met à jour au fil du temps. À partir de ce moment, le temps de jeu est suivi et les salaires s'accumulent."/>
+        <text name="helpLine_wt_sh_p1_start_text"     text="Use your Interact control while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
 
         <!-- ── Working a Shift, Page 2: During and leaving ── -->
         <text name="helpLine_wt_sh_p2_title"          text="Pendant votre quart"/>
         <text name="helpLine_wt_sh_p2_hud_title"      text="Le panneau HUD de quart"/>
-        <text name="helpLine_wt_sh_p2_hud_text"       text="Le panneau HUD reste visible dans le coin de l'écran pendant toute la durée de votre quart. Il affiche le nom du lieu de travail où vous travaillez actuellement, un chronomètre de quart qui compte les heures et minutes de jeu, et le montant total gagné jusqu'à présent pendant ce quart. Vous pouvez déplacer et redimensionner le panneau à tout moment en appuyant sur Maj pour entrer en mode Édition HUD. La position et la taille de votre panneau sont mémorisées entre les sessions de jeu."/>
+        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time with the HUD Edit Mode control. Your panel position and size are remembered between play sessions."/>
         <text name="helpLine_wt_sh_p2_leave_title"    text="Quitter la zone pendant un quart"/>
         <text name="helpLine_wt_sh_p2_leave_text"     text="Si vous sortez du rayon du déclencheur pendant le quart, une superposition d'avertissement apparaît à l'écran avec un compte à rebours. Vous disposez d'un court délai de grâce pour revenir avant que le quart ne soit automatiquement annulé. Si vous revenez à temps, le quart continue normalement sans pénalité. Si le compte à rebours atteint zéro, le quart se termine et vous êtes payé pour le temps travaillé jusqu'à ce moment. Ce comportement peut être modifié dans les paramètres - vous pouvez désactiver la fin automatique et rester en service même en dehors de la zone."/>
 
         <!-- ── Working a Shift, Page 3: Clocking out ── -->
         <text name="helpLine_wt_sh_p3_title"          text="Dépointer"/>
         <text name="helpLine_wt_sh_p3_end_title"      text="Terminer le quart manuellement"/>
-        <text name="helpLine_wt_sh_p3_end_text"       text="Pour terminer votre quart volontairement, tenez-vous dans la zone de déclenchement et appuyez à nouveau sur E. L'invite indiquera maintenant Terminer le travail. Appuyer dessus arrête immédiatement le chronomètre, calcule le salaire final et le dépose sur votre compte de ferme. Une notification récapitulative apparaît brièvement montrant combien vous avez gagné. Le panneau HUD se ferme et l'icône de la carte redevient verte. Vous pouvez commencer un nouveau quart au même endroit ou dans tout autre lieu de travail immédiatement."/>
+        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and use your Interact control again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
         <text name="helpLine_wt_sh_p3_pay_title"      text="Comment le paiement est calculé"/>
         <text name="helpLine_wt_sh_p3_pay_text"       text="La formule est simple : le paiement est égal au salaire horaire du lieu de travail multiplié par le nombre d'heures de jeu travaillées, multiplié par le multiplicateur de salaire global des paramètres. Par exemple, un lieu de travail à 500 par heure travaillé pendant 2 heures de jeu avec un multiplicateur de 1,0x paie 1 000. Avec un multiplicateur de 1,5x, le même quart paie 1 500. Les fractions d'heure sont incluses - un quart de 30 minutes à 500 par heure paie 250."/>
 
@@ -181,7 +181,7 @@
         <text name="helpLine_wt_hd_p1_panel_title"   text="Ce que montre le panneau"/>
         <text name="helpLine_wt_hd_p1_panel_text"    text="Le panneau HUD de quart apparaît automatiquement lorsque vous commencez un quart et se ferme lorsque le quart se termine. Il montre trois lignes d'information : le nom du lieu de travail où vous travaillez actuellement, le temps de quart écoulé en heures et minutes de jeu, et le montant total gagné jusqu'à présent pendant ce quart dans votre monnaie de ferme. Ces trois valeurs se mettent à jour en temps réel toutes les quelques secondes. Si vous ne voulez pas voir la ligne des gains, vous pouvez la masquer dans le menu des paramètres."/>
         <text name="helpLine_wt_hd_p1_edit_title"    text="Entrer en mode édition HUD"/>
-        <text name="helpLine_wt_hd_p1_edit_text"     text="Appuyez sur Maj gauche à tout moment (même quand vous n'êtes pas en service) pour entrer en mode Édition HUD. La bordure du panneau est surlignée en jaune et le texte MODE ÉDITION apparaît au-dessus pour confirmer que vous êtes en mode édition. Dans ce mode, la caméra du jeu arrête de tourner lorsque vous déplacez la souris, vous pouvez donc interagir librement avec le panneau. Appuyez à nouveau sur Maj pour quitter le mode édition et revenir à la normale. Vos changements de disposition sont sauvegardés automatiquement lorsque vous quittez le mode édition."/>
+        <text name="helpLine_wt_hd_p1_edit_text"     text="Use the HUD Edit Mode control at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Use it again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
 
         <!-- ── HUD and Settings, Page 2: Repositioning ── -->
         <text name="helpLine_wt_hd_p2_title"           text="Déplacer et redimensionner le HUD"/>
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Site"/>
         <text name="wt_site_hdr_purpose" text="Usage"/>
         <text name="wt_site_hdr_state" text="Rayon / État"/>
+        <text name="rf_live_key_unbound" text="Non assignée"/>
+        <text name="rf_live_key_keyboard_unbound" text="Clavier non assigné"/>
+        <text name="rf_live_key_unavailable" text="indisponible"/>
     </texts>
 </l10n>
