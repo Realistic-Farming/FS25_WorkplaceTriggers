@@ -88,17 +88,19 @@ Umiec wyzwalacz, nadaj mu nazwe, ustaw stawke i zarabiaj podczas dyspozycji.
     </actions>
     <inputBinding>
         <actionBinding action="WT_INTERACT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_e" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_g" />
         </actionBinding>
-        <actionBinding action="WT_MENU"/>
+        <actionBinding action="WT_MENU">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_y" />
+        </actionBinding>
         <!-- BUILD 06:43 (Sam DESIGN 06:42): seat-locked non-Function defaults so a
              fresh save can drive the Workplace HUD out of the box - Alt+W toggles
              (BUILD 07:18), Shift+Alt+W edits/moves. -->
         <actionBinding action="WT_TOGGLE_HUD">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_k" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_i" />
         </actionBinding>
         <actionBinding action="WT_HUD_EDIT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_c" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_j" />
         </actionBinding>
     </inputBinding>
 

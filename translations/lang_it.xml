@@ -56,7 +56,7 @@
         <!-- Store item -->
         <text name="storePack_wt_title"       text="Workplace Triggers"/>
         <text name="wt_store_name"           text="Zona di lavoro"/>
-        <text name="wt_store_desc"           text="Posiziona ovunque per designare un posto di lavoro. Entra nella zona e premi [E] per iniziare il turno e guadagnare un reddito."/>
+        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and use your Interact control to start your shift and earn income."/>
         <text name="wt_store_function"       text="Designa un luogo di lavoro posizionabile con nome e stipendio orario configurabili"/>
 
         <!-- Notifications -->
@@ -139,19 +139,19 @@
         <text name="helpLine_wt_sh_p1_enter_title"    text="Entrare nella zona di lavoro"/>
         <text name="helpLine_wt_sh_p1_enter_text"     text="Cammina o guida fino alla posizione del tuo luogo di lavoro. Quando il tuo personaggio entra nel raggio del trigger, vedrai apparire un prompt di azione in fondo allo schermo che mostra il nome del luogo di lavoro. Questo conferma che sei nella zona e pronto per iniziare. Se il prompt non appare, controlla di essere abbastanza vicino al centro della zona o aumenta il raggio del trigger nella finestra di dialogo Modifica."/>
         <text name="helpLine_wt_sh_p1_start_title"    text="Iniziare il turno"/>
-        <text name="helpLine_wt_sh_p1_start_text"     text="Premi E (o il tuo tasto di interazione riassegnato) mentre sei nella zona. Sentirai un suono di conferma, apparirà un breve messaggio di notifica sullo schermo, e il pannello HUD del turno si aprirà nell'angolo dello schermo. Il pannello mostra il nome del tuo luogo di lavoro, l'ora di gioco corrente e un contatore di guadagni in tempo reale che si aggiorna col passare del tempo. Da questo momento il tempo di gioco viene tracciato e le paghe si accumulano."/>
+        <text name="helpLine_wt_sh_p1_start_text"     text="Use your Interact control while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
 
         <!-- ── Working a Shift, Page 2: During and leaving ── -->
         <text name="helpLine_wt_sh_p2_title"          text="Durante il tuo turno"/>
         <text name="helpLine_wt_sh_p2_hud_title"      text="Il pannello HUD del turno"/>
-        <text name="helpLine_wt_sh_p2_hud_text"       text="Il pannello HUD rimane visibile nell'angolo dello schermo per l'intera durata del tuo turno. Mostra il nome del luogo di lavoro in cui stai attualmente lavorando, un timer del turno che conta in ore e minuti di gioco, e l'importo totale guadagnato finora in questo turno. Puoi spostare e ridimensionare il pannello in qualsiasi momento premendo Maiusc per entrare in Modalità modifica HUD. La posizione e le dimensioni del tuo pannello vengono ricordate tra le sessioni di gioco."/>
+        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time with the HUD Edit Mode control. Your panel position and size are remembered between play sessions."/>
         <text name="helpLine_wt_sh_p2_leave_title"    text="Lasciare la zona durante un turno"/>
         <text name="helpLine_wt_sh_p2_leave_text"     text="Se esci dal raggio del trigger durante il turno, appare una sovrapposizione di avviso sullo schermo con un conto alla rovescia. Hai un breve periodo di grazia per tornare prima che il turno venga automaticamente annullato. Se torni in tempo, il turno continua normalmente senza penalità. Se il conto alla rovescia raggiunge lo zero, il turno termina e vieni pagato per il tempo lavorato fino a quel momento. Questo comportamento può essere modificato nelle impostazioni - puoi disabilitare la terminazione automatica e rimanere in turno anche fuori dalla zona."/>
 
         <!-- ── Working a Shift, Page 3: Clocking out ── -->
         <text name="helpLine_wt_sh_p3_title"          text="Timbrare l'uscita"/>
         <text name="helpLine_wt_sh_p3_end_title"      text="Terminare il turno manualmente"/>
-        <text name="helpLine_wt_sh_p3_end_text"       text="Per terminare volontariamente il tuo turno, mettiti nella zona del trigger e premi di nuovo E. Il prompt ora leggerà Termina turno. Premendolo si ferma immediatamente il timer, si calcola la paga finale e la si deposita sul tuo conto della fattoria. Appare brevemente una notifica di riepilogo che mostra quanto hai guadagnato. Il pannello HUD si chiude e l'icona della mappa torna verde. Puoi iniziare un nuovo turno nello stesso o in qualsiasi altro luogo di lavoro immediatamente."/>
+        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and use your Interact control again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
         <text name="helpLine_wt_sh_p3_pay_title"      text="Come viene calcolato il pagamento"/>
         <text name="helpLine_wt_sh_p3_pay_text"       text="La formula è semplice: pagamento = paga oraria del luogo di lavoro × numero di ore di gioco lavorate × moltiplicatore paga globale dalle impostazioni. Ad esempio, un luogo di lavoro con 500 all'ora lavorato per 2 ore di gioco con un moltiplicatore 1,0x paga 1.000. Con un moltiplicatore 1,5x lo stesso turno paga 1.500. Le frazioni di ora sono incluse - un turno di 30 minuti a 500 all'ora paga 250."/>
 
@@ -181,7 +181,7 @@
         <text name="helpLine_wt_hd_p1_panel_title"   text="Cosa mostra il pannello"/>
         <text name="helpLine_wt_hd_p1_panel_text"    text="Il pannello HUD del turno appare automaticamente quando inizi un turno e si chiude quando il turno finisce. Mostra tre righe di informazioni: il nome del luogo di lavoro in cui stai attualmente lavorando, il tempo di turno trascorso in ore e minuti di gioco, e l'importo totale guadagnato finora in questo turno nella tua valuta della fattoria. Tutti e tre i valori si aggiornano in tempo reale ogni pochi secondi. Se non vuoi vedere la riga dei guadagni, puoi nasconderla nel menu delle impostazioni."/>
         <text name="helpLine_wt_hd_p1_edit_title"    text="Entrare in modalità modifica HUD"/>
-        <text name="helpLine_wt_hd_p1_edit_text"     text="Premi Maiusc sinistro in qualsiasi momento (anche quando non sei in turno) per entrare in Modalità modifica HUD. Il bordo del pannello si illumina in giallo e il testo MODALITÀ MODIFICA appare sopra per confermare che sei in modalità modifica. In questa modalità, la telecamera di gioco smette di ruotare quando muovi il mouse, così puoi interagire liberamente con il pannello. Premi di nuovo Maiusc per uscire dalla modalità modifica e tornare alla normalità. Le modifiche al layout vengono salvate automaticamente quando esci dalla modalità modifica."/>
+        <text name="helpLine_wt_hd_p1_edit_text"     text="Use the HUD Edit Mode control at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Use it again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
 
         <!-- ── HUD and Settings, Page 2: Repositioning ── -->
         <text name="helpLine_wt_hd_p2_title"           text="Spostare e ridimensionare l'HUD"/>
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Area"/>
         <text name="wt_site_hdr_purpose" text="Scopo"/>
         <text name="wt_site_hdr_state" text="Raggio / Stato"/>
+        <text name="rf_live_key_unbound" text="Non assegnato"/>
+        <text name="rf_live_key_keyboard_unbound" text="Tastiera non assegnata"/>
+        <text name="rf_live_key_unavailable" text="non disponibile"/>
     </texts>
 </l10n>
