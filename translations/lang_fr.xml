@@ -9,9 +9,9 @@
         <text name="wt_save_failed"          text="Échec de l'enregistrement : paramètres du déclencheur non valides."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
-        <text name="wt_input_interact"       text="[E] Interagir avec le lieu de travail"/>
-        <text name="wt_input_start_shift"    text="[E] Commencer le travail a %s"/>
-        <text name="wt_input_end_shift"      text="[E] Terminer le travail a %s"/>
+        <text name="wt_input_interact"       text="Interagir avec le lieu de travail"/>
+        <text name="wt_input_start_shift"    text="Commencer le travail a %s"/>
+        <text name="wt_input_end_shift"      text="Terminer le travail a %s"/>
         <text name="wt_input_open_menu"      text="Gestionnaire de lieux de travail"/>
         <text name="wt_input_hud_edit"       text="Mode édition HUD"/>
 
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Site"/>
         <text name="wt_site_hdr_purpose" text="Usage"/>
         <text name="wt_site_hdr_state" text="Rayon / État"/>
+        <text name="rf_live_key_unbound" text="Non assignée"/>
+        <text name="rf_live_key_keyboard_unbound" text="Clavier non assigné"/>
+        <text name="rf_live_key_unavailable" text="indisponible"/>
     </texts>
 </l10n>

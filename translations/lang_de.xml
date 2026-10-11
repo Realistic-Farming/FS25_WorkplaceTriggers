@@ -9,9 +9,9 @@
         <text name="wt_save_failed"          text="Speichern fehlgeschlagen: Ungültige Arbeitsplatz-Parameter."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
-        <text name="wt_input_interact"       text="[E] Mit Arbeitsplatz interagieren"/>
-        <text name="wt_input_start_shift"    text="[E] Schicht beginnen bei %s"/>
-        <text name="wt_input_end_shift"      text="[E] Schicht beenden bei %s"/>
+        <text name="wt_input_interact"       text="Mit Arbeitsplatz interagieren"/>
+        <text name="wt_input_start_shift"    text="Schicht beginnen bei %s"/>
+        <text name="wt_input_end_shift"      text="Schicht beenden bei %s"/>
         <text name="wt_input_open_menu"      text="Arbeitsplatz-Manager"/>
         <text name="wt_input_hud_edit"       text="HUD-Bearbeitungsmodus"/>
 
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Platz"/>
         <text name="wt_site_hdr_purpose" text="Zweck"/>
         <text name="wt_site_hdr_state" text="Radius / Status"/>
+        <text name="rf_live_key_unbound" text="Nicht belegt"/>
+        <text name="rf_live_key_keyboard_unbound" text="Tastatur nicht belegt"/>
+        <text name="rf_live_key_unavailable" text="nicht verfügbar"/>
     </texts>
 </l10n>

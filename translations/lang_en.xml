@@ -61,7 +61,7 @@
         <!-- Store item -->
         <text name="storePack_wt_title"       text="Workplace Triggers"/>
         <text name="wt_store_name"           text="Work Trigger Zone"/>
-        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and press [E] to start your shift and earn income."/>
+        <text name="wt_store_desc"           text="Place anywhere to designate a workplace. Walk inside and use your Interact control to start your shift and earn income."/>
         <text name="wt_store_function"       text="Designates a placeable work location with configurable name and hourly wage"/>
 
         <!-- Notifications -->
@@ -144,19 +144,19 @@
         <text name="helpLine_wt_sh_p1_enter_title"    text="Entering the Work Zone"/>
         <text name="helpLine_wt_sh_p1_enter_text"     text="Walk or drive to the location of your workplace. When your character steps inside the trigger radius you will see an action prompt appear at the bottom of the screen showing the workplace name. This confirms you are inside the zone and ready to start. If the prompt does not appear, check that you are standing close enough to the centre of the zone or increase the trigger radius in the Edit dialog."/>
         <text name="helpLine_wt_sh_p1_start_title"    text="Starting the Shift"/>
-        <text name="helpLine_wt_sh_p1_start_text"     text="Press E (or your rebound Interact key) while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
+        <text name="helpLine_wt_sh_p1_start_text"     text="Use your Interact control while inside the zone. You will hear a confirmation sound, a brief notification message will appear on screen, and the shift HUD panel will open in the corner of the screen. The panel shows your workplace name, the current in-game time, and a live earnings counter that updates as time passes. From this moment in-game time is being tracked and wages are accumulating."/>
 
         <!-- ── Working a Shift, Page 2: During and leaving ── -->
         <text name="helpLine_wt_sh_p2_title"          text="During Your Shift"/>
         <text name="helpLine_wt_sh_p2_hud_title"      text="The Shift HUD Panel"/>
-        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time by pressing Shift to enter HUD Edit Mode. Your panel position and size are remembered between play sessions."/>
+        <text name="helpLine_wt_sh_p2_hud_text"       text="The HUD panel stays visible in the corner of the screen for the entire duration of your shift. It displays the name of the workplace you are currently working at, a shift timer counting up in in-game hours and minutes, and the total amount earned so far this shift. You can move and resize the panel at any time with the HUD Edit Mode control. Your panel position and size are remembered between play sessions."/>
         <text name="helpLine_wt_sh_p2_leave_title"    text="Leaving the Zone During a Shift"/>
         <text name="helpLine_wt_sh_p2_leave_text"     text="If you walk outside the trigger radius while on shift a warning overlay appears on screen with a countdown timer. You have a short grace period to return before the shift is automatically cancelled. If you return in time the shift continues as normal with no penalty. If the countdown reaches zero the shift ends and you are paid for the time worked up to that point. This behaviour can be changed in settings - you can disable the auto-end and stay on shift even when away from the zone."/>
 
         <!-- ── Working a Shift, Page 3: Clocking out ── -->
         <text name="helpLine_wt_sh_p3_title"          text="Clocking Out"/>
         <text name="helpLine_wt_sh_p3_end_title"      text="Ending the Shift Manually"/>
-        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and press E again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
+        <text name="helpLine_wt_sh_p3_end_text"       text="To end your shift voluntarily, stand inside the trigger zone and use your Interact control again. The prompt will now read End Shift. Pressing it immediately stops the timer, calculates the final wage, and deposits it into your farm account. A summary notification appears briefly showing how much you earned. The HUD panel closes and the map icon returns to green. You can start a new shift at the same or any other workplace straight away."/>
         <text name="helpLine_wt_sh_p3_pay_title"      text="How the Payout is Calculated"/>
         <text name="helpLine_wt_sh_p3_pay_text"       text="The formula is simple: payout equals the hourly wage of the workplace multiplied by the number of in-game hours worked, multiplied by the global Wage Multiplier from settings. For example, a 500 per hour workplace worked for 2 in-game hours with a 1.0x multiplier pays 1,000. With a 1.5x multiplier the same shift pays 1,500. Fractions of an hour are included - a 30-minute shift at 500 per hour pays 250."/>
 
@@ -186,7 +186,7 @@
         <text name="helpLine_wt_hd_p1_panel_title"   text="What the Panel Shows"/>
         <text name="helpLine_wt_hd_p1_panel_text"    text="The shift HUD panel appears automatically when you start a shift and closes when the shift ends. It shows three rows of information: the name of the workplace where you are currently working, the elapsed in-game shift time in hours and minutes, and the total amount earned so far this shift in your farm currency. All three values update in real time every few seconds. If you do not want to see the earnings row you can hide it in the settings menu."/>
         <text name="helpLine_wt_hd_p1_edit_title"    text="Entering HUD Edit Mode"/>
-        <text name="helpLine_wt_hd_p1_edit_text"     text="Press Left Shift at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Press Shift again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
+        <text name="helpLine_wt_hd_p1_edit_text"     text="Use the HUD Edit Mode control at any time (even when not on shift) to enter HUD Edit Mode. The panel border highlights in yellow and the text EDIT MODE appears above it to confirm you are in edit mode. In this mode the game camera stops rotating when you move the mouse so you can freely interact with the panel. Use it again to leave edit mode and return to normal. Your layout changes are saved automatically when you exit edit mode."/>
 
         <!-- ── HUD and Settings, Page 2: Repositioning ── -->
         <text name="helpLine_wt_hd_p2_title"           text="Moving and Resizing the HUD"/>
@@ -270,5 +270,8 @@
         <text name="wt_site_hdr_name" text="Site"/>
         <text name="wt_site_hdr_purpose" text="Purpose"/>
         <text name="wt_site_hdr_state" text="Radius / State"/>
+        <text name="rf_live_key_unbound" text="Unbound"/>
+        <text name="rf_live_key_keyboard_unbound" text="Keyboard unbound"/>
+        <text name="rf_live_key_unavailable" text="unavailable"/>
     </texts>
 </l10n>

@@ -9,9 +9,9 @@
         <text name="wt_save_failed"          text="Salvataggio non riuscito: parametri del trigger non validi."/>
 
         <!-- E-key prompt strings (dynamic, set via setActionEventText) -->
-        <text name="wt_input_interact"       text="[E] Interagisci con il posto di lavoro"/>
-        <text name="wt_input_start_shift"    text="[E] Inizia turno a %s"/>
-        <text name="wt_input_end_shift"      text="[E] Termina turno a %s"/>
+        <text name="wt_input_interact"       text="Interagisci con il posto di lavoro"/>
+        <text name="wt_input_start_shift"    text="Inizia turno a %s"/>
+        <text name="wt_input_end_shift"      text="Termina turno a %s"/>
         <text name="wt_input_open_menu"      text="Gestore luoghi di lavoro"/>
         <text name="wt_input_hud_edit"       text="Modalità modifica HUD"/>
 
@@ -265,5 +265,8 @@
         <text name="wt_site_hdr_name" text="Area"/>
         <text name="wt_site_hdr_purpose" text="Scopo"/>
         <text name="wt_site_hdr_state" text="Raggio / Stato"/>
+        <text name="rf_live_key_unbound" text="Non assegnato"/>
+        <text name="rf_live_key_keyboard_unbound" text="Tastiera non assegnata"/>
+        <text name="rf_live_key_unavailable" text="non disponibile"/>
     </texts>
 </l10n>
