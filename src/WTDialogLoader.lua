@@ -14,6 +14,9 @@ WTDialogLoader.modDirectory  = nil
 WTDialogLoader.loaded        = false
 WTDialogLoader.listInstance  = nil
 WTDialogLoader.editInstance  = nil
+WTDialogLoader.siteLoaded        = false   -- WT-8 sibling dialogs
+WTDialogLoader.siteListInstance  = nil
+WTDialogLoader.siteEditInstance  = nil
 
 local function wtLog(msg)
     print("[WorkplaceTriggers] DialogLoader: " .. tostring(msg))
@@ -120,6 +123,72 @@ function WTDialogLoader.showEdit(system, trigger, isNew)
         return false
     end
     return true
+end
+
+-- =========================================================
+-- WT-8 site dialogs (siblings, loaded on first use)
+-- =========================================================
+function WTDialogLoader.ensureSiteLoaded()
+    if WTDialogLoader.siteLoaded then return true end
+    if not g_gui then return false end
+    local modDir = WTDialogLoader.modDirectory
+    if not modDir then return false end
+    local listInst = WTSiteListDialog.new()
+    local ok, err = pcall(function()
+        g_gui:loadGui(modDir .. "gui/WTSiteListDialog.xml", "WTSiteListDialog", listInst)
+    end)
+    if not ok then
+        wtLog("ERROR loading WTSiteListDialog: " .. tostring(err))
+        return false
+    end
+    WTDialogLoader.siteListInstance = listInst
+    local editInst = WTSiteEditDialog.new()
+    ok, err = pcall(function()
+        g_gui:loadGui(modDir .. "gui/WTSiteEditDialog.xml", "WTSiteEditDialog", editInst)
+    end)
+    if not ok then
+        wtLog("ERROR loading WTSiteEditDialog: " .. tostring(err))
+        return false
+    end
+    WTDialogLoader.siteEditInstance = editInst
+    WTDialogLoader.siteLoaded = true
+    wtLog("Site dialogs loaded OK")
+    return true
+end
+
+--- Show the site manager, optionally focused on a site. clearAdmin leaves a
+--- retained administration display context (openSiteManager from a consumer).
+function WTDialogLoader.showSiteList(system, focusSiteId, clearAdmin)
+    if not WTDialogLoader.ensureSiteLoaded() then return false end
+    local inst = WTDialogLoader.siteListInstance
+    if inst and inst.setSystem then inst:setSystem(system, focusSiteId, clearAdmin) end
+    local ok, err = pcall(function() g_gui:showDialog("WTSiteListDialog") end)
+    if not ok then
+        wtLog("ERROR showing WTSiteListDialog: " .. tostring(err))
+        return false
+    end
+    if inst and inst.system and inst.refresh then inst:refresh() end
+    return true
+end
+
+function WTDialogLoader.showSiteEdit(system, site, isNew, adminFarmId)
+    if not WTDialogLoader.ensureSiteLoaded() then return false end
+    local inst = WTDialogLoader.siteEditInstance
+    if inst and inst.setData then inst:setData(system, site, isNew, adminFarmId) end
+    local ok, err = pcall(function() g_gui:showDialog("WTSiteEditDialog") end)
+    if not ok then
+        wtLog("ERROR showing WTSiteEditDialog: " .. tostring(err))
+        return false
+    end
+    return true
+end
+
+--- A replaced replica refreshes an open site manager.
+function WTDialogLoader.refreshSiteList()
+    local inst = WTDialogLoader.siteListInstance
+    if inst ~= nil and inst.system ~= nil and inst.refresh ~= nil and g_gui ~= nil and g_gui.getIsDialogVisible ~= nil then
+        pcall(function() if g_gui:getIsDialogVisible() then inst:refresh() end end)
+    end
 end
 
 print("[WorkplaceTriggers] WTDialogLoader loaded")

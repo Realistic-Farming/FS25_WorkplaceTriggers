@@ -44,6 +44,16 @@ if modDirectory then
     print("[WorkplaceTriggers] Loading source files...")
 
     source(modDirectory .. "src/WTMapHotspot.lua")
+    -- WT-8 named farm sites: the registry exports at source time so a consumer
+    -- can register a purpose before or after this mod finishes loading; the
+    -- event classes register at file load like every native event.
+    source(modDirectory .. "src/WorkplaceSiteRegistry.lua")
+    source(modDirectory .. "src/WorkplaceSiteStore.lua")
+    source(modDirectory .. "src/WorkplaceSiteEvents.lua")
+    source(modDirectory .. "src/WorkplaceSiteService.lua")
+    source(modDirectory .. "src/WorkplaceSiteClient.lua")
+    source(modDirectory .. "src/WTSiteListDialog.lua")
+    source(modDirectory .. "src/WTSiteEditDialog.lua")
     source(modDirectory .. "src/WorkplaceTriggerManager.lua")
     source(modDirectory .. "src/WorkplaceShiftTracker.lua")
     source(modDirectory .. "src/WorkplaceFinanceIntegration.lua")
@@ -552,6 +562,18 @@ local function registerControlCenterActions()
         run = function()
             if workplaceSystem ~= nil and workplaceSystem.onMenuPressed ~= nil then
                 workplaceSystem:onMenuPressed()
+            end
+        end,
+    })
+
+    -- WT-8: the site manager as its own Control Center row.
+    registry.registerAction({
+        action     = "WT_SITES",
+        button     = "Open",
+        closeFirst = true,
+        run = function()
+            if workplaceSystem ~= nil and workplaceSystem.onSitesPressed ~= nil then
+                workplaceSystem:onSitesPressed()
             end
         end,
     })

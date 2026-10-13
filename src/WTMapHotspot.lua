@@ -41,6 +41,10 @@ WTMapHotspot.C_IDLE_TXT  = {0.85, 1.00, 0.88, 0.95}   -- label
 WTMapHotspot.C_ACT       = {1.00, 0.75, 0.10, 1.00}
 WTMapHotspot.C_ACT_TXT   = {1.00, 0.96, 0.70, 0.98}
 
+-- Named farm site (WT-8): blue, a place marker rather than a job offer.
+WTMapHotspot.C_SITE      = {0.25, 0.55, 0.95, 1.00}
+WTMapHotspot.C_SITE_TXT  = {0.80, 0.90, 1.00, 0.95}
+
 -- Constructor
 function WTMapHotspot.new(modDirectory)
     local self = setmetatable({}, WTMapHotspot_mt)
@@ -49,6 +53,7 @@ function WTMapHotspot.new(modDirectory)
     self.worldX         = 0
     self.worldZ         = 0
     self.name           = "Workplace"
+    self.style          = "workplace"   -- or "site" (WT-8)
     self._iconOverlay   = nil
     self._bgOverlay     = nil    -- plain-colour fallback background
     self._overlaysReady = false
@@ -66,6 +71,12 @@ end
 
 function WTMapHotspot:setIsActive(active)
     self.isActive = active == true
+end
+
+--- "workplace" (default) or "site": a site draws in the site colours and
+--- never takes the active-shift tint.
+function WTMapHotspot:setStyle(style)
+    self.style = (style == "site") and "site" or "workplace"
 end
 
 -- Overlay lazy init
@@ -130,6 +141,10 @@ function WTMapHotspot:drawOnMap(map)
 
     local iconC = self.isActive and WTMapHotspot.C_ACT     or WTMapHotspot.C_IDLE
     local txtC  = self.isActive and WTMapHotspot.C_ACT_TXT or WTMapHotspot.C_IDLE_TXT
+    if self.style == "site" then
+        iconC = WTMapHotspot.C_SITE
+        txtC  = WTMapHotspot.C_SITE_TXT
+    end
 
     -- Draw icon (mod PNG on top of a coloured background square)
     if self._bgOverlay then
@@ -150,7 +165,7 @@ function WTMapHotspot:drawOnMap(map)
         setTextBold(true)
         renderText(sx + WTMapHotspot.ICON_W * 0.5,
                    sy + (WTMapHotspot.ICON_H - WTMapHotspot.TEXT_SIZE) * 0.5,
-                   WTMapHotspot.TEXT_SIZE, "W")
+                   WTMapHotspot.TEXT_SIZE, self.style == "site" and "S" or "W")
         setTextBold(false)
         setTextColor(1, 1, 1, 1)
         setTextAlignment(RenderText.ALIGN_LEFT)

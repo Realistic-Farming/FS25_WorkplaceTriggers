@@ -41,6 +41,12 @@ function WorkplaceSystem.new(mission, modDirectory, modName)
     self.npcFavorIntegration = NPCFavorIntegration.new(self)
     self.workerCostsInteg    = WorkerCostsIntegration.new(self)
 
+    -- WT-8: named farm sites. The service is the server-side provider, the
+    -- client is every presentation context's replica (host included).
+    self.siteService = WorkplaceSiteService.new(self)
+    self.siteClient  = WorkplaceSiteClient.new(self)
+    WorkplaceSiteService.installAdapters(self, self)
+
     wtLog("WorkplaceSystem created")
     return self
 end
@@ -114,6 +120,12 @@ function WorkplaceSystem:onMissionLoaded()
     if WTNetworkSyncBridge    ~= nil then WTNetworkSyncBridge.register()    end
     if WorkplaceSettingsHubBridge ~= nil then WorkplaceSettingsHubBridge.register() end
     if WorkplaceMasterHUDBridge  ~= nil then WorkplaceMasterHUDBridge.register()  end
+
+    -- WT-8: own site container (ledger module + own XML), staged now and
+    -- finalized at the mission's loading boundary; the client replica asks
+    -- for its view after the join warm-up.
+    if self.siteService ~= nil then self.siteService:initialize() end
+    if self.siteClient  ~= nil then self.siteClient:initialize()  end
 end
 
 -- =========================================================
@@ -133,6 +145,7 @@ function WorkplaceSystem:update(dt)
     self.shiftTracker:update(dtSec)
     self.hud:update(dtSec)
     self.gui:update(dtSec)
+    if self.siteClient ~= nil then self.siteClient:update(dtSec) end
 end
 
 -- =========================================================
@@ -186,6 +199,16 @@ function WorkplaceSystem:saveToXMLFile(missionInfo)
     if self.saveLoad then
         self.saveLoad:saveToXMLFile(missionInfo)
     end
+    -- WT-8: the site container has its own file; the wage writer above never opens it.
+    if self.siteService ~= nil then
+        pcall(function() self.siteService:saveToXMLFile(missionInfo) end)
+    end
+end
+
+--- WT-8: open the site manager (menu entry, console, Control Center).
+function WorkplaceSystem:onSitesPressed()
+    if not self.isInitialized or self.siteClient == nil then return false end
+    return self.siteClient:openSiteManager(nil)
 end
 
 function WorkplaceSystem:loadFromXMLFile(missionInfo)
@@ -223,7 +246,13 @@ function WorkplaceSystem:registerConsoleCommands()
     addConsoleCommand("wtList",   "Workplace Triggers - list all placed triggers",   "consoleWTList",   self)
     addConsoleCommand("wtDebug",  "Workplace Triggers - toggle debug logging",        "consoleWTDebug",  self)
     addConsoleCommand("wtGui",    "Workplace Triggers - toggle the GUI manager",      "consoleWTGui",    self)
+    addConsoleCommand("wtSites",  "Workplace Triggers - open the farm site manager",  "consoleWTSites",  self)
     wtLog("Console commands registered")
+end
+
+function WorkplaceSystem:consoleWTSites()
+    if not self.isInitialized then return "System not initialized" end
+    return self:onSitesPressed() and "Site manager opened" or "Site manager unavailable"
 end
 
 function WorkplaceSystem:consoleWTGui()
@@ -238,6 +267,7 @@ function WorkplaceSystem:consoleWTHelp()
     print("  wtStatus - Show current shift status")
     print("  wtList   - List all placed workplace triggers")
     print("  wtDebug  - Toggle debug mode")
+    print("  wtSites  - Open the farm site manager")
     return "Commands listed above"
 end
 
@@ -294,8 +324,11 @@ function WorkplaceSystem:delete()
     if self.settingsIntegration then self.settingsIntegration:delete() end
     if self.npcFavorIntegration then self.npcFavorIntegration:delete() end
     if self.workerCostsInteg    then self.workerCostsInteg:delete()    end
+    if self.siteClient  then self.siteClient:delete()  end
+    if self.siteService then self.siteService:delete() end
 
     removeConsoleCommand("wtHelp")
+    removeConsoleCommand("wtSites")
     removeConsoleCommand("wtStatus")
     removeConsoleCommand("wtList")
     removeConsoleCommand("wtDebug")
