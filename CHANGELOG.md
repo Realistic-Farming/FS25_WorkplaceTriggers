@@ -13,6 +13,17 @@ the repo's git history and README.
 
 ## [Unreleased]
 
+## [1.2.0.0] - 2026-10-12
+
+> **This is not a final release.** It gives everyone, testers and players, new or returning, everything we have built so far, so nobody has to wait on an old version any longer. The Realistic Farming suite is far from done: we are still building and expanding every mod, and completing it could take months, possibly a year. Expect changes and rough edges along the way, and please report anything that looks wrong.
+
+### Added
+- Named farm sites: mark and name places on your farm (a yard, a storage area, a field entrance) separately from wage triggers. Open them from the Farm Sites entry in the Workplace list or the Control Center; your farm's sites show on the map in blue.
+
+### Changed
+- Key defaults no longer collide with other suite mods: workplace interaction is now Right Ctrl + K and the Workplace HUD toggle is Right Ctrl + I (HUD edit stays Right Shift + C). Your own saved key bindings are not touched.
+- Translated help and store text is kept as it was.
+
 ### Added
 - **Named farm sites (WT-8).** A second kind of named place beside wage triggers: a farm-owned circle with a name and a purpose, no wage, shift or capacity. Sites live in their own save container (StateLedger module `WorkplaceTriggers_Sites` and `FS25_WorkplaceTriggers_Sites.xml`), reach each farm's players privately through the mod's own event pair, and are created, edited, deleted and (by a server administrator) transferred through a sessioned command channel gated by the native farm permission. The Workplace Manager gains a Farm Sites entry with a sibling site manager and editor; own-farm sites draw on the map in blue. Consumers read them through `mission.workplaceTriggers` (`registerSitePurpose`, `getSiteCapabilities`, `getSitesForFarm`, `getSite`, `subscribeSiteChanges`, `unsubscribeSiteChanges`, `openSiteManager`).
 - Changelog file established (suite ruling 2026-08-22).
