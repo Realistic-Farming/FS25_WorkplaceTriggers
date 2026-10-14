@@ -49,3 +49,9 @@
 - [x] `modDesc.xml`: WT_INTERACT on Right Ctrl + K, WT_MENU on Right Shift + Y, WT_TOGGLE_HUD on Right Ctrl + I; the de, en, fr, it, nl and pl translation files.
 - [ ] The localized Help pages and shop text still name E for the interact in de, fr, it, nl and pl (MAINTENANCE row 301, parked: later, not queued).
 - [~] In game (owed): TESTING row 543.
+
+## 2026-10-14 (Fred (via Desk)): build packaging (MAINTENANCE row 314)
+
+- [x] `build.sh`: keeps the `.git` file out of the zip on both paths, and its Python fallback (taken when there is no `zip` command, as in Git Bash) names the zip `FS25_WorkplaceTriggers.zip` instead of after the folder, so `--deploy` copies the zip it just built rather than a missing or stale one.
+- [x] Built from a worktree (Python fallback; this machine's Git Bash has no `zip`) before and after this change: development wrote `bf-WorkplaceTriggers.zip`, named after the folder, with 45 entries, one of them the worktree `.git` file; this branch writes `FS25_WorkplaceTriggers.zip` with 44, exactly that file removed, every other entry byte-identical (CRC), nothing added. The `zip` command path gets the same `.git` exclusion but was not run here.
+- Build tooling only, no in-game check (TESTING row 576).
