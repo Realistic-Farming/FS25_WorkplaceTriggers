@@ -42,3 +42,8 @@
 
 ## 2026-08-31 (Fred): double payout fixed (issue #29)
 - [x] Shift end no longer pays twice. Root cause: the NetworkSync bridge's `onShiftEnd` paid once via `endShiftForFarm`, then cleared the local farm's single-slot mirror by calling `endShift()`/`endShiftPenalty()`, which paid a second time via `addMoney` (server-gated, so both fired on the host). `endShift`/`endShiftPenalty` now take a `skipPayout` flag; the bridge's mirror-clear and the trigger-delete finish pass `true`, so they reset state and update the host HUD without a second payment or duplicate history/integration row. In-game verification pending.
+
+## 2026-10-14 (Fred (via Desk)): keyboard defaults (Wizard, #39)
+
+- [x] Interact moves from E to Right Ctrl + K, the menu is bound to Right Shift + Y (it was unbound), and Toggle HUD moves from Right Shift + K (Soil's Scout) to Right Ctrl + I; HUD edit stays on Right Shift + C. The in-world prompts drop their '[E]' in German, French, Italian, Dutch and Polish, and the mod description names the control; three rf_live_key_* strings are added with no reader in this mod. (Wizard's #39, merged at fc9c9340 on 2026-10-11, one PR of his keyboard-defaults wave.)
+- The in-game check is TESTING row 543. Docs by Fred's catch-up (R-51), on Tyson's word of 2026-10-14.
