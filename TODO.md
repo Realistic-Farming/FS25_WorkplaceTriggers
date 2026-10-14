@@ -43,3 +43,9 @@
 - [x] F145: registerTrigger id de-dup. The placeable and standalone-XML load both registered the same trigger; the purpose designation landed on the purposeless duplicate. Replaces in place so the newest data wins.
 - [x] F144: rotY was saved but never read on load, so trigger orientation reset on reload. Read and restore it.
 - [x] Action-guard nil-userId: the trigger CRUD admin check skipped the guard when userId == nil (listen-server host). Nil now resolves as host-admin (SettingsHub pattern).
+
+## 2026-10-14 (Fred (via Desk)): keyboard defaults (Wizard, #39)
+
+- [x] `modDesc.xml`: WT_INTERACT on Right Ctrl + K, WT_MENU on Right Shift + Y, WT_TOGGLE_HUD on Right Ctrl + I; the de, en, fr, it, nl and pl translation files.
+- [ ] The localized Help pages and shop text still name E for the interact in de, fr, it, nl and pl (MAINTENANCE row 301, parked: later, not queued).
+- [~] In game (owed): TESTING row 543.
