@@ -47,3 +47,8 @@
 
 - [x] Interact moves from E to Right Ctrl + K, the menu is bound to Right Shift + Y (it was unbound), and Toggle HUD moves from Right Shift + K (Soil's Scout) to Right Ctrl + I; HUD edit stays on Right Shift + C. The in-world prompts drop their '[E]' in German, French, Italian, Dutch and Polish, and the mod description names the control; three rf_live_key_* strings are added with no reader in this mod. (Wizard's #39, merged at fc9c9340 on 2026-10-11, one PR of his keyboard-defaults wave.)
 - The in-game check is TESTING row 543. Docs by Fred's catch-up (R-51), on Tyson's word of 2026-10-14.
+
+## 2026-10-14 (Fred (via Desk)): the build script packs only the mod (MAINTENANCE row 314)
+
+- [x] `build.sh` keeps the `.git` file out of the zip on both paths, and its Python fallback (taken when there is no `zip` command, as in Git Bash) names the zip `FS25_WorkplaceTriggers.zip` instead of after the folder, so `--deploy` copies the zip it just built rather than a missing or stale one.
+- Build tooling only, no in-game check (TESTING row 576). Found by a fleet sweep that built every mod once from development in a throwaway worktree, on Tyson's word of 2026-10-14.
